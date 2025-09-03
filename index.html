@@ -1,16 +1,231 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <title>My Portfolio</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS180 Project 0 — Becoming Friends with Your Camera</title>
+  <meta name="description" content="CS180 Proj0: Selfie perspective, architectural perspective compression, and a dolly zoom GIF." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #111836;
+      --muted: #a0aec0;
+      --ink: #e6eefc;
+      --accent: #8ab4ff;
+      --accent2: #70f3c4;
+      --ring: rgba(138, 180, 255, 0.45);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink); background: radial-gradient(1200px 600px at 20% -10%, #18224a 0%, transparent 60%),
+                          radial-gradient(900px 500px at 120% 10%, rgba(112,243,196,0.15) 0%, transparent 60%),
+                          var(--bg);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Layout */
+    .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    header {
+      padding: 48px 0 24px; position: sticky; top: 0; backdrop-filter: saturate(150%) blur(10px);
+      background: linear-gradient(to bottom, rgba(11,16,32,0.8), rgba(11,16,32,0.3), transparent);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      z-index: 20;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand .dot { width: 10px; height: 10px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 0 0 6px rgba(138,180,255,0.15); }
+    .brand h1 { font-size: 18px; margin: 0; font-weight: 700; letter-spacing: 0.2px; }
+
+    .hero { padding: 32px 0 12px; }
+    .title { font-size: clamp(28px, 4vw, 44px); line-height: 1.1; margin: 6px 0 10px; font-weight: 800; }
+    .subtitle { color: var(--muted); max-width: 70ch; }
+    .meta { margin-top: 10px; color: #cbd5e1; font-size: 14px; display:inline-flex; gap: 12px; align-items:center }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); }
+
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+    .section { margin: 30px 0; }
+    .section h2 { margin: 0 0 8px; font-size: clamp(22px, 3vw, 28px); }
+    .section p.lead { margin-top: 0; color: #cbd5e1; }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 860px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+
+    figure { margin: 0; display: grid; gap: 8px; }
+    figure img, video { width: 100%; height: auto; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); display:block; }
+    figcaption { font-size: 14px; color: var(--muted); }
+
+    /* Details */
+    .details { display: grid; gap: 8px; margin-top: 8px; }
+    .details .row { display:flex; gap:10px; flex-wrap:wrap }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1) }
+
+    /* Footer */
+    footer { margin: 40px 0 60px; color: var(--muted); text-align: center; font-size: 14px; }
+
+    /* Simple lightbox on click */
+    .lightbox img { cursor: zoom-in; }
+    .lightbox.open { position: fixed; inset: 0; background: rgba(7,10,22,0.85); display: grid; place-items: center; padding: 40px; z-index: 50; }
+    .lightbox.open img { max-width: min(1200px, 92vw); max-height: 90vh; border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.55); cursor: zoom-out; }
+  </style>
 </head>
 <body>
-    <h1>Welcome to My CS180 Portfolio!</h1>
-    <a href="./1/index.html">Project 1</a>
+  <header>
+    <div class="container brand">
+      <span class="dot" aria-hidden="true"></span>
+      <h1>CS180 · Project 0</h1>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="card">
+        <h2 class="title">Becoming Friends with Your Camera</h2>
+        <p class="subtitle">Exploring perspective, focal length/zoom, and the center of projection through three mini‑experiments: portrait perspective, architectural compression, and a classic dolly zoom.</p>
+        <div class="meta">
+          <span class="pill">Course: CS180 — Intro to Computer Vision & Computational Photography</span>
+          <span class="pill">Project #0</span>
+          <span class="pill">Author: <strong>Your Name</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Overview / Thoughts -->
+    <section class="section">
+      <div class="card">
+        <h2>Overview & Key Idea</h2>
+        <p class="lead">The apparent “distortion” in portraits and the “compression” in telephoto scenes arise primarily from <strong>camera position (perspective)</strong>, not the lens itself. Changing focal length changes framing; changing distance changes perspective. Below, I reproduce three setups that illustrate this distinction.</p>
+      </div>
+    </section>
+
+    <!-- Part 1: Selfie (Wrong vs Right) -->
+    <section class="section">
+      <div class="card">
+        <h2>Part 1 — Portrait Perspective: Close vs. Step‑Back + Zoom</h2>
+        <p class="lead">First, I shot a close selfie (or a close portrait). Then I stepped back several feet and used zoom to match the framing. Notice how facial proportions look more natural when I keep the framing but change the camera position.</p>
+        <div class="grid two">
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <!-- Replace src with your actual image path -->
+            <img src="images/selfie_close.jpg" alt="Close-up portrait with wide perspective." loading="lazy" />
+            <figcaption>Close‑up portrait (short distance). Features appear exaggerated (e.g., larger nose relative to ears).</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="images/selfie_zoom.jpg" alt="Portrait from farther distance with zoom, matching framing." loading="lazy" />
+            <figcaption>Step‑back + zoom to match framing. Proportions look more neutral due to longer working distance.</figcaption>
+          </figure>
+        </div>
+        <div class="details">
+          <div class="row">
+            <span class="kbd">Camera: …</span>
+            <span class="kbd">Focal: …mm equiv</span>
+            <span class="kbd">Distance: ~… m</span>
+            <span class="kbd">f/…, 1/…, ISO …</span>
+          </div>
+          <p style="margin:6px 0 0;color:#cbd5e1">Observation: Keeping the face the same size in the frame while changing distance alters perspective (relative sizes of near vs. far features).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Part 2: Architectural Perspective Compression -->
+    <section class="section">
+      <div class="card">
+        <h2>Part 2 — Architectural Perspective Compression</h2>
+        <p class="lead">I photographed a receding scene two ways: (A) from a distance with more zoom, and (B) from closer with less (or no) zoom, keeping the overall framing similar. The distant viewpoint makes parallel lines appear “flatter” (compressed depth).</p>
+        <div class="grid two">
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="images/street_tele.jpg" alt="Telephoto framing of a street from far away." loading="lazy" />
+            <figcaption>Telephoto from afar: background objects appear closer to foreground — classic perspective compression.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="images/street_wide.jpg" alt="Wide-angle framing of a street from up close." loading="lazy" />
+            <figcaption>Wide from up close with similar framing: stronger convergence of lines; scene feels deeper.</figcaption>
+          </figure>
+        </div>
+        <div class="details">
+          <div class="row">
+            <span class="kbd">Camera: …</span>
+            <span class="kbd">Tele: …mm</span>
+            <span class="kbd">Wide: …mm</span>
+            <span class="kbd">Aperture/Shutter/ISO: …</span>
+          </div>
+          <p style="margin:6px 0 0;color:#cbd5e1">Note: The “compression” is a consequence of the far vantage point (rays are more parallel), not a magical property of the focal length alone.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Part 3: Dolly Zoom -->
+    <section class="section">
+      <div class="card">
+        <h2>Part 3 — The Dolly Zoom (a.k.a. “Vertigo Shot”)</h2>
+        <p class="lead">I created a dolly zoom by moving the camera backward while simultaneously zooming in, keeping the subject roughly the same size across frames. The changing perspective against a stable subject produces a cinematic “push‑pull” effect.</p>
+        <figure class="lightbox" style="margin-top:10px" onclick="openLightbox(event)">
+          <!-- Replace with your exported animated GIF -->
+          <img src="images/dolly_zoom.gif" alt="Animated GIF showing a dolly zoom sequence." loading="lazy" />
+          <figcaption>Animated sequence (4–8+ frames). Tip: keep the subject centered and frame size consistent for a smoother effect.</figcaption>
+        </figure>
+        <div class="details">
+          <div class="row">
+            <span class="kbd">Frames: 6</span>
+            <span class="kbd">Focal range: …mm → …mm</span>
+            <span class="kbd">Path: ~… m backward</span>
+          </div>
+          <p style="margin:6px 0 0;color:#cbd5e1">Export suggestion: Use an editor (e.g., Photos app, ImageMagick, or Photoshop) to combine frames into a GIF at ~8–12 fps.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reflection / Takeaways -->
+    <section class="section">
+      <div class="card">
+        <h2>Reflection & Takeaways</h2>
+        <ul>
+          <li>Perspective is governed by <strong>camera position</strong>. Focal length changes framing and sampling, not relative geometry.</li>
+          <li>Portraits generally benefit from more working distance — more flattering proportions.</li>
+          <li>Telephoto “compression” is the distant viewpoint visualized.</li>
+          <li>The dolly zoom keeps subject size constant while perspective shifts underneath — a dramatic contrast cue.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Appendix: How I Shot This -->
+    <section class="section">
+      <div class="card">
+        <h2>Appendix — Workflow Notes</h2>
+        <ol>
+          <li><strong>Shooting</strong>: Locked exposure when possible; tried to maintain consistent framing between pairs.</li>
+          <li><strong>Culling</strong>: Picked the cleanest two per pair with consistent subject size and horizon.</li>
+          <li><strong>Edits</strong>: Minor global exposure/white balance; no geometry warps.</li>
+          <li><strong>Export</strong>: JPGs at ~2000px on long edge; GIF at ~10 fps.</li>
+        </ol>
+        <p style="color:#cbd5e1">Replace the placeholder EXIF tags above with your camera details, or remove them if not applicable.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container">
+    <p>
+      Prepared for <a href="https://cal-cs180.github.io/fa25/hw/proj0/index.html">CS180 Project 0</a>. Print this page to PDF with the URL enabled in your browser’s print dialog.
+    </p>
+  </footer>
+
+  <script>
+    // Minimal “lightbox”: clicking any figure toggles a full-screen preview.
+    function openLightbox(e) {
+      const fig = e.currentTarget;
+      fig.classList.add('open');
+      function close(ev) {
+        if (ev.target.tagName === 'IMG' || ev.target === fig) {
+          fig.classList.remove('open');
+          fig.removeEventListener('click', close);
+        }
+      }
+      fig.addEventListener('click', close);
+    }
+  </script>
 </body>
 </html>
