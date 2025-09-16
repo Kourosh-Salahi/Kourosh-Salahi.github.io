@@ -105,7 +105,6 @@
         <a href="../0/">Project 0</a>
         <a href="#results-single">Single‑Scale</a>
         <a href="#results-pyramid">Pyramid</a>
-        <a href="#bells">Bells & Whistles</a>
       </nav>
     </div>
   </header>
@@ -163,7 +162,7 @@
 
 <h3 style="margin:12px 0 6px">2) Single‑Scale Exhaustive Search</h3>
 <ul>
-<li>For each channel <em>C ∈ {G,R}</em>, search integer displacements with np.roll <code>(dx,dy) ∈ [−w,w]</code>.</li>
+<li>For each channel <em>C ∈ {G,R}</em>, search integer displacements with np.roll <code>(dx,dy) ∈ [−w,w], where w is the displacement window that is being searched</code>.</li>
 <li><strong>NCC:</strong> <code>⟨B̂, Ĉ⟩ = (B)·(C) / (‖B‖‖C‖)</code>. Calculated by flattening channels into vectors. Higher is better.</li>
 <li>Pick the displacement with the best score and record <code>(dx,dy)</code> for R→B and G→B.</li>
 </ul>
@@ -234,7 +233,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 <section class="section" id="results-pyramid">
 <div class="card">
 <h2>Results — Multi‑Scale Pyramid (Mandatory Set)</h2>
-<p class="lead"><em>Placeholder:</em> This is where you would summarize the pyramid results and overall performance on the required images.</p>
+<p class="lead">Some very nice recolored images!</p>
 <div class="grid three" style="margin-bottom:12px">
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/church_recolored.jpg" alt="church — pyramid result" loading="lazy" />
@@ -242,7 +241,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/emir_recolored.jpg" alt="emir — pyramid result" loading="lazy" />
-<figcaption><strong>emir.tif</strong> — A man with significant swagger. Slight misalignment visible.</figcaption>
+<figcaption><strong>emir.tif</strong> — A man with significant swagger.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/harvesters_recolored.jpg" alt="harvesters — pyramid result" loading="lazy" />
@@ -258,11 +257,11 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/lastochikino_recolored.jpg" alt="lastochikino — pyramid result" loading="lazy" />
-<figcaption><strong>lastochikino.tif</strong> — Mountain side.</figcaption>
+<figcaption><strong>lastochikino.tif</strong> — A Mountain side.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/lugano_recolored.jpg" alt="lugano — pyramid result" loading="lazy" />
-<figcaption><strong>lugano.tif</strong> — Peaceful Lake.</figcaption>
+<figcaption><strong>lugano.tif</strong> — A Peaceful Lake.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/melons_recolored.jpg" alt="melons — pyramid result" loading="lazy" />
@@ -270,7 +269,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/self_portrait_recolored.jpg" alt="self portrait — pyramid result" loading="lazy" />
-<figcaption><strong>self_portrait.tif</strong> — Cool guy in a field.</figcaption>
+<figcaption><strong>self_portrait.tif</strong> — A Cool guy in a field.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/siren_recolored.jpg" alt="siren — pyramid result" loading="lazy" />
@@ -294,7 +293,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 </thead>
 <tbody>
 <tr><td>church.tif</td><td>NCC</td><td>(4, 25)</td><td>(-4, 58)</td><td class="ok">OK</td></tr>
-<tr><td>emir.tif</td><td>NCC</td><td>(24, 49)</td><td>(55, 103)</td><td class="warn">Slightly off</td></tr>
+<tr><td>emir.tif</td><td>NCC</td><td>(24, 49)</td><td>(55, 103)</td><td class="warn">Off</td></tr>
 <tr><td>harvesters.tif</td><td>NCC</td><td>(16, 59)</td><td>(13, 123)</td><td class="ok">OK</td></tr>
 <tr><td>icon.tif</td><td>NCC</td><td>(17, 41)</td><td>(23, 89)</td><td class="ok">OK</td></tr>
 <tr><td>italil.tif</td><td>NCC</td><td>(21, 38)</td><td>(35, 76)</td><td class="ok">OK</td></tr>
@@ -370,7 +369,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 
   <footer class="container">
     <p>
-      Prepared for CS180 Project 1 by Kourosh Andrew Salahi. Images: Prokudin‑Gorskii Collection (Library of Congress). This page is for presentation only; do not upload image assets to Gradescope.
+      Prepared for CS180 Project 1 by Kourosh Andrew Salahi. Images: Prokudin‑Gorskii Collection (Library of Congress).
     </p>
   </footer>
 
