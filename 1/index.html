@@ -141,7 +141,7 @@
         </div>
         <div class="details">
           <div class="callout">
-            <strong>Scoring metrics.</strong> I implemented both <span class="chip">L2 (SSD)</span> and <span class="chip">NCC</span>. For challenging scenes (exposure/contrast shifts), NCC tended to be more stable.
+            <strong>Scoring metrics.</strong> I implemented <span class="chip">NCC</span> as the scoring metric. This worked well throughout.
           </div>
         </div>
       </div>
@@ -151,15 +151,17 @@
     <section class="section" id="method">
       <div class="card">
         <h2>Method</h2>
-        <p class="lead"><em>Placeholder:</em> This is where you would describe your approach at a high level (single‑scale search and pyramid speed‑up), without revealing answers here.</p>
+        <p class="lead">At a high level the recolorization was broken into a few steps. First the image was seperated into the R, G, and B channels. 
+          Then, the image was preprocessed using a simple cropping algorithm (shaving 10 or 20% off the edges to remove the impact of borders on the scoring). Next the program would either go through single scale or multi-scale scoring, and return the best x and y displacements for the R and G channel. 
+          The final image was then returned by rolling each channel by the amount returned by the align function. </p>
         <div class="grid two">
           <div>
             <h3 style="margin:0 0 6px">Single‑Scale (Baseline)</h3>
             <ul style="margin-top:8px">
-              <li><em>Placeholder:</em> Explain how you split the plate into B/G/R.</li>
-              <li><em>Placeholder:</em> Explain the search window you chose and why.</li>
-              <li><em>Placeholder:</em> State which metric(s) you used (L2/NCC) and why.</li>
-              <li><em>Placeholder:</em> Mention border cropping / scoring strategy.</li>
+              <li>Split the original image into thirds, changing each pixel to a float for easier calculations</li>
+              <li>Used a 15 pixel wide search window so as to balance efficiency with thoroughness</li>
+              <li>Used an NCC metric to score the displacement on how good the resulting alignment was.</li>
+              <li>Used Cropping to preprocess then rebuilt using displacements. </li>
             </ul>
             <h3 style="margin:12px 0 6px">Coarse‑to‑Fine Pyramid</h3>
             <ul>
