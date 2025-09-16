@@ -150,30 +150,28 @@
 <section class="section" id="method">
 <div class="card">
 <h2>Method</h2>
-<p class="lead">Below is the end‑to‑end pipeline I used. It starts with a simple translation‑only matcher and extends it with a pyramid for efficiency and robustness on high‑resolution plates.</p>
+<p class="lead">Below is the end‑to‑end pipeline I used.</p>
 <div class="grid two">
 <div>
 <h3 style="margin:0 0 6px">1) Preprocessing</h3>
 <ul style="margin-top:8px">
 <li><strong>Split B/G/R:</strong> Each input plate is divided into three equal vertical slices in B→G→R order.</li>
-<li><strong>Type/scale:</strong> Convert to <code>float</code> in [0,1] to make metrics comparable across images.</li>
+<li><strong>Type/scale:</strong> Convert to <code>float</code> to make metrics comparable across images.</li>
 <li><strong>Interior crop for scoring:</strong> Ignore ~10% borders on each side when computing alignment scores to avoid frame artifacts and scan edges.</li>
-<li><strong>Optional normalization for NCC:</strong> Subtract mean and divide by std of the crop; improves stability under exposure shifts.</li>
 </ul>
 
 
 <h3 style="margin:12px 0 6px">2) Single‑Scale Exhaustive Search</h3>
 <ul>
-<li>For each channel <em>C ∈ {G,R}</em>, search integer displacements <code>(dx,dy) ∈ [−w,w]</code>.</li>
-<li><strong>L2 (SSD):</strong> <code>‖B−C‖²</code> on the interior crop. Lower is better.</li>
-<li><strong>NCC:</strong> <code>⟨B̂, Ĉ⟩ = (B−μB)·(C−μC) / (‖B−μB‖‖C−μC‖)</code>. Higher is better.</li>
-<li>Pick the displacement with the best score and record <code>(dx,dy)</code> for G→B and R→B.</li>
+<li>For each channel <em>C ∈ {G,R}</em>, search integer displacements with np.roll <code>(dx,dy) ∈ [−w,w]</code>.</li>
+<li><strong>NCC:</strong> <code>⟨B̂, Ĉ⟩ = (B)·(C) / (‖B‖‖C‖)</code>. Calculated by flattening channels into vectors. Higher is better.</li>
+<li>Pick the displacement with the best score and record <code>(dx,dy)</code> for R→B and G→B.</li>
 </ul>
 
 
 <h3 style="margin:12px 0 6px">3) Coarse‑to‑Fine Image Pyramid</h3>
 <ul>
-<li><strong>Build pyramid:</strong> Repeatedly downsample by 2 (with anti‑aliasing) until <code>min(H,W) ≲ 200</code>.</li>
+<li><strong>Build pyramid:</strong> Repeatedly downsample by 2 (with anti‑aliasing) until 1/16.</li>
 <li><strong>Coarsest match:</strong> Run the single‑scale matcher to get an initial <code>(dx,dy)</code>.</li>
 <li><strong>Upscale & refine:</strong> Multiply displacements by 2 when moving up a level and refine in a small window (e.g., ±4) around the upscaled estimate.</li>
 <li><strong>Rationale:</strong> The pyramid reduces the number of candidate shifts dramatically while avoiding local minima from large motions.</li>
@@ -191,37 +189,9 @@
 <ul>
 <li><strong>Metric choice:</strong> NCC is generally more robust when channels have different brightness/contrast; L2 serves as a simple baseline.</li>
 <li><strong>Interior crop:</strong> Ignoring borders prevents frame edges from dominating the score and helps with plates that include thick margins.</li>
-<li><strong>Gradients (optional):</strong> On very challenging images, comparing Sobel/Scharr edge maps instead of raw intensities reduces sensitivity to color/exposure differences.</li>
 <li><strong>Vectorization:</strong> All per‑candidate scores are computed with NumPy operations; loops only iterate over candidate shifts.</li>
 </ul>
 
-
-<h3 style="margin:12px 0 6px">Complexity & Performance</h3>
-<ul>
-<li>Single‑scale cost is <code>O((2w+1)^2 · H · W)</code> per channel; the pyramid cuts both the search window and image size at coarse levels.</li>
-<li>With fixed parameters across the dataset, runtime stays practical while meeting the assignment guidance (aim &lt;≈ 1 min/image).</li>
-</ul>
-
-
-<h3 style="margin:12px 0 6px">Pseudocode (High Level)</h3>
-<pre><code>def match_single_scale(B, C, metric, win, crop=0.10):
-best = (0, 0); best_score = -inf if metric=='ncc' else +inf
-for dy in range(-win, win+1):
-for dx in range(-win, win+1):
-s = score(B, shift(C, dx, dy), metric, crop)
-if better(s, best_score, metric):
-best, best_score = (dx, dy), s
-return best
-
-
-def match_pyramid(B, C, metric, win=15, refine=4):
-if min(B.shape) &lt; 200:
-return match_single_scale(B, C, metric, win)
-Bc, Cc = downsample(B), downsample(C)
-dx, dy = match_pyramid(Bc, Cc, metric, win, refine)
-dx, dy = 2*dx, 2*dy
-ddx, ddy = local_refine(B, C, metric, (dx, dy), refine)
-return dx+ddx, dy+ddy</code></pre>
 </div>
 </div>
 </div>
@@ -324,7 +294,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 </thead>
 <tbody>
 <tr><td>church.tif</td><td>NCC</td><td>(4, 25)</td><td>(-4, 58)</td><td class="ok">OK</td></tr>
-<tr><td>emir.tif</td><td>NCC</td><td>(24, 49)</td><td>(55, 103)</td><td class="warn">Note</td></tr>
+<tr><td>emir.tif</td><td>NCC</td><td>(24, 49)</td><td>(55, 103)</td><td class="warn">Slightly off</td></tr>
 <tr><td>harvesters.tif</td><td>NCC</td><td>(16, 59)</td><td>(13, 123)</td><td class="ok">OK</td></tr>
 <tr><td>icon.tif</td><td>NCC</td><td>(17, 41)</td><td>(23, 89)</td><td class="ok">OK</td></tr>
 <tr><td>italil.tif</td><td>NCC</td><td>(21, 38)</td><td>(35, 76)</td><td class="ok">OK</td></tr>
@@ -374,7 +344,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
         <p class="lead">Some images had slight alignment effects that can be attributed to people, animals, or scenes such as water moving in between shots. The only image that seemed to fail completely in aligning was the image of the Emir. I believe this to be due to the following:</p>
         <ul>
           <li><em>Image artifacts:</em> Some channels had scratches while others didn't potentiually causing the optimization function to try to match patterns that didnt actually correspond to real things in the image</li>
-          <li><em>Cross channel brightness</em>The Emir, in his eternal swagger, has a very bright garment, which appears very differently across the different color channels (very bright in Blue and very dark in Red).</li>
+          <li><em>Cross channel brightness: </em>The Emir, in his eternal swagger, has a very bright garment, which appears very differently across the different color channels (very bright in Blue and very dark in Red).</li>
         </ul>
       </div>
     </section>
