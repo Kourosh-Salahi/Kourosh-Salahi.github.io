@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CS180 Project 1 — Colorizing the Prokudin‑Gorskii Photo Collection</title>
-  <meta name="description" content="CS180 Proj1: Single‑scale & multi‑scale (image pyramid) alignment with L2/NCC, plus bells & whistles like auto‑crop, contrast, and white balance." />
+  <meta name="description" content="CS180 Proj1: Single‑scale & multi‑scale (image pyramid) alignment with L2/NCC" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
@@ -114,7 +114,7 @@
     <section class="hero">
       <div class="card">
         <h2 class="title">Colorizing the Prokudin‑Gorskii Photo Collection</h2>
-        <p class="subtitle">Aligning three monochrome glass‑plate channels (B, G, R) into vivid color images using single‑scale search and coarse‑to‑fine image pyramids. Metrics compared: L2 and NCC. Extras include auto‑crop, contrast stretching, and gray‑world white balance.</p>
+        <p class="subtitle">Aligning three monochrome glass‑plate channels (B, G, R) into vivid color images using single‑scale search and coarse‑to‑fine image pyramids. Used NCC in alignment algorithm.</p>
         <div class="meta">
           <span class="pill">Course: CS180 — Intro to Computer Vision & Computational Photography</span>
           <span class="pill">Project #1</span>
@@ -128,14 +128,14 @@
     <section class="section">
       <div class="card">
         <h2>Overview & Key Ideas</h2>
-        <p class="lead"><em>Placeholder:</em> This is where you would briefly summarize the project goals and key ideas you implemented.</p>
+        <p class="lead">Given three images taken in black and white which have R, G, and B filters put on the lenses of the camera, we can use the intensities of the pixel brightness and these three images to reconstruct a color image. Utilizing an alignment algorithm, this was accomplished.</p>
         <div class="grid two">
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/example_plate.jpg" alt="Example glass plate (BGR from top to bottom)." loading="lazy" />
+            <img src="./media/cathedral.jpg" alt="Example glass plate (BGR from top to bottom)." loading="lazy" />
             <figcaption>Input glass plate (top→bottom = B, G, R).</figcaption>
           </figure>
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/example_colorized.jpg" alt="Aligned and colorized output image." loading="lazy" />
+            <img src="./media/cathedral_colorized.jpg" alt="Aligned and colorized output image." loading="lazy" />
             <figcaption>Output after alignment & composition.</figcaption>
           </figure>
         </div>
