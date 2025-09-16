@@ -147,42 +147,92 @@
       </div>
     </section>
 
-    <!-- Method -->
-    <section class="section" id="method">
-      <div class="card">
-        <h2>Method</h2>
-        <p class="lead">At a high level the recolorization was broken into a few steps. First the image was seperated into the R, G, and B channels. 
-          Then, the image was preprocessed using a simple cropping algorithm (shaving 10 or 20% off the edges to remove the impact of borders on the scoring). Next the program would either go through single scale or multi-scale scoring, and return the best x and y displacements for the R and G channel. 
-          The final image was then returned by rolling each channel by the amount returned by the align function. </p>
-        <div class="grid two">
-          <div>
-            <h3 style="margin:0 0 6px">Single‑Scale (Baseline)</h3>
-            <ul style="margin-top:8px">
-              <li>Split the original image into thirds, changing each pixel to a float for easier calculations</li>
-              <li>Used a 15 pixel wide search window so as to balance efficiency with thoroughness</li>
-              <li>Used an NCC metric to score the displacement on how good the resulting alignment was.</li>
-              <li>Used Cropping to preprocess then rebuilt using displacements. </li>
-            </ul>
-            <h3 style="margin:12px 0 6px">Coarse‑to‑Fine Pyramid</h3>
-            <ul>
-              <li><em>Placeholder:</em> Describe how you downsample and how many levels.</li>
-              <li><em>Placeholder:</em> Describe how you propagate and refine displacements.</li>
-              <li><em>Placeholder:</em> Any heuristics (e.g., refine window size).</li>
-            </ul>
-          </div>
-          <div>
-            <p style="margin:8px 0 0" class="muted"><em>Placeholder:</em> Implementation notes (e.g., shifting with np.roll, float conversion).</p>
-          </div>
-        </div>
-      </div>
-    </section>
+<section class="section" id="method">
+<div class="card">
+<h2>Method</h2>
+<p class="lead">Below is the end‑to‑end pipeline I used. It starts with a simple translation‑only matcher and extends it with a pyramid for efficiency and robustness on high‑resolution plates.</p>
+<div class="grid two">
+<div>
+<h3 style="margin:0 0 6px">1) Preprocessing</h3>
+<ul style="margin-top:8px">
+<li><strong>Split B/G/R:</strong> Each input plate is divided into three equal vertical slices in B→G→R order.</li>
+<li><strong>Type/scale:</strong> Convert to <code>float</code> in [0,1] to make metrics comparable across images.</li>
+<li><strong>Interior crop for scoring:</strong> Ignore ~10% borders on each side when computing alignment scores to avoid frame artifacts and scan edges.</li>
+<li><strong>Optional normalization for NCC:</strong> Subtract mean and divide by std of the crop; improves stability under exposure shifts.</li>
+</ul>
+
+
+<h3 style="margin:12px 0 6px">2) Single‑Scale Exhaustive Search</h3>
+<ul>
+<li>For each channel <em>C ∈ {G,R}</em>, search integer displacements <code>(dx,dy) ∈ [−w,w]</code>.</li>
+<li><strong>L2 (SSD):</strong> <code>‖B−C‖²</code> on the interior crop. Lower is better.</li>
+<li><strong>NCC:</strong> <code>⟨B̂, Ĉ⟩ = (B−μB)·(C−μC) / (‖B−μB‖‖C−μC‖)</code>. Higher is better.</li>
+<li>Pick the displacement with the best score and record <code>(dx,dy)</code> for G→B and R→B.</li>
+</ul>
+
+
+<h3 style="margin:12px 0 6px">3) Coarse‑to‑Fine Image Pyramid</h3>
+<ul>
+<li><strong>Build pyramid:</strong> Repeatedly downsample by 2 (with anti‑aliasing) until <code>min(H,W) ≲ 200</code>.</li>
+<li><strong>Coarsest match:</strong> Run the single‑scale matcher to get an initial <code>(dx,dy)</code>.</li>
+<li><strong>Upscale & refine:</strong> Multiply displacements by 2 when moving up a level and refine in a small window (e.g., ±4) around the upscaled estimate.</li>
+<li><strong>Rationale:</strong> The pyramid reduces the number of candidate shifts dramatically while avoiding local minima from large motions.</li>
+</ul>
+
+
+<h3 style="margin:12px 0 6px">4) Composition</h3>
+<ul>
+<li>Shift G and R by the chosen displacements using <code>np.roll</code> (or equivalent) and stack channels into <code>[R,G,B]</code>.</li>
+<li>For visualization, optionally crop outer margins to remove wraparound introduced by shifting.</li>
+</ul>
+</div>
+<div>
+<h3 style="margin:0 0 6px">Scoring Notes & Design Choices</h3>
+<ul>
+<li><strong>Metric choice:</strong> NCC is generally more robust when channels have different brightness/contrast; L2 serves as a simple baseline.</li>
+<li><strong>Interior crop:</strong> Ignoring borders prevents frame edges from dominating the score and helps with plates that include thick margins.</li>
+<li><strong>Gradients (optional):</strong> On very challenging images, comparing Sobel/Scharr edge maps instead of raw intensities reduces sensitivity to color/exposure differences.</li>
+<li><strong>Vectorization:</strong> All per‑candidate scores are computed with NumPy operations; loops only iterate over candidate shifts.</li>
+</ul>
+
+
+<h3 style="margin:12px 0 6px">Complexity & Performance</h3>
+<ul>
+<li>Single‑scale cost is <code>O((2w+1)^2 · H · W)</code> per channel; the pyramid cuts both the search window and image size at coarse levels.</li>
+<li>With fixed parameters across the dataset, runtime stays practical while meeting the assignment guidance (aim &lt;≈ 1 min/image).</li>
+</ul>
+
+
+<h3 style="margin:12px 0 6px">Pseudocode (High Level)</h3>
+<pre><code>def match_single_scale(B, C, metric, win, crop=0.10):
+best = (0, 0); best_score = -inf if metric=='ncc' else +inf
+for dy in range(-win, win+1):
+for dx in range(-win, win+1):
+s = score(B, shift(C, dx, dy), metric, crop)
+if better(s, best_score, metric):
+best, best_score = (dx, dy), s
+return best
+
+
+def match_pyramid(B, C, metric, win=15, refine=4):
+if min(B.shape) &lt; 200:
+return match_single_scale(B, C, metric, win)
+Bc, Cc = downsample(B), downsample(C)
+dx, dy = match_pyramid(Bc, Cc, metric, win, refine)
+dx, dy = 2*dx, 2*dy
+ddx, ddy = local_refine(B, C, metric, (dx, dy), refine)
+return dx+ddx, dy+ddy</code></pre>
+</div>
+</div>
+</div>
+</section>
 
     <!-- Results: Single Scale -->
 <!-- Results: Single Scale -->
 <section class="section" id="results-single">
 <div class="card">
 <h2>Results — Single‑Scale (Low‑Res JPEGs)</h2>
-<p class="lead"><em>Placeholder:</em> This is where you would summarize your single‑scale results and observations. The three low‑res JPEGs have their own section here.</p>
+<p class="lead">These are the single scale images, which were constructed very quickly.</p>
 <div class="grid three">
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/cathedral_recolored.jpg" alt="cathedral — single-scale result" loading="lazy" />
@@ -218,47 +268,47 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 <div class="grid three" style="margin-bottom:12px">
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/church_recolored.jpg" alt="church — pyramid result" loading="lazy" />
-<figcaption><strong>church.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>church.tif</strong> — A beatiful church.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/emir_recolored.jpg" alt="emir — pyramid result" loading="lazy" />
-<figcaption><strong>emir.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>emir.tif</strong> — A man with significant swagger. Slight misalignment visible.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/harvesters_recolored.jpg" alt="harvesters — pyramid result" loading="lazy" />
-<figcaption><strong>harvesters.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>harvesters.tif</strong> — A group of harvesters in a field.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/icon_recolored.jpg" alt="icon — pyramid result" loading="lazy" />
-<figcaption><strong>icon.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>icon.tif</strong> — An extravagant scene. </figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/italil_recolored.jpg" alt="italil — pyramid result" loading="lazy" />
-<figcaption><strong>italil.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>italil.tif</strong> — Another beautiful image.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/lastochikino_recolored.jpg" alt="lastochikino — pyramid result" loading="lazy" />
-<figcaption><strong>lastochikino.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>lastochikino.tif</strong> — Mountain side.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/lugano_recolored.jpg" alt="lugano — pyramid result" loading="lazy" />
-<figcaption><strong>lugano.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>lugano.tif</strong> — Peaceful Lake.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/melons_recolored.jpg" alt="melons — pyramid result" loading="lazy" />
-<figcaption><strong>melons.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>melons.tif</strong> — A melon seller. Significant swagger here as well. </figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/self_portrait_recolored.jpg" alt="self portrait — pyramid result" loading="lazy" />
-<figcaption><strong>self_portrait.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>self_portrait.tif</strong> — Cool guy in a field.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/siren_recolored.jpg" alt="siren — pyramid result" loading="lazy" />
-<figcaption><strong>siren.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>siren.tif</strong> — Pretty flowers.</figcaption>
 </figure>
 <figure class="lightbox" onclick="openLightbox(event)">
 <img src="./media/three_generations_recolored.jpg" alt="three generations — pyramid result" loading="lazy" />
-<figcaption><strong>three_generations.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+<figcaption><strong>three_generations.tif</strong> — A happy family.</figcaption>
 </figure>
 </div>
 <div class="card" style="margin-top:12px">
@@ -292,16 +342,39 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
 
 
 <!-- Extra Images from LoC -->
+<!-- Extra Images from LoC -->
+<section class="section" id="extras">
+<div class="card">
+<h2>Additional Examples — My Own LoC Selections</h2>
+<p class="lead">These four were chosen from the online collection.</p>
+<div class="grid four">
+<figure class="lightbox" onclick="openLightbox(event)">
+<img src="./media/mosque_recolored.jpg" alt="mosque — selection" loading="lazy" />
+<figcaption><strong>mosque.tif</strong> — A deserted mosque — R→B: <code>(11, 70)</code> • G→B: <code>(10, 26)</code></figcaption>
+</figure>
+<figure class="lightbox" onclick="openLightbox(event)">
+<img src="./media/camel_recolored.jpg" alt="camel — selection" loading="lazy" />
+<figcaption><strong>camel.tif</strong> — A man and his camel — R→B: <code>(38, 80)</code> • G→B: <code>(15, 19)</code></figcaption>
+</figure>
+<figure class="lightbox" onclick="openLightbox(event)">
+<img src="./media/mat_recolored.jpg" alt="mat — selection" loading="lazy" />
+<figcaption><strong>mat.tif</strong> — A woman standing on a mat — R→B: <code>(55, 107)</code> • G→B: <code>(38, 48)</code></figcaption>
+</figure>
+<figure class="lightbox" onclick="openLightbox(event)">
+<img src="./media/fire_recolored.jpg" alt="fire — selection" loading="lazy" />
+<figcaption><strong>fire.tif</strong> — People sitting around a fire — R→B: <code>(-39, 82)</code> • G→B: <code>(-11, 44)</code></figcaption>
+</figure>
+</div>
+</div>
 </section>
     <!-- Failures / Analysis -->
     <section class="section" id="failures">
       <div class="card">
         <h2>Failure Cases & Analysis</h2>
-        <p class="lead">The only image that seemed to fail completely in aligning was the image of the Emir. .</p>
+        <p class="lead">Some images had slight alignment effects that can be attributed to people, animals, or scenes such as water moving in between shots. The only image that seemed to fail completely in aligning was the image of the Emir. I believe this to be due to the following:</p>
         <ul>
-          <li><em>Placeholder:</em> Brief description of a failure mode and a potential fix.</li>
-          <li><em>Placeholder:</em> Another failure mode and potential fix.</li>
-          <li><em>Placeholder:</em> Any notes on trade‑offs or parameter sensitivity.</li>
+          <li><em>Image artifacts:</em> Some channels had scratches while others didn't potentiually causing the optimization function to try to match patterns that didnt actually correspond to real things in the image</li>
+          <li><em>Cross channel brightness</em>The Emir, in his eternal swagger, has a very bright garment, which appears very differently across the different color channels (very bright in Blue and very dark in Red).</li>
         </ul>
       </div>
     </section>
@@ -311,9 +384,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
       <div class="card">
         <h2>Reproducibility & Notes</h2>
         <ul>
-          <li><em>Placeholder:</em> Notes on data types, scaling, and performance.</li>
-          <li><em>Placeholder:</em> Notes on fixed parameters used across images.</li>
-          <li><em>Placeholder:</em> Any tips for running your code (without including large files).</li>
+          <li>While the code for this is not publically available, I encourage those who stumble upon this and are not part of CS180 to attempt reimplementing this. It is a very fun exercise! </li>
         </ul>
       </div>
     </section>
@@ -322,7 +393,7 @@ R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <
     <section class="section">
       <div class="card">
         <h2>Thanks for reading! 📷🧮</h2>
-        <p class="lead">Per the assignment: submit code to Gradescope (no large images) and include this webpage URL in both Gradescope and the class gallery form.</p>
+        <p class="lead">I hope you enjoyed reading about my project and viewing these beautiful images :)</p>
       </div>
     </section>
   </main>
