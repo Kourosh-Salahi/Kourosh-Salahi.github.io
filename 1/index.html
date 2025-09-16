@@ -92,6 +92,7 @@
 
     /* Chips */
     .chip { display:inline-flex; align-items:center; gap:8px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); font-size:12px }
+      @media (min-width: 1100px) { .grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; } }
   </style>
 </head>
 <body>
@@ -182,27 +183,27 @@
     <section class="section" id="results-single">
       <div class="card">
         <h2>Results — Single‑Scale (Low‑Res JPEGs)</h2>
-        <p class="lead"><em>Placeholder:</em> This is where you would summarize your single‑scale results and observations.</p>
+        <p class="lead"><em>Placeholder:</em> This is where you would summarize your single‑scale results and observations. The three low‑res JPEGs have their own section here.</p>
         <div class="grid three">
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/single_monastery.jpg" alt="Monastery single-scale result" loading="lazy" />
-            <figcaption>
-              <strong>monastery.jpg</strong><br>
-              <em>Placeholder:</em> This is where you would put the offsets and a short caption.
-            </figcaption>
-          </figure>
-          <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/single_cathedral.jpg" alt="Cathedral single-scale result" loading="lazy" />
+            <img src="./media/cathedral_recolored.jpg" alt="cathedral — single-scale result" loading="lazy" />
             <figcaption>
               <strong>cathedral.jpg</strong><br>
-              <em>Placeholder:</em> This is where you would put the offsets and a short caption.
+              <em>Placeholder:</em> Offsets and notes for cathedral (single‑scale) go here.
             </figcaption>
           </figure>
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/single_tobolsk.jpg" alt="Tobolsk single-scale result" loading="lazy" />
+            <img src="./media/monastery_recolored.jpg" alt="monastery — single-scale result" loading="lazy" />
+            <figcaption>
+              <strong>monastery.jpg</strong><br>
+              <em>Placeholder:</em> Offsets and notes for monastery (single‑scale) go here.
+            </figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/tobolsk_recolored.jpg" alt="tobolsk — single-scale result" loading="lazy" />
             <figcaption>
               <strong>tobolsk.jpg</strong><br>
-              <em>Placeholder:</em> This is where you would put the offsets and a short caption.
+              <em>Placeholder:</em> Offsets and notes for tobolsk (single‑scale) go here.
             </figcaption>
           </figure>
         </div>
@@ -212,16 +213,52 @@
     <!-- Results: Pyramid -->
     <section class="section" id="results-pyramid">
       <div class="card">
-        <h2>Results — Multi‑Scale Pyramid (All Images)</h2>
-        <p class="lead"><em>Placeholder:</em> This is where you would summarize the pyramid results and overall performance.</p>
-        <div class="grid two" style="margin-bottom:12px">
+        <h2>Results — Multi‑Scale Pyramid (Mandatory Set)</h2>
+        <p class="lead"><em>Placeholder:</em> This is where you would summarize the pyramid results and overall performance on the required images.</p>
+        <div class="grid three" style="margin-bottom:12px">
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/pyr_emir.jpg" alt="Emir (pyramid result)" loading="lazy" />
-            <figcaption><em>Placeholder:</em> Brief note about this example.</figcaption>
+            <img src="./media/church_recolored.jpg" alt="church — pyramid result" loading="lazy" />
+            <figcaption><strong>church.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
           </figure>
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/pyr_cathedral.jpg" alt="Cathedral (pyramid result)" loading="lazy" />
-            <figcaption><em>Placeholder:</em> Brief note about this example.</figcaption>
+            <img src="./media/emir_recolored.jpg" alt="emir — pyramid result" loading="lazy" />
+            <figcaption><strong>emir.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/harvesters_recolored.jpg" alt="harvesters — pyramid result" loading="lazy" />
+            <figcaption><strong>harvesters.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/icon_recolored.jpg" alt="icon — pyramid result" loading="lazy" />
+            <figcaption><strong>icon.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/italil_recolored.jpg" alt="italil — pyramid result" loading="lazy" />
+            <figcaption><strong>italil.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/lastochikino_recolored.jpg" alt="lastochikino — pyramid result" loading="lazy" />
+            <figcaption><strong>lastochikino.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/lugano_recolored.jpg" alt="lugano — pyramid result" loading="lazy" />
+            <figcaption><strong>lugano.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/melons_recolored.jpg" alt="melons — pyramid result" loading="lazy" />
+            <figcaption><strong>melons.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/self_portrait_recolored.jpg" alt="self portrait — pyramid result" loading="lazy" />
+            <figcaption><strong>self_portrait.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/siren_recolored.jpg" alt="siren — pyramid result" loading="lazy" />
+            <figcaption><strong>siren.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/three_generations_recolored.jpg" alt="three generations — pyramid result" loading="lazy" />
+            <figcaption><strong>three_generations.tif</strong> — <em>Placeholder:</em> brief note here.</figcaption>
           </figure>
         </div>
         <div class="card" style="margin-top:12px">
@@ -236,9 +273,17 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td><em>Placeholder image</em></td><td><em>Metric</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
-              <tr><td><em>Placeholder image</em></td><td><em>Metric</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
-              <tr><td><em>Placeholder image</em></td><td><em>Metric</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="warn">Note</td></tr>
+              <tr><td>church.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>emir.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="warn">Note</td></tr>
+              <tr><td>harvesters.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>icon.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>italil.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>lastochikino.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>lugano.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>melons.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>self_portrait.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>siren.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td>three_generations.tif</td><td><em>Placeholder</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
             </tbody>
           </table>
         </div>
@@ -248,20 +293,24 @@
     <!-- Extra Images from LoC -->
     <section class="section" id="extras">
       <div class="card">
-        <h2>Additional Examples (LoC Collection)</h2>
-        <p class="lead"><em>Placeholder:</em> This is where you would show and describe a few extra aligned results from the LoC collection.</p>
-        <div class="grid three">
+        <h2>Additional Examples — My Own LoC Selections</h2>
+        <p class="lead">These four were chosen from the online collection. <em>Placeholder:</em> Add brief notes per image.</p>
+        <div class="grid four">
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/loc_1.jpg" alt="Extra example 1" loading="lazy" />
-            <figcaption><em>Placeholder:</em> Offsets & notes here.</figcaption>
+            <img src="./media/mosque_recolored.jpg" alt="mosque — selection" loading="lazy" />
+            <figcaption><strong>mosque.tif</strong> — <em>Placeholder:</em> notes and offsets here.</figcaption>
           </figure>
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/loc_2.jpg" alt="Extra example 2" loading="lazy" />
-            <figcaption><em>Placeholder:</em> Offsets & notes here.</figcaption>
+            <img src="./media/camel_recolored.jpg" alt="camel — selection" loading="lazy" />
+            <figcaption><strong>camel.tif</strong> — <em>Placeholder:</em> notes and offsets here.</figcaption>
           </figure>
           <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/loc_3.jpg" alt="Extra example 3" loading="lazy" />
-            <figcaption><em>Placeholder:</em> Offsets & notes here.</figcaption>
+            <img src="./media/mat_recolored.jpg" alt="mat — selection" loading="lazy" />
+            <figcaption><strong>mat.tif</strong> — <em>Placeholder:</em> notes and offsets here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/fire_recolored.jpg" alt="fire — selection" loading="lazy" />
+            <figcaption><strong>fire.tif</strong> — <em>Placeholder:</em> notes and offsets here.</figcaption>
           </figure>
         </div>
       </div>
