@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS180 Project 1 — Colorizing the Prokudin‑Gorskii Photo Collection</title>
+  <meta name="description" content="CS180 Proj1: Single‑scale & multi‑scale (image pyramid) alignment with L2/NCC, plus bells & whistles like auto‑crop, contrast, and white balance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #111836;
+      --muted: #a0aec0;
+      --ink: #e6eefc;
+      --accent: #8ab4ff;
+      --accent2: #70f3c4;
+      --ring: rgba(138, 180, 255, 0.45);
+      --ok: #70f3c4;
+      --warn: #f5b971;
+      --bad: #f87171;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink); background: radial-gradient(1200px 600px at 20% -10%, #18224a 0%, transparent 60%),
+                          radial-gradient(900px 500px at 120% 10%, rgba(112,243,196,0.15) 0%, transparent 60%),
+                          var(--bg);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Layout */
+    .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    header {
+      padding: 48px 0 24px; position: sticky; top: 0; backdrop-filter: saturate(150%) blur(10px);
+      background: linear-gradient(to bottom, rgba(11,16,32,0.8), rgba(11,16,32,0.3), transparent);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      z-index: 20;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand .dot { width: 10px; height: 10px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 0 0 6px rgba(138,180,255,0.15); }
+    .brand h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: 0.2px; }
+
+    .hero { padding: 32px 0 12px; }
+    .title { font-size: clamp(28px, 4vw, 44px); line-height: 1.1; margin: 6px 0 10px; font-weight: 800; }
+    .subtitle { color: var(--muted); max-width: 75ch; }
+    .meta { margin-top: 10px; color: #cbd5e1; font-size: 14px; display:inline-flex; gap: 12px; align-items:center; flex-wrap: wrap; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); }
+
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+    .section { margin: 30px 0; }
+    .section h2 { margin: 0 0 8px; font-size: clamp(22px, 3vw, 28px); }
+    .section p.lead { margin-top: 0; color: #cbd5e1; }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 860px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 860px) { .grid.three { grid-template-columns: 1fr 1fr 1fr; } }
+
+    figure { margin: 0; display: grid; gap: 8px; }
+    figure img, video { width: 100%; height: auto; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); display:block; }
+    figcaption { font-size: 14px; color: var(--muted); }
+
+    /* Details */
+    .details { display: grid; gap: 8px; margin-top: 8px; }
+    .details .row { display:flex; gap:10px; flex-wrap:wrap }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1) }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; }
+    th { font-weight: 700; }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+
+    /* Footer */
+    footer { margin: 40px 0 60px; color: var(--muted); text-align: center; font-size: 14px; }
+
+    /* Lightbox */
+    .lightbox img { cursor: zoom-in; }
+    .lightbox.open { position: fixed; inset: 0; background: rgba(7,10,22,0.85); display: grid; place-items: center; padding: 40px; z-index: 50; }
+    .lightbox.open img { max-width: min(1200px, 92vw); max-height: 90vh; border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.55); cursor: zoom-out; }
+
+    /* Callouts */
+    .callout { border-left: 3px solid var(--accent); padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    pre { padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); overflow:auto }
+
+    /* Chips */
+    .chip { display:inline-flex; align-items:center; gap:8px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); font-size:12px }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container brand">
+      <span class="dot" aria-hidden="true"></span>
+      <h1>CS180 · Project 1</h1>
+      <nav style="margin-left:auto;font-size:14px;display:flex;gap:12px">
+        <a href="../">Home</a>
+        <a href="../0/">Project 0</a>
+        <a href="#results-single">Single‑Scale</a>
+        <a href="#results-pyramid">Pyramid</a>
+        <a href="#bells">Bells & Whistles</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="card">
+        <h2 class="title">Colorizing the Prokudin‑Gorskii Photo Collection</h2>
+        <p class="subtitle">Aligning three monochrome glass‑plate channels (B, G, R) into vivid color images using single‑scale search and coarse‑to‑fine image pyramids. Metrics compared: L2 and NCC. Extras include auto‑crop, contrast stretching, and gray‑world white balance.</p>
+        <div class="meta">
+          <span class="pill">Course: CS180 — Intro to Computer Vision & Computational Photography</span>
+          <span class="pill">Project #1</span>
+          <span class="pill">Author: <strong>Kourosh Salahi</strong></span>
+          <span class="pill">Due: Sep 12, 2025 • 11:59 PM</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Overview / Key Ideas -->
+    <section class="section">
+      <div class="card">
+        <h2>Overview & Key Ideas</h2>
+        <p class="lead"><em>Placeholder:</em> This is where you would briefly summarize the project goals and key ideas you implemented.</p>
+        <div class="grid two">
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/example_plate.jpg" alt="Example glass plate (BGR from top to bottom)." loading="lazy" />
+            <figcaption>Input glass plate (top→bottom = B, G, R).</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/example_colorized.jpg" alt="Aligned and colorized output image." loading="lazy" />
+            <figcaption>Output after alignment & composition.</figcaption>
+          </figure>
+        </div>
+        <div class="details">
+          <div class="callout">
+            <strong>Scoring metrics.</strong> I implemented both <span class="chip">L2 (SSD)</span> and <span class="chip">NCC</span>. For challenging scenes (exposure/contrast shifts), NCC tended to be more stable.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Method -->
+    <section class="section" id="method">
+      <div class="card">
+        <h2>Method</h2>
+        <p class="lead"><em>Placeholder:</em> This is where you would describe your approach at a high level (single‑scale search and pyramid speed‑up), without revealing answers here.</p>
+        <div class="grid two">
+          <div>
+            <h3 style="margin:0 0 6px">Single‑Scale (Baseline)</h3>
+            <ul style="margin-top:8px">
+              <li><em>Placeholder:</em> Explain how you split the plate into B/G/R.</li>
+              <li><em>Placeholder:</em> Explain the search window you chose and why.</li>
+              <li><em>Placeholder:</em> State which metric(s) you used (L2/NCC) and why.</li>
+              <li><em>Placeholder:</em> Mention border cropping / scoring strategy.</li>
+            </ul>
+            <h3 style="margin:12px 0 6px">Coarse‑to‑Fine Pyramid</h3>
+            <ul>
+              <li><em>Placeholder:</em> Describe how you downsample and how many levels.</li>
+              <li><em>Placeholder:</em> Describe how you propagate and refine displacements.</li>
+              <li><em>Placeholder:</em> Any heuristics (e.g., refine window size).</li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="margin:0 0 6px">Pseudocode</h3>
+            <pre><code>// Placeholder pseudocode block
+// This is where you would put a concise pseudocode summary of your pipeline
+// (no actual answers or computed values here).</code></pre>
+            <p style="margin:8px 0 0" class="muted"><em>Placeholder:</em> Implementation notes (e.g., shifting with np.roll, float conversion).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results: Single Scale -->
+    <section class="section" id="results-single">
+      <div class="card">
+        <h2>Results — Single‑Scale (Low‑Res JPEGs)</h2>
+        <p class="lead"><em>Placeholder:</em> This is where you would summarize your single‑scale results and observations.</p>
+        <div class="grid three">
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/single_monastery.jpg" alt="Monastery single-scale result" loading="lazy" />
+            <figcaption>
+              <strong>monastery.jpg</strong><br>
+              <em>Placeholder:</em> This is where you would put the offsets and a short caption.
+            </figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/single_cathedral.jpg" alt="Cathedral single-scale result" loading="lazy" />
+            <figcaption>
+              <strong>cathedral.jpg</strong><br>
+              <em>Placeholder:</em> This is where you would put the offsets and a short caption.
+            </figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/single_tobolsk.jpg" alt="Tobolsk single-scale result" loading="lazy" />
+            <figcaption>
+              <strong>tobolsk.jpg</strong><br>
+              <em>Placeholder:</em> This is where you would put the offsets and a short caption.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results: Pyramid -->
+    <section class="section" id="results-pyramid">
+      <div class="card">
+        <h2>Results — Multi‑Scale Pyramid (All Images)</h2>
+        <p class="lead"><em>Placeholder:</em> This is where you would summarize the pyramid results and overall performance.</p>
+        <div class="grid two" style="margin-bottom:12px">
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/pyr_emir.jpg" alt="Emir (pyramid result)" loading="lazy" />
+            <figcaption><em>Placeholder:</em> Brief note about this example.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/pyr_cathedral.jpg" alt="Cathedral (pyramid result)" loading="lazy" />
+            <figcaption><em>Placeholder:</em> Brief note about this example.</figcaption>
+          </figure>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <table>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Metric</th>
+                <th>G→B (dx, dy)</th>
+                <th>R→B (dx, dy)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><em>Placeholder image</em></td><td><em>Metric</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td><em>Placeholder image</em></td><td><em>Metric</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="ok">OK</td></tr>
+              <tr><td><em>Placeholder image</em></td><td><em>Metric</em></td><td>(placeholder)</td><td>(placeholder)</td><td class="warn">Note</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Extra Images from LoC -->
+    <section class="section" id="extras">
+      <div class="card">
+        <h2>Additional Examples (LoC Collection)</h2>
+        <p class="lead"><em>Placeholder:</em> This is where you would show and describe a few extra aligned results from the LoC collection.</p>
+        <div class="grid three">
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/loc_1.jpg" alt="Extra example 1" loading="lazy" />
+            <figcaption><em>Placeholder:</em> Offsets & notes here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/loc_2.jpg" alt="Extra example 2" loading="lazy" />
+            <figcaption><em>Placeholder:</em> Offsets & notes here.</figcaption>
+          </figure>
+          <figure class="lightbox" onclick="openLightbox(event)">
+            <img src="./media/loc_3.jpg" alt="Extra example 3" loading="lazy" />
+            <figcaption><em>Placeholder:</em> Offsets & notes here.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- Failures / Analysis -->
+    <section class="section" id="failures">
+      <div class="card">
+        <h2>Failure Cases & Analysis</h2>
+        <p class="lead"><em>Placeholder:</em> This is where you would explain any images that failed and why.</p>
+        <ul>
+          <li><em>Placeholder:</em> Brief description of a failure mode and a potential fix.</li>
+          <li><em>Placeholder:</em> Another failure mode and potential fix.</li>
+          <li><em>Placeholder:</em> Any notes on trade‑offs or parameter sensitivity.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Bells & Whistles -->
+    <section class="section" id="bells">
+      <div class="card">
+        <h2>Bells & Whistles</h2>
+        <p class="lead"><em>Placeholder:</em> This is where you would document any extra credit features with before/after visuals.</p>
+        <div class="grid two">
+          <div>
+            <h3 style="margin:0 0 6px">Automatic Cropping</h3>
+            <p><em>Placeholder:</em> Describe your border detection and cropping strategy.</p>
+            <div class="grid two">
+              <figure class="lightbox" onclick="openLightbox(event)">
+                <img src="./media/crop_before.jpg" alt="Before auto-crop" loading="lazy" />
+                <figcaption>Before (placeholder)</figcaption>
+              </figure>
+              <figure class="lightbox" onclick="openLightbox(event)">
+                <img src="./media/crop_after.jpg" alt="After auto-crop" loading="lazy" />
+                <figcaption>After (placeholder)</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div>
+            <h3 style="margin:0 0 6px">Contrast & White Balance</h3>
+            <p><em>Placeholder:</em> Describe your contrast stretch and gray‑world/other WB approach.</p>
+            <div class="grid two">
+              <figure class="lightbox" onclick="openLightbox(event)">
+                <img src="./media/wb_before.jpg" alt="Before white balance/contrast" loading="lazy" />
+                <figcaption>Before (placeholder)</figcaption>
+              </figure>
+              <figure class="lightbox" onclick="openLightbox(event)">
+                <img src="./media/wb_after.jpg" alt="After white balance/contrast" loading="lazy" />
+                <figcaption>After (placeholder)</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+        <div class="grid two" style="margin-top:12px">
+          <div>
+            <h3 style="margin:0 0 6px">Better Features</h3>
+            <p><em>Placeholder:</em> Explain edge/gradient‑based matching if implemented.</p>
+          </div>
+          <div>
+            <h3 style="margin:0 0 6px">Better Color Mapping</h3>
+            <p><em>Placeholder:</em> Explain any learned/hand‑tuned color transforms.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Repro / Notes -->
+    <section class="section" id="repro">
+      <div class="card">
+        <h2>Reproducibility & Notes</h2>
+        <ul>
+          <li><em>Placeholder:</em> Notes on data types, scaling, and performance.</li>
+          <li><em>Placeholder:</em> Notes on fixed parameters used across images.</li>
+          <li><em>Placeholder:</em> Any tips for running your code (without including large files).</li>
+        </ul>
+        <pre><code># Placeholder CLI example
+python align.py --input PATH/TO/IMAGE.tif --metric ncc --pyramid --save ./out/output.jpg</code></pre>
+      </div>
+    </section>
+
+    <!-- Thanks -->
+    <section class="section">
+      <div class="card">
+        <h2>Thanks for reading! 📷🧮</h2>
+        <p class="lead">Per the assignment: submit code to Gradescope (no large images) and include this webpage URL in both Gradescope and the class gallery form.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container">
+    <p>
+      Prepared for CS180 Project 1 by Kourosh Andrew Salahi. Images: Prokudin‑Gorskii Collection (Library of Congress). This page is for presentation only; do not upload image assets to Gradescope.
+    </p>
+  </footer>
+
+  <script>
+    function openLightbox(e) {
+      const fig = e.currentTarget;
+      fig.classList.add('open');
+      function close(ev) {
+        if (ev.target.tagName === 'IMG' || ev.target === fig) {
+          fig.classList.remove('open');
+          fig.removeEventListener('click', close);
+        }
+      }
+      fig.addEventListener('click', close);
+    }
+  </script>
+</body>
+</html>
