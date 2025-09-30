@@ -16,12 +16,7 @@
     body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
     .container { max-width:1100px; margin:0 auto; padding:20px; }
 
-    /* Top header */
-    header {
-      padding: 32px 20px;
-      background: linear-gradient(to bottom, rgba(11,16,32,0.95), rgba(11,16,32,0.7));
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
+    header { padding:32px 20px; background:linear-gradient(to bottom,rgba(11,16,32,0.95),rgba(11,16,32,0.7)); border-bottom:1px solid rgba(255,255,255,0.08);}
     .brand { display:flex; align-items:center; gap:12px; }
     .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
     .brand h1 { font-size:18px; margin:0; font-weight:800; }
@@ -29,57 +24,29 @@
     nav a { color:var(--accent); text-decoration:none; }
     nav a:hover { text-decoration:underline; }
 
-    /* Card styling */
     .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:30px; }
     h2 { margin-top:0; }
 
-    /* Hero card */
     .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
     .subtitle { color:var(--muted); margin:0 0 10px; }
     .meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:14px; }
     .pill { padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); }
 
-    /* Grid + images */
     .grid { display:grid; gap:16px; }
     .grid.two { grid-template-columns:repeat(2,1fr); }
     .grid.three { grid-template-columns:repeat(3,1fr); }
     .grid.four { grid-template-columns:repeat(4,1fr); }
     .grid.five { grid-template-columns:repeat(5,1fr); }
-    figure { margin:0; cursor: zoom-in; }
+    figure { margin:0; cursor:zoom-in; }
 
-    /* Default sizing */
     img { width:100%; max-height:250px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
-
-    /* Exceptions for large images */
-    img[src*="expanded.jpg"],
-    img[src*="stack"],
-    img[src*="dreekend_process"],
-    img[src*="fig234"] {
-      max-height: none;
-      width: 100%;
-    }
+    img[src*="expanded.jpg"], img[src*="stack"], img[src*="dreekend_process"], img[src*="fig234"] { max-height:none; width:100%; }
 
     figcaption { font-size:14px; color:var(--muted); }
     pre { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; overflow:auto; font-size:14px; }
 
-    /* Lightbox */
-    .lightbox {
-      display:none;
-      position:fixed;
-      top:0; left:0; right:0; bottom:0;
-      background:rgba(7,10,22,0.9);
-      z-index:1000;
-      justify-content:center;
-      align-items:center;
-      padding:40px;
-    }
-    .lightbox img {
-      max-width:90%;
-      max-height:90%;
-      border-radius:18px;
-      box-shadow:0 20px 60px rgba(0,0,0,0.6);
-      cursor: zoom-out;
-    }
+    .lightbox { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(7,10,22,0.9); z-index:1000; justify-content:center; align-items:center; padding:40px; }
+    .lightbox img { max-width:90%; max-height:90%; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,0.6); cursor:zoom-out; }
   </style>
 </head>
 <body>
@@ -98,145 +65,168 @@
 
   <main class="container">
 
-    <!-- Hero Intro -->
+    <!-- Hero -->
     <section class="card">
       <h2 class="hero-title">Filters, Hybrid Images, and Multi-Resolution Blending</h2>
-      <p class="subtitle">Exploring convolution, edge detection, sharpening, hybrid image construction, and Laplacian pyramid blending to create compelling image manipulations.</p>
-      <div class="meta">
-        <span class="pill">Course: CS180 — Intro to Computer Vision & Computational Photography</span>
-        <span class="pill">Project #2</span>
-        <span class="pill">Author: <strong>Kourosh Salahi</strong></span>
-      </div>
+      <p class="subtitle">By <strong>Kourosh Salahi</strong> · CS180: Computer Vision & Computational Photography</p>
     </section>
 
     <!-- Part 1.1 -->
     <section class="card" id="part1">
       <h2>Part 1.1 — Convolution</h2>
-      <pre><code># conv4loops implementation here</code></pre>
-      <pre><code># conv2loops implementation here</code></pre>
+      <p>This section implements convolution from scratch with both four nested loops and a more efficient two-loop version. Results are compared to <code>scipy.signal.convolve2d</code> in terms of runtime and edge handling.</p>
+      <pre><code>def conv4loops(image, kernel):
+    height, width = image.shape
+    kh, kw = kernel.shape
+    pad_h, pad_w = kh // 2, kw // 2
+    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
+    output = np.zeros_like(image)
+    for i in range(height):
+        for j in range(width):
+            val = 0
+            for m in range(kh):
+                for n in range(kw):
+                    val += kernel[m, n] * padded[i+m, j+n]
+            output[i, j] = val
+    return output
+</code></pre>
+      <pre><code>def conv2loops(image, kernel):
+    height, width = image.shape
+    kh, kw = kernel.shape
+    pad_h, pad_w = kh // 2, kw // 2
+    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
+    output = np.zeros_like(image)
+    for i in range(height):
+            for j in range(width):
+                region = padded[i:i+kh, j:j+kw]
+                output[i, j] = np.sum(region * kernel)
+    return output</code></pre>
       <div class="grid four">
-        <figure><img src="./media/Me.jpg" onclick="openLightbox(this.src)"><figcaption>Original</figcaption></figure>
-        <figure><img src="./media/res_four.png" onclick="openLightbox(this.src)"><figcaption>Box Filtered</figcaption></figure>
-        <figure><img src="./media/fdx_two.png" onclick="openLightbox(this.src)"><figcaption>Dx</figcaption></figure>
-        <figure><img src="./media/fdy_two.png" onclick="openLightbox(this.src)"><figcaption>Dy</figcaption></figure>
+        <figure><img src="./media/Me.jpg" onclick="openLightbox(this.src)"><figcaption>Original image (grayscale self-portrait)</figcaption></figure>
+        <figure><img src="./media/res_four.png" onclick="openLightbox(this.src)"><figcaption>9×9 box filter result</figcaption></figure>
+        <figure><img src="./media/fdx_two.png" onclick="openLightbox(this.src)"><figcaption>Finite difference Dx</figcaption></figure>
+        <figure><img src="./media/fdy_two.png" onclick="openLightbox(this.src)"><figcaption>Finite difference Dy</figcaption></figure>
       </div>
+      <p><em>Runtime & boundary comment: zero-padding was used; edges appear softened compared to central regions.</em></p>
     </section>
 
     <!-- Part 1.2 -->
     <section class="card">
       <h2>Part 1.2 — Derivatives & Edges</h2>
+      <p>Finite difference filters are applied to the Cameraman image to extract partial derivatives. Gradient magnitude highlights edge strength, and binarization creates an edge map while suppressing noise.</p>
       <div class="grid five">
-        <figure><img src="./media/cameraman.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cameraman_gx.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cameraman_gy.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cameraman_gradmag.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cameraman_edges.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/cameraman.png" onclick="openLightbox(this.src)"><figcaption>Original Cameraman</figcaption></figure>
+        <figure><img src="./media/cameraman_gx.png" onclick="openLightbox(this.src)"><figcaption>Partial derivative Dx</figcaption></figure>
+        <figure><img src="./media/cameraman_gy.png" onclick="openLightbox(this.src)"><figcaption>Partial derivative Dy</figcaption></figure>
+        <figure><img src="./media/cameraman_gradmag.png" onclick="openLightbox(this.src)"><figcaption>Gradient magnitude</figcaption></figure>
+        <figure><img src="./media/cameraman_edges.png" onclick="openLightbox(this.src)"><figcaption>Binarized edge map</figcaption></figure>
       </div>
     </section>
 
     <!-- Part 1.3 -->
     <section class="card">
       <h2>Part 1.3 — Gaussian & DoG</h2>
+      <p>Gaussian smoothing reduces noise before edge detection. Derivative of Gaussian (DoG) filters combine smoothing and differentiation into one operation, producing cleaner results compared to plain finite difference.</p>
       <div class="grid four">
-        <figure><img src="./media/DoGx.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/DoGy.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cam_gradmag_blur.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cam_gradmag_dog.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/DoGx.png" onclick="openLightbox(this.src)"><figcaption>DoG filter (x-direction)</figcaption></figure>
+        <figure><img src="./media/DoGy.png" onclick="openLightbox(this.src)"><figcaption>DoG filter (y-direction)</figcaption></figure>
+        <figure><img src="./media/cam_gradmag_blur.png" onclick="openLightbox(this.src)"><figcaption>Smoothed Cameraman (Gaussian blur)</figcaption></figure>
+        <figure><img src="./media/cam_gradmag_dog.png" onclick="openLightbox(this.src)"><figcaption>Edges via DoG</figcaption></figure>
       </div>
+      <p><em>Observation: DoG edges are sharper and less noisy compared to plain finite difference.</em></p>
     </section>
 
     <!-- Part 2.1 -->
     <section class="card" id="part2">
       <h2>Part 2.1 — Unsharp Mask</h2>
+      <p>Unsharp masking subtracts a blurred image (low frequencies) from the original to extract high frequencies, which are then added back to sharpen the result.</p>
       <div class="grid four">
-        <figure><img src="./media/taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/blurred_taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/high_taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/sharp_taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/taj.jpg" onclick="openLightbox(this.src)"><figcaption>Original Taj Mahal</figcaption></figure>
+        <figure><img src="./media/blurred_taj.jpg" onclick="openLightbox(this.src)"><figcaption>Blurred Taj</figcaption></figure>
+        <figure><img src="./media/high_taj.jpg" onclick="openLightbox(this.src)"><figcaption>High frequencies</figcaption></figure>
+        <figure><img src="./media/sharp_taj.jpg" onclick="openLightbox(this.src)"><figcaption>Sharpened Taj</figcaption></figure>
       </div>
       <div class="grid four">
-        <figure><img src="./media/dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/blurred_dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/high_dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/sharp_dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/dog.jpg" onclick="openLightbox(this.src)"><figcaption>Original Dog</figcaption></figure>
+        <figure><img src="./media/blurred_dog.jpg" onclick="openLightbox(this.src)"><figcaption>Blurred Dog</figcaption></figure>
+        <figure><img src="./media/high_dog.jpg" onclick="openLightbox(this.src)"><figcaption>High frequencies</figcaption></figure>
+        <figure><img src="./media/sharp_dog.jpg" onclick="openLightbox(this.src)"><figcaption>Sharpened Dog</figcaption></figure>
       </div>
       <div class="grid four">
-        <figure><img src="./media/pre_sharp_cat.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/blurred_cat.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/high_blurred_catresharpened.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/sharp_blurred_catresharpened.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/pre_sharp_cat.jpeg" onclick="openLightbox(this.src)"><figcaption>Original Cat</figcaption></figure>
+        <figure><img src="./media/blurred_cat.jpeg" onclick="openLightbox(this.src)"><figcaption>Blurred Cat</figcaption></figure>
+        <figure><img src="./media/high_blurred_catresharpened.jpeg" onclick="openLightbox(this.src)"><figcaption>High frequencies</figcaption></figure>
+        <figure><img src="./media/sharp_blurred_catresharpened.jpeg" onclick="openLightbox(this.src)"><figcaption>Resharpened Cat</figcaption></figure>
       </div>
+      <p><em>Observation: Sharpening improves details but can amplify noise if over-applied.</em></p>
     </section>
 
     <!-- Part 2.2 -->
     <section class="card" id="hybrids">
       <h2>Part 2.2 — Hybrid Images</h2>
+      <p>Hybrid images mix low frequencies from one source and high frequencies from another. The perception changes depending on viewing distance.</p>
       <div class="grid three">
-        <figure><img src="./media/DerekPicture.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/nutmeg.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/hybrid_Derek.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/DerekPicture.jpg" onclick="openLightbox(this.src)"><figcaption>Derek </figcaption></figure>
+        <figure><img src="./media/nutmeg.jpg" onclick="openLightbox(this.src)"><figcaption>Nutmeg</figcaption></figure>
+        <figure><img src="./media/hybrid_Derek.jpg" onclick="openLightbox(this.src)"><figcaption>Derek + Nutmeg. Dutmeg, if you will.</figcaption></figure>
       </div>
       <div class="grid three">
-        <figure><img src="./media/Bron.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/Denero.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/hybrid_DeneroBron.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/Bron.jpg" onclick="openLightbox(this.src)"><figcaption>LeBron</figcaption></figure>
+        <figure><img src="./media/Denero.jpg" onclick="openLightbox(this.src)"><figcaption>Denero</figcaption></figure>
+        <figure><img src="./media/hybrid_DeneroBron.jpg" onclick="openLightbox(this.src)"><figcaption>LeBron + Denero. Respective G.O.A.T.s</figcaption></figure>
       </div>
       <div class="grid three">
-        <figure><img src="./media/gihun_happy.webp" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/gihun_mad.webp" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/hybrid_Gihun.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/gihun_happy.webp" onclick="openLightbox(this.src)"><figcaption>Gi-hun Happy</figcaption></figure>
+        <figure><img src="./media/gihun_mad.webp" onclick="openLightbox(this.src)"><figcaption>Gi-hun Mad</figcaption></figure>
+        <figure><img src="./media/hybrid_Gihun.jpg" onclick="openLightbox(this.src)"><figcaption>Gi-hun Expressions</figcaption></figure>
       </div>
       <div class="grid three">
-        <figure><img src="./media/Monkey.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/monkey2.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/hybrid_Monkey.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/Monkey.jpg" onclick="openLightbox(this.src)"><figcaption>Monkey Image 1</figcaption></figure>
+        <figure><img src="./media/monkey2.jpg" onclick="openLightbox(this.src)"><figcaption>Monkey Image 2</figcaption></figure>
+        <figure><img src="./media/hybrid_Monkey.jpg" onclick="openLightbox(this.src)"><figcaption>Monkey Blend</figcaption></figure>
       </div>
       <div>
-        <figure><img src="./media/expanded.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/expanded.jpg" onclick="openLightbox(this.src)"><figcaption>Fourier Analysis of Hybrid</figcaption></figure>
       </div>
+      <p><em>Observation: At close distance, high-frequency details dominate. At far distance, low-frequency structures dominate.</em></p>
     </section>
 
     <!-- Part 2.3 -->
     <section class="card" id="blending">
       <h2>Part 2.3 — Multi-resolution Blending</h2>
+      <p>Gaussian and Laplacian stacks allow smooth blending across frequency bands, avoiding harsh seams. Here we recreate the classic “Oraple” and experiment with custom blends.</p>
 
-      <!-- Row 1 -->
       <div class="grid three">
-        <figure><img src="./media/apple.jpeg" onclick="openLightbox(this.src)"><figcaption>Apple</figcaption></figure>
-        <figure><img src="./media/orange.jpeg" onclick="openLightbox(this.src)"><figcaption>Orange</figcaption></figure>
-        <figure><img src="./media/hybrid_apple_orange.png" onclick="openLightbox(this.src)"><figcaption>Hybrid</figcaption></figure>
+        <figure><img src="./media/apple.jpeg" onclick="openLightbox(this.src)"><figcaption>Apple source</figcaption></figure>
+        <figure><img src="./media/orange.jpeg" onclick="openLightbox(this.src)"><figcaption>Orange source</figcaption></figure>
+        <figure><img src="./media/hybrid_apple_orange.png" onclick="openLightbox(this.src)"><figcaption>Oraple</figcaption></figure>
       </div>
 
-      <!-- Row 2 -->
       <div class="grid three">
-        <figure><img src="./media/apple_stack.png" onclick="openLightbox(this.src)"><figcaption>Apple Stack</figcaption></figure>
-        <figure><img src="./media/orange_stack.png" onclick="openLightbox(this.src)"><figcaption>Orange Stack</figcaption></figure>
-        <figure><img src="./media/fig234.png" onclick="openLightbox(this.src)"><figcaption>Reference Fig 3.42</figcaption></figure>
+        <figure><img src="./media/apple_stack.png" onclick="openLightbox(this.src)"><figcaption>Apple stack</figcaption></figure>
+        <figure><img src="./media/orange_stack.png" onclick="openLightbox(this.src)"><figcaption>Orange stack</figcaption></figure>
+        <figure><img src="./media/fig234.png" onclick="openLightbox(this.src)"><figcaption>Reference Fig. 3.42</figcaption></figure>
       </div>
 
-      <!-- Row 3 -->
       <div class="grid three">
-        <figure><img src="./media/golf_img.jpg" onclick="openLightbox(this.src)"><figcaption>Golf</figcaption></figure>
-        <figure><img src="./media/face.jpg" onclick="openLightbox(this.src)"><figcaption>Face</figcaption></figure>
-        <figure><img src="./media/golface.png" onclick="openLightbox(this.src)"><figcaption>Blended</figcaption></figure>
+        <figure><img src="./media/golf_img.jpg" onclick="openLightbox(this.src)"><figcaption>Golf image</figcaption></figure>
+        <figure><img src="./media/face.jpg" onclick="openLightbox(this.src)"><figcaption>Face image</figcaption></figure>
+        <figure><img src="./media/golface.png" onclick="openLightbox(this.src)"><figcaption>Golf + Face blend. Golface</figcaption></figure>
       </div>
 
-      <!-- Row 4 -->
       <div class="grid three">
-        <figure><img src="./media/weeknd.jpg" onclick="openLightbox(this.src)"><figcaption>Weeknd</figcaption></figure>
-        <figure><img src="./media/drake2.jpg" onclick="openLightbox(this.src)"><figcaption>Drake</figcaption></figure>
-        <figure><img src="./media/dreekend.png" onclick="openLightbox(this.src)"><figcaption>Blended</figcaption></figure>
+        <figure><img src="./media/weeknd.jpg" onclick="openLightbox(this.src)"><figcaption>Weeknd source</figcaption></figure>
+        <figure><img src="./media/drake2.jpg" onclick="openLightbox(this.src)"><figcaption>Drake source</figcaption></figure>
+        <figure><img src="./media/dreekend.png" onclick="openLightbox(this.src)"><figcaption>The Dreekend</figcaption></figure>
       </div>
 
-      <!-- Row 5 -->
       <div>
-        <figure><img src="./media/dreekend_process.png" onclick="openLightbox(this.src)"><figcaption>Process Visualization</figcaption></figure>
+        <figure><img src="./media/dreekend_process.png" onclick="openLightbox(this.src)"><figcaption>Laplacian stack visualization for “Dreekend”</figcaption></figure>
       </div>
     </section>
 
   </main>
 
-  <!-- Lightbox -->
   <div id="lightbox" class="lightbox" onclick="closeLightbox()">
     <img id="lightbox-img" src="" alt="">
   </div>
