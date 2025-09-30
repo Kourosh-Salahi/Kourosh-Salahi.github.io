@@ -112,8 +112,31 @@
     <!-- Part 1.1 -->
     <section class="card" id="part1">
       <h2>Part 1.1 — Convolution</h2>
-      <pre><code># conv2d implementation here</code></pre>
-      <pre><code># convcv2d implementation here</code></pre>
+      <pre><code>def conv4loops(image, kernel):
+    height, width = image.shape
+    kh, kw = kernel.shape
+    pad_h, pad_w = kh // 2, kw // 2
+    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
+    output = np.zeros_like(image)
+    for i in range(height):
+        for j in range(width):
+            val = 0
+            for m in range(kh):
+                for n in range(kw):
+                    val += kernel[m, n] * padded[i+m, j+n]
+            output[i, j] = val
+    return output</code></pre>
+      <pre><code>def conv2loops(image, kernel):
+    height, width = image.shape
+    kh, kw = kernel.shape
+    pad_h, pad_w = kh // 2, kw // 2
+    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
+    output = np.zeros_like(image)
+    for i in range(height):
+            for j in range(width):
+                region = padded[i:i+kh, j:j+kw]
+                output[i, j] = np.sum(region * kernel)
+    return output</code></pre>
       <div class="grid four">
         <figure><img src="./media/Me.jpg" onclick="openLightbox(this.src)"><figcaption>Original</figcaption></figure>
         <figure><img src="./media/res_four.png" onclick="openLightbox(this.src)"><figcaption>Box Filtered</figcaption></figure>
