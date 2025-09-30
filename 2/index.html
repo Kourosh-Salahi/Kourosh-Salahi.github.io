@@ -107,13 +107,14 @@
         <figure><img src="./media/fdx_two.png" onclick="openLightbox(this.src)"><figcaption>Finite difference Dx</figcaption></figure>
         <figure><img src="./media/fdy_two.png" onclick="openLightbox(this.src)"><figcaption>Finite difference Dy</figcaption></figure>
       </div>
-      <p><em>Runtime & boundary comment: zero-padding was used; edges appear softened compared to central regions.</em></p>
+      <p><em>Runtime: the four loop convolution was much slower, taking 1 minute and 4 seconds to run, compared to the 2 loop convolution only taking 10 seconds. These were both much slower than the built in method, convolve2d, which took 0.3 seconds</em></p>
     </section>
 
     <!-- Part 1.2 -->
     <section class="card">
       <h2>Part 1.2 — Derivatives & Edges</h2>
-      <p>Finite difference filters are applied to the Cameraman image to extract partial derivatives. Gradient magnitude highlights edge strength, and binarization creates an edge map while suppressing noise.</p>
+      <p>Finite difference filters are applied to the Cameraman image to extract partial derivatives. I found that the best threshold was 0.32. When I went to high above this, I would lose out on the thickness of the edges. 
+        When i went below this, I would get more noise. The value 0.32 allowed me to get most of the cameraman's edges while only getting a little bit of the background included</p>
       <div class="grid five">
         <figure><img src="./media/cameraman.png" onclick="openLightbox(this.src)"><figcaption>Original Cameraman</figcaption></figure>
         <figure><img src="./media/cameraman_gx.png" onclick="openLightbox(this.src)"><figcaption>Partial derivative Dx</figcaption></figure>
@@ -130,10 +131,11 @@
       <div class="grid four">
         <figure><img src="./media/DoGx.png" onclick="openLightbox(this.src)"><figcaption>DoG filter (x-direction)</figcaption></figure>
         <figure><img src="./media/DoGy.png" onclick="openLightbox(this.src)"><figcaption>DoG filter (y-direction)</figcaption></figure>
-        <figure><img src="./media/cam_gradmag_blur.png" onclick="openLightbox(this.src)"><figcaption>Smoothed Cameraman (Gaussian blur)</figcaption></figure>
+        <figure><img src="./media/cam_gradmag_blur.png" onclick="openLightbox(this.src)"><figcaption>Edges via blur first</figcaption></figure>
         <figure><img src="./media/cam_gradmag_dog.png" onclick="openLightbox(this.src)"><figcaption>Edges via DoG</figcaption></figure>
       </div>
-      <p><em>Observation: DoG edges are sharper and less noisy compared to plain finite difference.</em></p>
+      <p><em>Observation: DoG/blurred edges are thicker and less noisy compared to plain finite difference.</em></p>
+      <p><em>Verification: Both Edge images are the same as found by computing their difference in the code and finding that it is negligible.</em></p>
     </section>
 
     <!-- Part 2.1 -->
@@ -147,6 +149,12 @@
         <figure><img src="./media/sharp_taj.jpg" onclick="openLightbox(this.src)"><figcaption>Sharpened Taj</figcaption></figure>
       </div>
       <div class="grid four">
+        <figure><img src="./media/taj.jpg" onclick="openLightbox(this.src)"><figcaption>Original Taj Mahal</figcaption></figure>
+        <figure><img src="./media/blurred_taj_stronger.jpg" onclick="openLightbox(this.src)"><figcaption>Blurred Taj with more sharpening</figcaption></figure>
+        <figure><img src="./media/high_taj_stronger.jpg" onclick="openLightbox(this.src)"><figcaption>High frequencies with more sharpening</figcaption></figure>
+        <figure><img src="./media/sharp_taj_stronger.jpg" onclick="openLightbox(this.src)"><figcaption>Sharpened Taj with more sharpening</figcaption></figure>
+      </div>
+      <div class="grid four">
         <figure><img src="./media/dog.jpg" onclick="openLightbox(this.src)"><figcaption>Original Dog</figcaption></figure>
         <figure><img src="./media/blurred_dog.jpg" onclick="openLightbox(this.src)"><figcaption>Blurred Dog</figcaption></figure>
         <figure><img src="./media/high_dog.jpg" onclick="openLightbox(this.src)"><figcaption>High frequencies</figcaption></figure>
@@ -158,7 +166,8 @@
         <figure><img src="./media/high_blurred_catresharpened.jpeg" onclick="openLightbox(this.src)"><figcaption>High frequencies</figcaption></figure>
         <figure><img src="./media/sharp_blurred_catresharpened.jpeg" onclick="openLightbox(this.src)"><figcaption>Resharpened Cat</figcaption></figure>
       </div>
-      <p><em>Observation: Sharpening improves details but can amplify noise if over-applied.</em></p>
+      <p><em>Observation: Sharpening improves details but can amplify noise if over-applied. Also makes the images brighter.</em></p>
+      <p><em>Key Point to notice: more sharpening on the taj mahal not only makes the image sharper, but also brighter</em></p>
     </section>
 
     <!-- Part 2.2 -->
@@ -186,7 +195,7 @@
         <figure><img src="./media/hybrid_Monkey.jpg" onclick="openLightbox(this.src)"><figcaption>Monkey Blend</figcaption></figure>
       </div>
       <div>
-        <figure><img src="./media/expanded.jpg" onclick="openLightbox(this.src)"><figcaption>Fourier Analysis of Hybrid</figcaption></figure>
+        <figure><img src="./media/expanded.jpg" onclick="openLightbox(this.src)"><figcaption>Fourier Analysis of Hybrid Monkey</figcaption></figure>
       </div>
       <p><em>Observation: At close distance, high-frequency details dominate. At far distance, low-frequency structures dominate.</em></p>
     </section>
@@ -194,7 +203,7 @@
     <!-- Part 2.3 -->
     <section class="card" id="blending">
       <h2>Part 2.3 — Multi-resolution Blending</h2>
-      <p>Gaussian and Laplacian stacks allow smooth blending across frequency bands, avoiding harsh seams. Here we recreate the classic “Oraple” and experiment with custom blends.</p>
+      <p>Gaussian and Laplacian stacks allow smooth blending, avoiding harsh seams. Here I recreate the classic “Oraple” and experiment with custom blends.</p>
 
       <div class="grid three">
         <figure><img src="./media/apple.jpeg" onclick="openLightbox(this.src)"><figcaption>Apple source</figcaption></figure>
@@ -223,6 +232,10 @@
       <div>
         <figure><img src="./media/dreekend_process.png" onclick="openLightbox(this.src)"><figcaption>Laplacian stack visualization for “Dreekend”</figcaption></figure>
       </div>
+
+      <p><em>Observation: The golface image has a circular mask. Notice that it is more than just transparency on the face and pasting that over the golf ball, the ball blends into the face, and you can see parts of the golf ball divots fade away as the face becomes more prominent. The face is rather light, which was my attempt to match the shades. 
+      I would assume that implementing color matching would make the blend much prettier.</em></p>
+      <p><em>Observation: The Weeknd and Drake both make music that is enjoyable together. Their faces are not enjoyable together. The way that their mouths, hairlines, noses, and forehead wrinkles line up make the image rather eery. Notice that the sharp line above drake is not a seam, but a remant of the background he stands in front of.</em></p>
     </section>
 
   </main>
