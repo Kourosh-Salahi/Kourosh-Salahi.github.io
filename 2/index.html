@@ -6,8 +6,27 @@
   <title>CS180 Project 2 — Filters, Hybrid Images, and Multi-Resolution Blending</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
   <style>
-    body { margin:0; font-family:Inter,system-ui,sans-serif; background:#0b1020; color:#e6eefc; line-height:1.6; }
+    :root {
+      --bg: #0b1020;
+      --card: #111836;
+      --muted: #a0aec0;
+      --ink: #e6eefc;
+      --accent: #8ab4ff;
+    }
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
     .container { max-width:1100px; margin:0 auto; padding:20px; }
+    header {
+      padding: 32px 20px; position: sticky; top: 0; z-index: 50;
+      background: linear-gradient(to bottom, rgba(11,16,32,0.95), rgba(11,16,32,0.7));
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
+    .brand h1 { font-size:18px; margin:0; font-weight:800; }
+    nav { margin-left:auto; font-size:14px; display:flex; gap:12px; }
+    nav a { color:var(--accent); text-decoration:none; }
+    nav a:hover { text-decoration:underline; }
+
     .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:30px; }
     h2 { margin-top:0; }
     .grid { display:grid; gap:16px; }
@@ -29,7 +48,7 @@
       width: 100%;
     }
 
-    figcaption { font-size:14px; color:#a0aec0; }
+    figcaption { font-size:14px; color:var(--muted); }
     pre { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; overflow:auto; font-size:14px; }
 
     /* Lightbox */
@@ -53,16 +72,29 @@
   </style>
 </head>
 <body>
+  <header>
+    <div class="container brand">
+      <span class="dot"></span>
+      <h1>CS180 · Project 2</h1>
+      <nav>
+        <a href="#part1">Part 1</a>
+        <a href="#part2">Part 2</a>
+        <a href="#hybrids">Hybrids</a>
+        <a href="#blending">Blending</a>
+      </nav>
+    </div>
+  </header>
+
   <main class="container">
 
     <!-- Part 1.1 -->
-    <section class="card">
+    <section class="card" id="part1">
       <h2>Part 1.1 — Convolution</h2>
       <pre><code># conv2d implementation here</code></pre>
       <pre><code># convcv2d implementation here</code></pre>
       <div class="grid four">
-        <figure><img src="./media/Me.jpg" onclick="openLightbox(this.src)"><figcaption>Original Image</figcaption></figure>
-        <figure><img src="./media/res_four.png" onclick="openLightbox(this.src)"><figcaption>9x9 Box Filtered</figcaption></figure>
+        <figure><img src="./media/Me.jpg" onclick="openLightbox(this.src)"><figcaption>Original</figcaption></figure>
+        <figure><img src="./media/res_four.png" onclick="openLightbox(this.src)"><figcaption>Box Filtered</figcaption></figure>
         <figure><img src="./media/fdx_two.png" onclick="openLightbox(this.src)"><figcaption>Dx</figcaption></figure>
         <figure><img src="./media/fdy_two.png" onclick="openLightbox(this.src)"><figcaption>Dy</figcaption></figure>
       </div>
@@ -74,28 +106,26 @@
       <h2>Part 1.2 — Derivatives & Edges</h2>
       <div class="grid five">
         <figure><img src="./media/cameraman.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cam_gx.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cam_gy.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/cameraman_gx.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/cameraman_gy.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
         <figure><img src="./media/cameraman_gradmag.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
         <figure><img src="./media/cameraman_edges.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
       </div>
-      <p><em>Write analysis here.</em></p>
     </section>
 
     <!-- Part 1.3 -->
     <section class="card">
       <h2>Part 1.3 — Gaussian & DoG</h2>
       <div class="grid four">
-        <figure><img src="./media/DoGx.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/DoGy.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cameraman_smooth.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cameraman_dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/DoGx.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/DoGy.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/cam_gradmag_blur.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/cam_gradmag_dog.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
       </div>
-      <p><em>Observations and comparisons go here.</em></p>
     </section>
 
     <!-- Part 2.1 -->
-    <section class="card">
+    <section class="card" id="part2">
       <h2>Part 2.1 — Unsharp Mask</h2>
       <div class="grid four">
         <figure><img src="./media/taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
@@ -115,11 +145,10 @@
         <figure><img src="./media/cat_high.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
         <figure><img src="./media/resharp_cat.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
       </div>
-      <p><em>Comments on sharpening strength here.</em></p>
     </section>
 
     <!-- Part 2.2 -->
-    <section class="card">
+    <section class="card" id="hybrids">
       <h2>Part 2.2 — Hybrid Images</h2>
       <div class="grid three">
         <figure><img src="./media/DerekPicture.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
@@ -144,11 +173,10 @@
       <div>
         <figure><img src="./media/expanded.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
       </div>
-      <p><em>Discussion of results here.</em></p>
     </section>
 
     <!-- Part 2.3 -->
-    <section class="card">
+    <section class="card" id="blending">
       <h2>Part 2.3 — Multi-resolution Blending</h2>
       <div class="grid five">
         <figure><img src="./media/apple.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
@@ -168,7 +196,6 @@
         <figure><img src="./media/dreekend.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
         <figure><img src="./media/dreekend_process.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
       </div>
-      <p><em>Write analysis here.</em></p>
     </section>
 
   </main>
