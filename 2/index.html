@@ -15,6 +15,8 @@
     }
     body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
     .container { max-width:1100px; margin:0 auto; padding:20px; }
+
+    /* Top header */
     header {
       padding: 32px 20px; position: sticky; top: 0; z-index: 50;
       background: linear-gradient(to bottom, rgba(11,16,32,0.95), rgba(11,16,32,0.7));
@@ -27,8 +29,17 @@
     nav a { color:var(--accent); text-decoration:none; }
     nav a:hover { text-decoration:underline; }
 
+    /* Card styling */
     .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:30px; }
     h2 { margin-top:0; }
+
+    /* Hero card */
+    .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
+    .subtitle { color:var(--muted); margin:0 0 10px; }
+    .meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:14px; }
+    .pill { padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); }
+
+    /* Grid + images */
     .grid { display:grid; gap:16px; }
     .grid.two { grid-template-columns:repeat(2,1fr); }
     .grid.three { grid-template-columns:repeat(3,1fr); }
@@ -87,6 +98,17 @@
 
   <main class="container">
 
+    <!-- Hero Intro -->
+    <section class="card">
+      <h2 class="hero-title">Filters, Hybrid Images, and Multi-Resolution Blending</h2>
+      <p class="subtitle">Exploring convolution, edge detection, sharpening, hybrid image construction, and Laplacian pyramid blending to create compelling image manipulations.</p>
+      <div class="meta">
+        <span class="pill">Course: CS180 — Intro to Computer Vision & Computational Photography</span>
+        <span class="pill">Project #2</span>
+        <span class="pill">Author: <strong>Kourosh Salahi</strong></span>
+      </div>
+    </section>
+
     <!-- Part 1.1 -->
     <section class="card" id="part1">
       <h2>Part 1.1 — Convolution</h2>
@@ -129,21 +151,21 @@
       <h2>Part 2.1 — Unsharp Mask</h2>
       <div class="grid four">
         <figure><img src="./media/taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/taj_blur.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/taj_high.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/blurred_taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/high_taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
         <figure><img src="./media/sharp_taj.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
       </div>
       <div class="grid four">
         <figure><img src="./media/dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/dog_blur.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/dog_high.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/blurred_dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/high_dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
         <figure><img src="./media/sharp_dog.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
       </div>
       <div class="grid four">
         <figure><img src="./media/pre_sharp_cat.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
         <figure><img src="./media/blurred_cat.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/cat_high.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/resharp_cat.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/high_blurred_cat.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/sharp_blurred_cat.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
       </div>
     </section>
 
