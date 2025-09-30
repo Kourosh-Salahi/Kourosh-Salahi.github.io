@@ -108,6 +108,7 @@
         <figure><img src="./media/fdy_two.png" onclick="openLightbox(this.src)"><figcaption>Finite difference Dy</figcaption></figure>
       </div>
       <p><em>Runtime: the four loop convolution was much slower, taking 1 minute and 4 seconds to run, compared to the 2 loop convolution only taking 10 seconds. These were both much slower than the built in method, convolve2d, which took 0.3 seconds</em></p>
+        <p><em>Boundaries: boundaries are handled with zero padding in my implementation, and optinal, changeable padding in the scipy version.</em></p>
     </section>
 
     <!-- Part 1.2 -->
@@ -173,7 +174,7 @@
     <!-- Part 2.2 -->
     <section class="card" id="hybrids">
       <h2>Part 2.2 — Hybrid Images</h2>
-      <p>Hybrid images mix low frequencies from one source and high frequencies from another. The perception changes depending on viewing distance.</p>
+      <p>Hybrid images mix low frequencies from one source and high frequencies from another. The perception changes depending on viewing distance. To see the effect best: click on the hybrid image of your choice, then look at it from very close, and then look at it from very far. You should see two different images.</p>
       <div class="grid three">
         <figure><img src="./media/DerekPicture.jpg" onclick="openLightbox(this.src)"><figcaption>Derek </figcaption></figure>
         <figure><img src="./media/nutmeg.jpg" onclick="openLightbox(this.src)"><figcaption>Nutmeg</figcaption></figure>
