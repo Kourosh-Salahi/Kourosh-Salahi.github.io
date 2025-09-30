@@ -14,8 +14,21 @@
     .grid.two { grid-template-columns:repeat(2,1fr); }
     .grid.three { grid-template-columns:repeat(3,1fr); }
     .grid.four { grid-template-columns:repeat(4,1fr); }
+    .grid.five { grid-template-columns:repeat(5,1fr); }
     figure { margin:0; }
-    img { width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
+    
+    /* Default image sizing */
+    img { width:100%; max-height:250px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
+    
+    /* Exceptions: allow bigger */
+    img[src*="expanded.jpg"],
+    img[src*="stack"],
+    img[src*="dreekend_process"],
+    img[src*="fig234"] {
+      max-height: none;
+      width: 100%;
+    }
+
     figcaption { font-size:14px; color:#a0aec0; }
     pre { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; overflow:auto; font-size:14px; }
   </style>
@@ -30,9 +43,9 @@
       <pre><code># convcv2d implementation here</code></pre>
       <div class="grid four">
         <figure><img src="./media/Me.jpg"><figcaption>Original Image of me</figcaption></figure>
-        <figure><img src="./media/res_four.png"><figcaption> 9x9 box convolved image of me (not much of a noticible difference)</figcaption></figure>
-        <figure><img src="./media/fdx_two.png"><figcaption>Dx. Notice the directionality of the edges</figcaption></figure>
-        <figure><img src="./media/fdy_two.png"><figcaption>Dy. Notice the edges are in a different direction now</figcaption></figure>
+        <figure><img src="./media/res_four.png"><figcaption>9x9 box convolved image of me</figcaption></figure>
+        <figure><img src="./media/fdx_two.png"><figcaption>Dx filter applied</figcaption></figure>
+        <figure><img src="./media/fdy_two.png"><figcaption>Dy filter applied</figcaption></figure>
       </div>
       <p><em>Comment on runtime and boundary handling here.</em></p>
     </section>
