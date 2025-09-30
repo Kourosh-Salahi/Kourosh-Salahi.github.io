@@ -16,7 +16,7 @@
     .grid.four { grid-template-columns:repeat(4,1fr); }
     .grid.five { grid-template-columns:repeat(5,1fr); }
     figure { margin:0; }
-    
+
     /* Default image sizing */
     img { width:100%; max-height:250px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
     
@@ -78,14 +78,26 @@
     <!-- Part 2.1 -->
     <section class="card">
       <h2>Part 2.1 — Unsharp Mask</h2>
-      <div class="grid three">
-        <figure><img src="./media/taj.jpg"><figcaption></figcaption></figure>
-        <figure><img src="./media/sharp_taj.jpg"><figcaption></figcaption></figure>
-        <figure><img src="./media/dog.jpg"><figcaption></figcaption></figure>
-        <figure><img src="./media/sharp_dog.jpg"><figcaption></figcaption></figure>
-        <figure><img src="./media/pre_sharp_cat.jpeg"><figcaption></figcaption></figure>
-        <figure><img src="./media/blurred_cat.jpeg"><figcaption></figcaption></figure>
-        <figure><img src="./media/resharp_cat.jpeg"><figcaption></figcaption></figure>
+      <!-- First row -->
+      <div class="grid four">
+        <figure><img src="./media/taj.jpg"><figcaption>Original Taj</figcaption></figure>
+        <figure><img src="./media/taj_blurred.jpg"><figcaption>Blurred Taj</figcaption></figure>
+        <figure><img src="./media/taj_highfreq.jpg"><figcaption>High-frequency Taj</figcaption></figure>
+        <figure><img src="./media/sharp_taj.jpg"><figcaption>Sharpened Taj</figcaption></figure>
+      </div>
+      <!-- Second row -->
+      <div class="grid four">
+        <figure><img src="./media/dog.jpg"><figcaption>Original Dog</figcaption></figure>
+        <figure><img src="./media/dog_blurred.jpg"><figcaption>Blurred Dog</figcaption></figure>
+        <figure><img src="./media/dog_highfreq.jpg"><figcaption>High-frequency Dog</figcaption></figure>
+        <figure><img src="./media/sharp_dog.jpg"><figcaption>Sharpened Dog</figcaption></figure>
+      </div>
+      <!-- Third row -->
+      <div class="grid four">
+        <figure><img src="./media/pre_sharp_cat.jpeg"><figcaption>Original Cat</figcaption></figure>
+        <figure><img src="./media/blurred_cat.jpeg"><figcaption>Blurred Cat</figcaption></figure>
+        <figure><img src="./media/cat_highfreq.jpeg"><figcaption>High-frequency Cat</figcaption></figure>
+        <figure><img src="./media/resharp_cat.jpeg"><figcaption>Sharpened Cat</figcaption></figure>
       </div>
       <p><em>Comments on sharpening strength here.</em></p>
     </section>
@@ -108,12 +120,13 @@
         <figure><img src="./media/gihun_mad.webp"><figcaption></figcaption></figure>
         <figure><img src="./media/hybrid_Gihun.jpg"><figcaption></figcaption></figure>
       </div>
-      <div class="grid four">
+      <div class="grid three">
         <figure><img src="./media/Monkey.jpg"><figcaption></figcaption></figure>
         <figure><img src="./media/monkey2.jpg"><figcaption></figcaption></figure>
         <figure><img src="./media/hybrid_Monkey.jpg"><figcaption></figcaption></figure>
-        <figure><img src="./media/expanded.jpg"><figcaption></figcaption></figure>
       </div>
+      <!-- Expanded process image on its own line -->
+      <figure><img src="./media/expanded.jpg"><figcaption></figcaption></figure>
       <p><em>Discussion of results here.</em></p>
     </section>
 
