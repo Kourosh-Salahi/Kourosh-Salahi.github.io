@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CS180 Project 1 — Colorizing the Prokudin‑Gorskii Photo Collection</title>
-  <meta name="description" content="CS180 Proj1: Single‑scale & multi‑scale (image pyramid) alignment with L2/NCC" />
+  <title>CS180 Project 2 — Filters, Hybrid Images, and Multi-Resolution Blending</title>
+  <meta name="description" content="CS180 Project 2: Convolution, Filters, Edges, Hybrid Images, and Multi-resolution Pyramid Blending" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
@@ -16,375 +16,124 @@
       --ink: #e6eefc;
       --accent: #8ab4ff;
       --accent2: #70f3c4;
-      --ring: rgba(138, 180, 255, 0.45);
-      --ok: #70f3c4;
-      --warn: #f5b971;
-      --bad: #f87171;
     }
     * { box-sizing: border-box; }
-    html, body { height: 100%; }
     body {
-      margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--ink); background: radial-gradient(1200px 600px at 20% -10%, #18224a 0%, transparent 60%),
-                          radial-gradient(900px 500px at 120% 10%, rgba(112,243,196,0.15) 0%, transparent 60%),
-                          var(--bg);
+      margin: 0; font-family: Inter, system-ui, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(1200px 600px at 20% -10%, #18224a 0%, transparent 60%),
+                  radial-gradient(900px 500px at 120% 10%, rgba(112,243,196,0.15) 0%, transparent 60%),
+                  var(--bg);
       line-height: 1.6;
     }
     a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    /* Layout */
-    .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
     header {
-      padding: 48px 0 24px; position: sticky; top: 0; backdrop-filter: saturate(150%) blur(10px);
+      padding: 48px 0 24px; position: sticky; top: 0;
+      backdrop-filter: saturate(150%) blur(10px);
       background: linear-gradient(to bottom, rgba(11,16,32,0.8), rgba(11,16,32,0.3), transparent);
       border-bottom: 1px solid rgba(255,255,255,0.06);
       z-index: 20;
     }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand .dot { width: 10px; height: 10px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 0 0 6px rgba(138,180,255,0.15); }
-    .brand h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: 0.2px; }
-
+    .brand h1 { font-size: 18px; margin: 0; font-weight: 800; }
     .hero { padding: 32px 0 12px; }
-    .title { font-size: clamp(28px, 4vw, 44px); line-height: 1.1; margin: 6px 0 10px; font-weight: 800; }
-    .subtitle { color: var(--muted); max-width: 75ch; }
-    .meta { margin-top: 10px; color: #cbd5e1; font-size: 14px; display:inline-flex; gap: 12px; align-items:center; flex-wrap: wrap; }
-    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); }
-
-    .card { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
-    .section { margin: 30px 0; }
-    .section h2 { margin: 0 0 8px; font-size: clamp(22px, 3vw, 28px); }
-    .section p.lead { margin-top: 0; color: #cbd5e1; }
-
-    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 860px) { .grid.two { grid-template-columns: 1fr 1fr; } }
-    @media (min-width: 860px) { .grid.three { grid-template-columns: 1fr 1fr 1fr; } }
-
-    figure { margin: 0; display: grid; gap: 8px; }
-    figure img, video { width: 100%; height: auto; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); display:block; }
+    .title { font-size: clamp(28px, 4vw, 44px); font-weight: 800; }
+    .subtitle { color: var(--muted); }
+    .meta { margin-top: 10px; font-size: 14px; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 12px; }
+    .pill { padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); }
+    .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 20px; margin-bottom: 30px; }
+    h2 { margin-top: 0; font-size: clamp(22px, 3vw, 28px); }
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, 1fr); }
+    .grid.three { grid-template-columns: repeat(3, 1fr); }
+    .grid.four { grid-template-columns: repeat(4, 1fr); }
+    figure { margin: 0; }
+    figure img { width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
     figcaption { font-size: 14px; color: var(--muted); }
-
-    /* Details */
-    .details { display: grid; gap: 8px; margin-top: 8px; }
-    .details .row { display:flex; gap:10px; flex-wrap:wrap }
-    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1) }
-
-    /* Tables */
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; }
-    th { font-weight: 700; }
-    .ok { color: var(--ok); }
-    .warn { color: var(--warn); }
-    .bad { color: var(--bad); }
-
-    /* Footer */
-    footer { margin: 40px 0 60px; color: var(--muted); text-align: center; font-size: 14px; }
-
-    /* Lightbox */
-    .lightbox img { cursor: zoom-in; }
-    .lightbox.open { position: fixed; inset: 0; background: rgba(7,10,22,0.85); display: grid; place-items: center; padding: 40px; z-index: 50; }
-    .lightbox.open img { max-width: min(1200px, 92vw); max-height: 90vh; border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.55); cursor: zoom-out; }
-
-    /* Callouts */
-    .callout { border-left: 3px solid var(--accent); padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; }
-    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
-    pre { padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); overflow:auto }
-
-    /* Chips */
-    .chip { display:inline-flex; align-items:center; gap:8px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); font-size:12px }
-      @media (min-width: 1100px) { .grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; } }
+    footer { margin: 40px 0 60px; text-align: center; font-size: 14px; color: var(--muted); }
   </style>
 </head>
 <body>
   <header>
     <div class="container brand">
-      <span class="dot" aria-hidden="true"></span>
-      <h1>CS180 · Project 1</h1>
-      <nav style="margin-left:auto;font-size:14px;display:flex;gap:12px">
-        <a href="../">Home</a>
-        <a href="../0/">Project 0</a>
-        <a href="#results-single">Single‑Scale</a>
-        <a href="#results-pyramid">Pyramid</a>
-      </nav>
+      <span class="dot"></span>
+      <h1>CS180 · Project 2</h1>
     </div>
   </header>
 
   <main class="container">
     <section class="hero">
       <div class="card">
-        <h2 class="title">Colorizing the Prokudin‑Gorskii Photo Collection</h2>
-        <p class="subtitle">Aligning three monochrome glass‑plate channels (B, G, R) into vivid color images using single‑scale search and coarse‑to‑fine image pyramids. Used NCC in alignment algorithm.</p>
+        <h2 class="title">Filters, Hybrid Images, and Multi-Resolution Blending</h2>
+        <p class="subtitle">From convolution and edge detection to Gaussian/Laplacian stacks and blending.</p>
         <div class="meta">
-          <span class="pill">Course: CS180 — Intro to Computer Vision & Computational Photography</span>
-          <span class="pill">Project #1</span>
+          <span class="pill">Course: CS180</span>
+          <span class="pill">Project #2</span>
           <span class="pill">Author: <strong>Kourosh Salahi</strong></span>
-          <span class="pill">Due: Sep 12, 2025 • 11:59 PM</span>
         </div>
       </div>
     </section>
 
-    <!-- Overview / Key Ideas -->
-    <section class="section">
-      <div class="card">
-        <h2>Overview & Key Ideas</h2>
-        <p class="lead">Given three images taken in black and white which have R, G, and B filters put on the lenses of the camera, we can use the intensities of the pixel brightness and these three images to reconstruct a color image. Utilizing an alignment algorithm, this was accomplished.</p>
-        <div class="grid two">
-          <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/cathedral.jpg" alt="Example glass plate (BGR from top to bottom)." loading="lazy" />
-            <figcaption>Input glass plate (top→bottom = B, G, R).</figcaption>
-          </figure>
-          <figure class="lightbox" onclick="openLightbox(event)">
-            <img src="./media/cathedral_recolored.jpg" alt="Aligned and colorized output image." loading="lazy" />
-            <figcaption>Output after alignment & composition.</figcaption>
-          </figure>
-        </div>
-        <div class="details">
-          <div class="callout">
-            <strong>Scoring metrics.</strong> I implemented <span class="chip">NCC</span> as the scoring metric. This worked well throughout.
-          </div>
-        </div>
+    <!-- Part 1 -->
+    <section class="card">
+      <h2>Part 1: Filters and Edges</h2>
+
+      <h3>1.1 Convolution</h3>
+      <p>Implemented convolution with NumPy only, compared results with <code>scipy.signal.convolve2d</code>. Discussed runtime and boundary handling.</p>
+
+      <h3>1.2 Finite Differences & Edges</h3>
+      <div class="grid.three">
+        <figure><img src="./media/dx.jpg"><figcaption>dx</figcaption></figure>
+        <figure><img src="./media/dy.jpg"><figcaption>dy</figcaption></figure>
+        <figure><img src="./media/edges.jpg"><figcaption>Binarized edge map</figcaption></figure>
+      </div>
+
+      <h3>1.3 Gaussian & DoG Filters</h3>
+      <div class="grid.two">
+        <figure><img src="./media/gaussian.jpg"><figcaption>Gaussian smoothing</figcaption></figure>
+        <figure><img src="./media/dog.jpg"><figcaption>DoG filter response</figcaption></figure>
+      </div>
+      <p>Compared Gaussian/DoG with finite difference method.</p>
+    </section>
+
+    <!-- Part 2 -->
+    <section class="card">
+      <h2>Part 2: Applications</h2>
+
+      <h3>2.1 Unsharp Mask</h3>
+      <div class="grid.three">
+        <figure><img src="./media/taj_blur.jpg"><figcaption>Blurred</figcaption></figure>
+        <figure><img src="./media/taj_high.jpg"><figcaption>High frequencies</figcaption></figure>
+        <figure><img src="./media/taj_sharp.jpg"><figcaption>Sharpened</figcaption></figure>
+      </div>
+
+      <h3>2.2 Hybrid Images</h3>
+      <div class="grid.two">
+        <figure><img src="./media/derek_nutmeg.jpg"><figcaption>Derek + Nutmeg hybrid</figcaption></figure>
+        <figure><img src="./media/hybrid_custom1.jpg"><figcaption>Custom hybrid 1</figcaption></figure>
+      </div>
+      <p>Included Fourier transforms and cutoff visualizations for one example.</p>
+
+      <h3>2.3 + 2.4 Multi-resolution Blending</h3>
+      <div class="grid.three">
+        <figure><img src="./media/apple_stack.jpg"><figcaption>Apple stack</figcaption></figure>
+        <figure><img src="./media/orange_stack.jpg"><figcaption>Orange stack</figcaption></figure>
+        <figure><img src="./media/oraple.jpg"><figcaption>Blended result</figcaption></figure>
+      </div>
+      <p>Also recreated Fig. 3.42 showing Laplacian pyramid details and blending contributions.</p>
+
+      <h3>2.4 Custom Blends</h3>
+      <div class="grid.two">
+        <figure><img src="./media/custom_blend1.jpg"><figcaption>Blend with circular mask ()</figcaption></figure>
+        <figure><img src="./media/custom_blend2.jpg"><figcaption>The Dreekend</figcaption></figure>
       </div>
     </section>
 
-<section class="section" id="method">
-<div class="card">
-<h2>Method</h2>
-<p class="lead">Below is the end‑to‑end pipeline I used.</p>
-<div class="grid two">
-<div>
-<h3 style="margin:0 0 6px">1) Preprocessing</h3>
-<ul style="margin-top:8px">
-<li><strong>Split B/G/R:</strong> Each input plate is divided into three equal vertical slices in B→G→R order.</li>
-<li><strong>Type/scale:</strong> Convert to <code>float</code> to make metrics comparable across images.</li>
-<li><strong>Interior crop for scoring:</strong> Ignore ~10% borders on each side when computing alignment scores to avoid frame artifacts and scan edges.</li>
-</ul>
-
-
-<h3 style="margin:12px 0 6px">2) Single‑Scale Exhaustive Search</h3>
-<ul>
-<li>For each channel <em>C ∈ {G,R}</em>, search integer displacements with np.roll <code>(dx,dy) ∈ [−w,w], where w is the displacement window that is being searched</code>.</li>
-<li><strong>NCC:</strong> <code>⟨B̂, Ĉ⟩ = (B)·(C) / (‖B‖‖C‖)</code>. Calculated by flattening channels into vectors. Higher is better.</li>
-<li>Pick the displacement with the best score and record <code>(dx,dy)</code> for R→B and G→B.</li>
-</ul>
-
-
-<h3 style="margin:12px 0 6px">3) Coarse‑to‑Fine Image Pyramid</h3>
-<ul>
-<li><strong>Build pyramid:</strong> Repeatedly downsample by 2 (with anti‑aliasing) until 1/16.</li>
-<li><strong>Coarsest match:</strong> Run the single‑scale matcher to get an initial <code>(dx,dy)</code>.</li>
-<li><strong>Upscale & refine:</strong> Multiply displacements by 2 when moving up a level and refine in a small window (e.g., ±4) around the upscaled estimate.</li>
-<li><strong>Rationale:</strong> The pyramid reduces the number of candidate shifts dramatically while avoiding local minima from large motions.</li>
-</ul>
-
-
-<h3 style="margin:12px 0 6px">4) Composition</h3>
-<ul>
-<li>Shift G and R by the chosen displacements using <code>np.roll</code> (or equivalent) and stack channels into <code>[R,G,B]</code>.</li>
-<li>For visualization, optionally crop outer margins to remove wraparound introduced by shifting.</li>
-</ul>
-</div>
-<div>
-<h3 style="margin:0 0 6px">Scoring Notes & Design Choices</h3>
-<ul>
-<li><strong>Metric choice:</strong> NCC is generally more robust when channels have different brightness/contrast; L2 serves as a simple baseline.</li>
-<li><strong>Interior crop:</strong> Ignoring borders prevents frame edges from dominating the score and helps with plates that include thick margins.</li>
-<li><strong>Vectorization:</strong> All per‑candidate scores are computed with NumPy operations; loops only iterate over candidate shifts.</li>
-</ul>
-
-</div>
-</div>
-</div>
-</section>
-
-    <!-- Results: Single Scale -->
-<!-- Results: Single Scale -->
-<section class="section" id="results-single">
-<div class="card">
-<h2>Results — Single‑Scale (Low‑Res JPEGs)</h2>
-<p class="lead">These are the single scale images, which were constructed very quickly.</p>
-<div class="grid three">
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/cathedral_recolored.jpg" alt="cathedral — single-scale result" loading="lazy" />
-<figcaption>
-<strong>cathedral.jpg</strong><br>
-R→B: <code>(3, 12)</code> • G→B: <code>(2, 5)</code> • <em>metric:</em> <span class="chip">NCC</span>
-</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/monastery_recolored.jpg" alt="monastery — single-scale result" loading="lazy" />
-<figcaption>
-<strong>monastery.jpg</strong><br>
-R→B: <code>(2, 3)</code> • G→B: <code>(2, -3)</code> • <em>metric:</em> <span class="chip">NCC</span>
-</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/tobolsk_recolored.jpg" alt="tobolsk — single-scale result" loading="lazy" />
-<figcaption>
-<strong>tobolsk.jpg</strong><br>
-R→B: <code>(3, 6)</code> • G→B: <code>(3, 3)</code> • <em>metric:</em> <span class="chip">NCC</span>
-</figcaption>
-</figure>
-</div>
-</div>
-</section>
-
-
-<!-- Results: Pyramid -->
-<section class="section" id="results-pyramid">
-<div class="card">
-<h2>Results — Multi‑Scale Pyramid (Mandatory Set)</h2>
-<p class="lead">Some very nice recolored images!</p>
-<div class="grid three" style="margin-bottom:12px">
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/church_recolored.jpg" alt="church — pyramid result" loading="lazy" />
-<figcaption><strong>church.tif</strong> — A beautiful church.</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/emir_recolored.jpg" alt="emir — pyramid result" loading="lazy" />
-<figcaption><strong>emir.tif</strong> — A man with significant swagger.</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/harvesters_recolored.jpg" alt="harvesters — pyramid result" loading="lazy" />
-<figcaption><strong>harvesters.tif</strong> — A group of harvesters in a field.</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/icon_recolored.jpg" alt="icon — pyramid result" loading="lazy" />
-<figcaption><strong>icon.tif</strong> — An extravagant scene. </figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/italil_recolored.jpg" alt="italil — pyramid result" loading="lazy" />
-<figcaption><strong>italil.tif</strong> — Another beautiful image.</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/lastochikino_recolored.jpg" alt="lastochikino — pyramid result" loading="lazy" />
-<figcaption><strong>lastochikino.tif</strong> — A Mountain side.</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/lugano_recolored.jpg" alt="lugano — pyramid result" loading="lazy" />
-<figcaption><strong>lugano.tif</strong> — A Peaceful Lake.</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/melons_recolored.jpg" alt="melons — pyramid result" loading="lazy" />
-<figcaption><strong>melons.tif</strong> — A melon seller. Significant swagger here as well. </figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/self_portrait_recolored.jpg" alt="self portrait — pyramid result" loading="lazy" />
-<figcaption><strong>self_portrait.tif</strong> — A Cool guy in a field.</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/siren_recolored.jpg" alt="siren — pyramid result" loading="lazy" />
-<figcaption><strong>siren.tif</strong> — Pretty flowers.</figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/three_generations_recolored.jpg" alt="three generations — pyramid result" loading="lazy" />
-<figcaption><strong>three_generations.tif</strong> — A happy family.</figcaption>
-</figure>
-</div>
-<div class="card" style="margin-top:12px">
-<table>
-  <thead>
-    <tr>
-      <th>Image</th>
-      <th>Metric</th>
-      <th>R→B (dx, dy)</th>
-      <th>G→B (dx, dy)</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td>church.tif</td><td>NCC</td><td>(-4, 58)</td><td>(4, 25)</td><td class="ok">OK</td></tr>
-    <tr><td>emir.tif</td><td>NCC</td><td>(55, 103)</td><td>(24, 49)</td><td class="warn">Off</td></tr>
-    <tr><td>harvesters.tif</td><td>NCC</td><td>(13, 123)</td><td>(16, 59)</td><td class="ok">OK</td></tr>
-    <tr><td>icon.tif</td><td>NCC</td><td>(23, 89)</td><td>(17, 41)</td><td class="ok">OK</td></tr>
-    <tr><td>italil.tif</td><td>NCC</td><td>(35, 76)</td><td>(21, 38)</td><td class="ok">OK</td></tr>
-    <tr><td>lastochikino.tif</td><td>NCC</td><td>(-8, 75)</td><td>(-2, -2)</td><td class="ok">OK</td></tr>
-    <tr><td>lugano.tif</td><td>NCC</td><td>(-29, 92)</td><td>(-16, 41)</td><td class="ok">OK</td></tr>
-    <tr><td>melons.tif</td><td>NCC</td><td>(13, 178)</td><td>(10, 81)</td><td class="ok">OK</td></tr>
-    <tr><td>self_portrait.tif</td><td>NCC</td><td>(37, 176)</td><td>(29, 78)</td><td class="ok">OK</td></tr>
-    <tr><td>siren.tif</td><td>NCC</td><td>(-25, 95)</td><td>(-6, 49)</td><td class="ok">OK</td></tr>
-    <tr><td>three_generations.tif</td><td>NCC</td><td>(11, 112)</td><td>(14, 53)</td><td class="ok">OK</td></tr>
-  </tbody>
-</table>
-</div>
-</div>
-</section>
-
-
-<!-- Extra Images from LoC -->
-<!-- Extra Images from LoC -->
-<section class="section" id="extras">
-<div class="card">
-<h2>Additional Examples — My Own Selections</h2>
-<p class="lead">These four were chosen from the online collection.</p>
-<div class="grid four">
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/mosque_recolored.jpg" alt="mosque — selection" loading="lazy" />
-<figcaption><strong>mosque.tif</strong> — A deserted mosque — R→B: <code>(11, 70)</code> • G→B: <code>(10, 26)</code></figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/camel_recolored.jpg" alt="camel — selection" loading="lazy" />
-<figcaption><strong>camel.tif</strong> — A man and his camel — R→B: <code>(38, 80)</code> • G→B: <code>(15, 19)</code></figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/mat_recolored.jpg" alt="mat — selection" loading="lazy" />
-<figcaption><strong>mat.tif</strong> — A woman standing on a mat — R→B: <code>(55, 107)</code> • G→B: <code>(38, 48)</code></figcaption>
-</figure>
-<figure class="lightbox" onclick="openLightbox(event)">
-<img src="./media/fire_recolored.jpg" alt="fire — selection" loading="lazy" />
-<figcaption><strong>fire.tif</strong> — People sitting around a fire — R→B: <code>(-39, 82)</code> • G→B: <code>(-11, 44)</code></figcaption>
-</figure>
-</div>
-</div>
-</section>
-    <!-- Failures / Analysis -->
-    <section class="section" id="failures">
-      <div class="card">
-        <h2>Failure Cases & Analysis</h2>
-        <p class="lead">Some images had slight alignment effects that can be attributed to people, animals, or scenes such as water moving inbetween shots. The only image that seemed to fail completely in aligning was the image of the Emir. I believe this to be due to the following:</p>
-        <ul>
-          <li><em>Image artifacts:</em> Some channels had scratches while others didn't potentially causing the optimization function to try to match patterns that didnt actually correspond to real things in the image</li>
-          <li><em>Cross channel brightness: </em>The Emir, in his eternal swagger, has a very bright garment, which appears very differently across the different color channels (very bright in Blue and very dark in Red).</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Repro / Notes -->
-    <section class="section" id="repro">
-      <div class="card">
-        <h2>Reproducibility & Notes</h2>
-        <ul>
-          <li>While the code for this is not publicly available, I encourage those who stumble upon this and are not part of CS180 to attempt reimplementing this. It is a very fun exercise! </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Thanks -->
-    <section class="section">
-      <div class="card">
-        <h2>Thanks for reading! 📷🧮</h2>
-        <p class="lead">I hope you enjoyed reading about my project and viewing these beautiful images :)</p>
-      </div>
-    </section>
+    <footer>
+      <p>Prepared for CS180 Project 2 by Kourosh Andrew Salahi.</p>
+    </footer>
   </main>
-
-  <footer class="container">
-    <p>
-      Prepared for CS180 Project 1 by Kourosh Andrew Salahi. Images: Prokudin‑Gorskii Collection (Library of Congress).
-    </p>
-  </footer>
-
-  <script>
-    function openLightbox(e) {
-      const fig = e.currentTarget;
-      fig.classList.add('open');
-      function close(ev) {
-        if (ev.target.tagName === 'IMG' || ev.target === fig) {
-          fig.classList.remove('open');
-          fig.removeEventListener('click', close);
-        }
-      }
-      fig.addEventListener('click', close);
-    }
-  </script>
 </body>
 </html>
