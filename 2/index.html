@@ -112,38 +112,14 @@
     <!-- Part 1.1 -->
     <section class="card" id="part1">
       <h2>Part 1.1 — Convolution</h2>
-      <pre><code>def conv4loops(image, kernel):
-    height, width = image.shape
-    kh, kw = kernel.shape
-    pad_h, pad_w = kh // 2, kw // 2
-    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
-    output = np.zeros_like(image)
-    for i in range(height):
-        for j in range(width):
-            val = 0
-            for m in range(kh):
-                for n in range(kw):
-                    val += kernel[m, n] * padded[i+m, j+n]
-            output[i, j] = val
-    return output</code></pre>
-      <pre><code>def conv2loops(image, kernel):
-    height, width = image.shape
-    kh, kw = kernel.shape
-    pad_h, pad_w = kh // 2, kw // 2
-    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
-    output = np.zeros_like(image)
-    for i in range(height):
-            for j in range(width):
-                region = padded[i:i+kh, j:j+kw]
-                output[i, j] = np.sum(region * kernel)
-    return output</code></pre>
+      <pre><code># conv4loops implementation here</code></pre>
+      <pre><code># conv2loops implementation here</code></pre>
       <div class="grid four">
         <figure><img src="./media/Me.jpg" onclick="openLightbox(this.src)"><figcaption>Original</figcaption></figure>
         <figure><img src="./media/res_four.png" onclick="openLightbox(this.src)"><figcaption>Box Filtered</figcaption></figure>
         <figure><img src="./media/fdx_two.png" onclick="openLightbox(this.src)"><figcaption>Dx</figcaption></figure>
         <figure><img src="./media/fdy_two.png" onclick="openLightbox(this.src)"><figcaption>Dy</figcaption></figure>
       </div>
-      <p><em>Comment on runtime and boundary handling here.</em></p>
     </section>
 
     <!-- Part 1.2 -->
@@ -223,23 +199,38 @@
     <!-- Part 2.3 -->
     <section class="card" id="blending">
       <h2>Part 2.3 — Multi-resolution Blending</h2>
-      <div class="grid five">
-        <figure><img src="./media/apple.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/orange.jpeg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/apple_stack.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/orange_stack.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/fig234.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-      </div>
+
+      <!-- Row 1 -->
       <div class="grid three">
-        <figure><img src="./media/golf_img.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/face.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/golface.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+        <figure><img src="./media/apple.jpeg" onclick="openLightbox(this.src)"><figcaption>Apple</figcaption></figure>
+        <figure><img src="./media/orange.jpeg" onclick="openLightbox(this.src)"><figcaption>Orange</figcaption></figure>
+        <figure><img src="./media/hybrid_apple_orange.png" onclick="openLightbox(this.src)"><figcaption>Hybrid</figcaption></figure>
       </div>
-      <div class="grid four">
-        <figure><img src="./media/weeknd.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/drake2.jpg" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/dreekend.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
-        <figure><img src="./media/dreekend_process.png" onclick="openLightbox(this.src)"><figcaption></figcaption></figure>
+
+      <!-- Row 2 -->
+      <div class="grid three">
+        <figure><img src="./media/apple_stack.png" onclick="openLightbox(this.src)"><figcaption>Apple Stack</figcaption></figure>
+        <figure><img src="./media/orange_stack.png" onclick="openLightbox(this.src)"><figcaption>Orange Stack</figcaption></figure>
+        <figure><img src="./media/fig234.png" onclick="openLightbox(this.src)"><figcaption>Reference Fig 3.42</figcaption></figure>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="grid three">
+        <figure><img src="./media/golf_img.jpg" onclick="openLightbox(this.src)"><figcaption>Golf</figcaption></figure>
+        <figure><img src="./media/face.jpg" onclick="openLightbox(this.src)"><figcaption>Face</figcaption></figure>
+        <figure><img src="./media/golface.png" onclick="openLightbox(this.src)"><figcaption>Blended</figcaption></figure>
+      </div>
+
+      <!-- Row 4 -->
+      <div class="grid three">
+        <figure><img src="./media/weeknd.jpg" onclick="openLightbox(this.src)"><figcaption>Weeknd</figcaption></figure>
+        <figure><img src="./media/drake2.jpg" onclick="openLightbox(this.src)"><figcaption>Drake</figcaption></figure>
+        <figure><img src="./media/dreekend.png" onclick="openLightbox(this.src)"><figcaption>Blended</figcaption></figure>
+      </div>
+
+      <!-- Row 5 -->
+      <div>
+        <figure><img src="./media/dreekend_process.png" onclick="openLightbox(this.src)"><figcaption>Process Visualization</figcaption></figure>
       </div>
     </section>
 
