@@ -108,7 +108,7 @@
         <figure><img src="./media/fdy_two.png" onclick="openLightbox(this.src)"><figcaption>Finite difference Dy</figcaption></figure>
       </div>
       <p><em>Runtime: the four loop convolution was much slower, taking 1 minute and 4 seconds to run, compared to the 2 loop convolution only taking 10 seconds. These were both much slower than the built in method, convolve2d, which took 0.3 seconds</em></p>
-        <p><em>Boundaries: boundaries are handled with zero padding in my implementation, and optinal, changeable padding in the scipy version.</em></p>
+        <p><em>Boundaries: boundaries are handled with zero padding in my implementation, and optional, changeable padding in the scipy version.</em></p>
     </section>
 
     <!-- Part 1.2 -->
@@ -135,14 +135,15 @@
         <figure><img src="./media/cam_gradmag_blur.png" onclick="openLightbox(this.src)"><figcaption>Edges via blur first</figcaption></figure>
         <figure><img src="./media/cam_gradmag_dog.png" onclick="openLightbox(this.src)"><figcaption>Edges via DoG</figcaption></figure>
       </div>
-      <p><em>Observation: DoG/blurred edges are thicker and less noisy compared to plain finite difference.</em></p>
+      <p><em>Observation: DoG/blurred edges are thicker, smoother, and less noisy compared to plain finite difference. The background edges are more easily picked up. I am overall able to get a cleaner, nicer edge image through the DoG/blurred image as opposed to the finite difference image.</em></p>
       <p><em>Verification: Both Edge images are the same as found by computing their difference in the code and finding that it is negligible.</em></p>
     </section>
 
     <!-- Part 2.1 -->
     <section class="card" id="part2">
       <h2>Part 2.1 — Unsharp Mask</h2>
-      <p>Unsharp masking subtracts a blurred image (low frequencies) from the original to extract high frequencies, which are then added back to sharpen the result.</p>
+      <p>Unsharp masking works by first creating a blurred version of the original image to capture its low-frequency content, subtracting this blurred version from the original to isolate the high-frequency details such as edges and fine textures, 
+        and then adding these extracted high frequencies back to the original image, often scaled by a chosen factor, to produce a result that appears sharper and more defined to the human eye.</p>
       <div class="grid four">
         <figure><img src="./media/taj.jpg" onclick="openLightbox(this.src)"><figcaption>Original Taj Mahal</figcaption></figure>
         <figure><img src="./media/blurred_taj.jpg" onclick="openLightbox(this.src)"><figcaption>Blurred Taj</figcaption></figure>
@@ -203,7 +204,7 @@
 
     <!-- Part 2.3 -->
     <section class="card" id="blending">
-      <h2>Part 2.3 — Multi-resolution Blending</h2>
+      <h2>Part 2.3 & 2.4 — Multi-resolution Blending</h2>
       <p>Gaussian and Laplacian stacks allow smooth blending, avoiding harsh seams. Here I recreate the classic “Oraple” and experiment with custom blends.</p>
 
       <div class="grid three">
@@ -237,6 +238,24 @@
       <p><em>Observation: The golface image has a circular mask. Notice that it is more than just transparency on the face and pasting that over the golf ball, the ball blends into the face, and you can see parts of the golf ball divots fade away as the face becomes more prominent. The face is rather light, which was my attempt to match the shades. 
       I would assume that implementing color matching would make the blend much prettier.</em></p>
       <p><em>Observation: The Weeknd and Drake both make music that is enjoyable together. Their faces are not enjoyable together. The way that their mouths, hairlines, noses, and forehead wrinkles line up make the image rather eery. Notice that the sharp line above drake is not a seam, but a remant of the background he stands in front of.</em></p>
+    </section>
+
+
+        <!-- Conclusion -->
+    <section class="card" id="conclusion">
+      <h2>Conclusion</h2>
+      <p>
+        This project explored convolution, edge detection, Gaussian and DoG filtering, 
+        unsharp masking, hybrid images, and multi-resolution blending. Along the way, 
+        I learned how different frequency components contribute to visual perception 
+        and how computational photography techniques can be combined to produce 
+        compelling and sometimes surprising results. 
+      </p>
+      <p>
+        <strong>🍎 + 🍊 Thanks for checking out my project!</strong>  
+        I appreciate you taking the time to explore my work and I hope you found the 
+        results as fun and fascinating as I did while building them! -Kourosh Salahi
+      </p>
     </section>
 
   </main>
