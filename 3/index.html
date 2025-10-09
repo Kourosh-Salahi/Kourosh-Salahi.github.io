@@ -26,8 +26,6 @@
     h2 { margin-top:0; }
     .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
     .subtitle { color:var(--muted); margin:0 0 10px; }
-    .meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:14px; }
-    .pill { padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); }
     .grid { display:grid; gap:16px; }
     .grid.two { grid-template-columns:repeat(2,1fr); }
     .grid.three { grid-template-columns:repeat(3,1fr); }
@@ -57,73 +55,84 @@
 
   <main class="container">
 
+    <!-- Hero -->
     <section class="card">
       <h2 class="hero-title">Image Warping and Mosaicing</h2>
       <p class="subtitle">By <strong>Kourosh Salahi</strong> · CS180/280A: Computer Vision & Computational Photography</p>
-      <p>The goal of this project is to learn how to compute homographies, perform image warping, and create seamless mosaics by blending multiple views of a scene. This forms the foundation for later parts of Project 3.</p>
+      <p>The goal of this project is to compute homographies, perform custom image warping, and blend multiple photographs into seamless mosaics. This part focuses on implementing warping, resampling, and compositing from scratch.</p>
     </section>
 
+    <!-- A.1 -->
     <section class="card" id="A1">
       <h2>A.1 — Shooting and Digitizing Pictures</h2>
-      <p>I captured multiple sets of overlapping photographs by rotating my camera around a fixed center of projection. This ensured projective transformations between images. Below are two sets of example inputs used for my mosaics.</p>
+      <p>Three sets of images were captured by rotating the camera about a fixed point to produce overlapping projective views. These serve as the base inputs for mosaicing.</p>
       <div class="grid.three">
-        <figure><img src="./media/set1_left.jpg" onclick="openLightbox(this.src)"><figcaption>Set 1 — Left Image</figcaption></figure>
-        <figure><img src="./media/set1_right.jpg" onclick="openLightbox(this.src)"><figcaption>Set 1 — Right Image</figcaption></figure>
-        <figure><img src="./media/set2_left.jpg" onclick="openLightbox(this.src)"><figcaption>Set 2 — Left Image</figcaption></figure>
+        <figure><img src="./images/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Left Image</figcaption></figure>
+        <figure><img src="./images/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Right Image</figcaption></figure>
+        <figure><img src="./images/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Left Image</figcaption></figure>
+        <figure><img src="./images/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Right Image</figcaption></figure>
+        <figure><img src="./images/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering — Left Image</figcaption></figure>
+        <figure><img src="./images/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering — Right Image</figcaption></figure>
       </div>
-      <p><em>Both sets were taken with decent overlap.</em></p>
+      <p><em>Each pair was shot with ~50% overlap to ensure stable correspondence estimation.</em></p>
     </section>
 
+    <!-- A.2 -->
     <section class="card" id="A2">
       <h2>A.2 — Recovering Homographies</h2>
-      <p>I implemented <code>computeH(im1_pts, im2_pts)</code> to solve for the 3×3 homography matrix using point correspondences between two images. The linear system <code>Ah = b</code> is built from at least four correspondences and solved in a least-squares sense.</p>
-      <pre><code>def computeH(im1_pts, im2_pts):
-    n = im1_pts.shape[0]
-    A = []
-    for i in range(n):
-        x, y = im1_pts[i]
-        x_p, y_p = im2_pts[i]
-        A.append([-x, -y, -1, 0, 0, 0, x*x_p, y*x_p, x_p])
-        A.append([0, 0, 0, -x, -y, -1, x*y_p, y*y_p, y_p])
-    A = np.array(A)
-    _, _, Vt = np.linalg.svd(A)
-    H = Vt[-1].reshape(3, 3)
-    return H / H[-1, -1]</code></pre>
+      <p>I implemented <code>computeH(im1_pts, im2_pts)</code> to estimate the homography via least-squares from manually selected point correspondences. Below are visualizations of the correspondences for two sets.</p>
       <div class="grid.two">
-        <figure><img src="./media/points_visualized.png" onclick="openLightbox(this.src)"><figcaption>Manual correspondences visualized</figcaption></figure>
-        <figure><img src="./media/homography_matrix.png" onclick="openLightbox(this.src)"><figcaption>Recovered Homography Matrix</figcaption></figure>
+        <figure><img src="./images/eng_correspondence.png" onclick="openLightbox(this.src)"><figcaption>Engineering Correspondences</figcaption></figure>
+        <figure><img src="./images/pan_correspondence.png" onclick="openLightbox(this.src)"><figcaption>Panorama Correspondences</figcaption></figure>
       </div>
-      <p><em>Using more than four correspondences improved stability and reduced alignment errors from pixel inaccuracies.</em></p>
+      <p><em>Homographies were normalized to ensure stability. Using more than 4 points improved numerical accuracy.</em></p>
     </section>
 
+    <!-- A.3 -->
     <section class="card" id="A3">
       <h2>A.3 — Warping Images</h2>
-      <p>Using the computed homography, I implemented both nearest-neighbor and bilinear inverse warping functions: <code>warpImageNearestNeighbor(im, H)</code> and <code>warpImageBilinear(im, H)</code>. Each maps output pixels back into input coordinates, avoiding holes in the final image.</p>
+      <p>Using the recovered homography, I implemented inverse warping with both nearest-neighbor and bilinear interpolation. The examples below show rectification results for <em>Painting</em> and <em>Interstellar</em> images.</p>
       <div class="grid.two">
-        <figure><img src="./media/rectified_nn.jpg" onclick="openLightbox(this.src)"><figcaption>Rectified Image (Nearest Neighbor)</figcaption></figure>
-        <figure><img src="./media/rectified_bilinear.jpg" onclick="openLightbox(this.src)"><figcaption>Rectified Image (Bilinear)</figcaption></figure>
+        <figure><img src="./images/painting_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Painting</figcaption></figure>
+        <figure><img src="./out_images/nn_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
+        <figure><img src="./out_images/bil_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
       </div>
-      <p><em>Nearest neighbor is faster but produces jagged edges, while bilinear interpolation yields smoother, higher-quality results.</em></p>
+      <div class="grid.two">
+        <figure><img src="./images/interstellar_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Interstellar</figcaption></figure>
+        <figure><img src="./out_images/nn_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
+        <figure><img src="./out_images/bil_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
+      </div>
+      <p><em>Bilinear interpolation provides smoother intensity transitions, while nearest neighbor is faster but jagged. Both verify the correctness of inverse warping.</em></p>
     </section>
 
+    <!-- A.4 -->
     <section class="card" id="A4">
-      <h2>A.4 — Blending into a Mosaic</h2>
-      <p>Once the warped images were aligned, I composited them into mosaics using weighted averaging. Each image had an alpha mask that decreased near the borders to reduce seams. The results below show three mosaics.</p>
+      <h2>A.4 — Creating the Mosaic</h2>
+      <p>Each pair of warped images was composited into a mosaic using alpha blending to reduce visible seams. The following results show the source images alongside their final mosaics.</p>
       <div class="grid.three">
-        <figure><img src="./media/mosaic1.jpg" onclick="openLightbox(this.src)"><figcaption>Mosaic 1 — Indoor Scene</figcaption></figure>
-        <figure><img src="./media/mosaic2.jpg" onclick="openLightbox(this.src)"><figcaption>Mosaic 2 — Outdoor Panorama</figcaption></figure>
-        <figure><img src="./media/mosaic3.jpg" onclick="openLightbox(this.src)"><figcaption>Mosaic 3 — Architectural Scene</figcaption></figure>
+        <figure><img src="./images/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Left</figcaption></figure>
+        <figure><img src="./images/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Right</figcaption></figure>
+        <figure><img src="./out_images/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Grimes Mosaic</figcaption></figure>
       </div>
-      <p><em>Feathering and alpha weighting help eliminate harsh transitions between images. For wider scenes, non-planar mapping (e.g. cylindrical) would further improve alignment.</em></p>
+
+      <div class="grid.three">
+        <figure><img src="./images/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Left</figcaption></figure>
+        <figure><img src="./images/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Right</figcaption></figure>
+        <figure><img src="./out_images/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Mosaic</figcaption></figure>
+      </div>
+
+      <div class="grid.three">
+        <figure><img src="./images/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Left</figcaption></figure>
+        <figure><img src="./images/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Right</figcaption></figure>
+        <figure><img src="./out_images/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Mosaic</figcaption></figure>
+      </div>
+      <p><em>The feathered averaging reduces intensity seams and produces smooth transitions between overlapping regions.</em></p>
     </section>
 
+    <!-- Conclusion -->
     <section class="card" id="conclusion">
       <h2>Conclusion</h2>
-      <p>
-        This project introduced the geometry of planar transformations through homographies and provided practical experience in image rectification and mosaicing. 
-        Implementing inverse warping and custom interpolation gave me a deeper understanding of image resampling, while blending techniques emphasized the importance of 
-        compositing for seamless results.
-      </p>
+      <p>This project demonstrated how planar homographies enable perspective alignment between views and how blending creates seamless mosaics. Implementing inverse warping and interpolation from scratch deepened my understanding of geometric image transformations.</p>
       <p><strong>Thanks for viewing my project!</strong> — Kourosh Salahi</p>
     </section>
 
