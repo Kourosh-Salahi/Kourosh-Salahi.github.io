@@ -249,7 +249,7 @@
     <!-- A.4 -->
     <section class="card" id="A4">
       <h2>A.4 — Creating the Mosaic</h2>
-      <p>The warped images were composited into mosaics using alpha-weighted blending to minimize seams and exposure differences.</p>
+      <p>The warped images were composited into mosaics using alpha weighted blending with a feathered mask for each images alpha.</p>
 
       <div class="grid.three">
         <figure><img src="./media/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Left</figcaption></figure>
@@ -269,8 +269,21 @@
         <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Mosaic</figcaption></figure>
       </div>
 
-      <p><em>Feathering with alpha blending produced smooth transitions and minimized visible ghosting in overlapping regions.</em></p>
-    </section>
+      <h3>Method Description</h3>
+      <p>The <code>make_mosaic()</code> function follows a multi-stage procedure to accurately warp and blend two input images into a unified panorama:</p>
+      <ol>
+        <li><strong>Homography Estimation:</strong> The 3×3 matrix <code>H</code> is computed using corresponding feature points between the two images. This transformation maps pixels from the first image into the coordinate system of the second image.</li>
+        <li><strong>Canvas Determination:</strong> The warped corners of <code>im1</code> and the original corners of <code>im2</code> are combined to determine the overall mosaic bounds. The output canvas size is set to encompass both.</li>
+        <li><strong>Warping via Bilinear Interpolation:</strong> The first image is warped into the mosaic coordinate frame using inverse mapping and bilinear interpolation.</li>
+        <li><strong>Feather Mask Generation:</strong> A 2D alpha mask is created for each image using a falloff at the borders. The mask has values near 1 in the center and gradually decays to 0 near the edges, ensuring that overlapping regions fade naturally instead of forming sharp transitions.</li>
+        <li><strong>Compositing and Alpha Blending:</strong> Both images are placed into the mosaic canvas.</li>
+        <li><strong>Final Normalization:</strong> The accumulated weights are divided out at the end, leaving a visually smooth mosaic without visible seams or intensity jumps.</li>
+      </ol>
+
+      <h3>Edge Feathering</h3>
+      <p>The feather mask fades to 0 near the edges, with a default distance of 20% distance away from the edges</p>
+
+
 
     <!-- Conclusion -->
     <section class="card" id="conclusion">
