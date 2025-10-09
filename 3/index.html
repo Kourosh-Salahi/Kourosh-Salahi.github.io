@@ -1,1 +1,146 @@
-hello
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS180 Project 3A — Image Warping and Mosaicing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #111836;
+      --muted: #a0aec0;
+      --ink: #e6eefc;
+      --accent: #8ab4ff;
+    }
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
+    .container { max-width:1100px; margin:0 auto; padding:20px; }
+    header { padding:32px 20px; background:linear-gradient(to bottom,rgba(11,16,32,0.95),rgba(11,16,32,0.7)); border-bottom:1px solid rgba(255,255,255,0.08);}
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
+    .brand h1 { font-size:18px; margin:0; font-weight:800; }
+    nav { margin-left:auto; font-size:14px; display:flex; gap:12px; }
+    nav a { color:var(--accent); text-decoration:none; }
+    nav a:hover { text-decoration:underline; }
+    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:30px; }
+    h2 { margin-top:0; }
+    .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
+    .subtitle { color:var(--muted); margin:0 0 10px; }
+    .meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:14px; }
+    .pill { padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); }
+    .grid { display:grid; gap:16px; }
+    .grid.two { grid-template-columns:repeat(2,1fr); }
+    .grid.three { grid-template-columns:repeat(3,1fr); }
+    .grid.four { grid-template-columns:repeat(4,1fr); }
+    figure { margin:0; cursor:zoom-in; }
+    img { width:100%; max-height:250px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
+    figcaption { font-size:14px; color:var(--muted); }
+    pre { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; overflow:auto; font-size:14px; }
+    .lightbox { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(7,10,22,0.9); z-index:1000; justify-content:center; align-items:center; padding:40px; }
+    .lightbox img { max-width:90%; max-height:90%; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,0.6); cursor:zoom-out; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container brand">
+      <span class="dot"></span>
+      <h1>CS180 · Project 3A</h1>
+      <nav>
+        <a href="#A1">A.1</a>
+        <a href="#A2">A.2</a>
+        <a href="#A3">A.3</a>
+        <a href="#A4">A.4</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="card">
+      <h2 class="hero-title">Image Warping and Mosaicing</h2>
+      <p class="subtitle">By <strong>Kourosh Salahi</strong> · CS180/280A: Computer Vision & Computational Photography</p>
+      <p>The goal of this project is to learn how to compute homographies, perform image warping, and create seamless mosaics by blending multiple views of a scene. This forms the foundation for later parts of Project 3.</p>
+    </section>
+
+    <section class="card" id="A1">
+      <h2>A.1 — Shooting and Digitizing Pictures</h2>
+      <p>I captured multiple sets of overlapping photographs by rotating my camera around a fixed center of projection. This ensured projective transformations between images. Below are two sets of example inputs used for my mosaics.</p>
+      <div class="grid.three">
+        <figure><img src="./media/set1_left.jpg" onclick="openLightbox(this.src)"><figcaption>Set 1 — Left Image</figcaption></figure>
+        <figure><img src="./media/set1_right.jpg" onclick="openLightbox(this.src)"><figcaption>Set 1 — Right Image</figcaption></figure>
+        <figure><img src="./media/set2_left.jpg" onclick="openLightbox(this.src)"><figcaption>Set 2 — Left Image</figcaption></figure>
+      </div>
+      <p><em>Both sets were taken with approximately 50% overlap and minimal parallax to ensure stable homography estimation.</em></p>
+    </section>
+
+    <section class="card" id="A2">
+      <h2>A.2 — Recovering Homographies</h2>
+      <p>I implemented <code>computeH(im1_pts, im2_pts)</code> to solve for the 3×3 homography matrix using point correspondences between two images. The linear system <code>Ah = b</code> is built from at least four correspondences and solved in a least-squares sense.</p>
+      <pre><code>def computeH(im1_pts, im2_pts):
+    n = im1_pts.shape[0]
+    A = []
+    for i in range(n):
+        x, y = im1_pts[i]
+        x_p, y_p = im2_pts[i]
+        A.append([-x, -y, -1, 0, 0, 0, x*x_p, y*x_p, x_p])
+        A.append([0, 0, 0, -x, -y, -1, x*y_p, y*y_p, y_p])
+    A = np.array(A)
+    _, _, Vt = np.linalg.svd(A)
+    H = Vt[-1].reshape(3, 3)
+    return H / H[-1, -1]</code></pre>
+      <div class="grid.two">
+        <figure><img src="./media/points_visualized.png" onclick="openLightbox(this.src)"><figcaption>Manual correspondences visualized</figcaption></figure>
+        <figure><img src="./media/homography_matrix.png" onclick="openLightbox(this.src)"><figcaption>Recovered Homography Matrix</figcaption></figure>
+      </div>
+      <p><em>Using more than four correspondences improved stability and reduced alignment errors from pixel inaccuracies.</em></p>
+    </section>
+
+    <section class="card" id="A3">
+      <h2>A.3 — Warping Images</h2>
+      <p>Using the computed homography, I implemented both nearest-neighbor and bilinear inverse warping functions: <code>warpImageNearestNeighbor(im, H)</code> and <code>warpImageBilinear(im, H)</code>. Each maps output pixels back into input coordinates, avoiding holes in the final image.</p>
+      <div class="grid.two">
+        <figure><img src="./media/rectified_nn.jpg" onclick="openLightbox(this.src)"><figcaption>Rectified Image (Nearest Neighbor)</figcaption></figure>
+        <figure><img src="./media/rectified_bilinear.jpg" onclick="openLightbox(this.src)"><figcaption>Rectified Image (Bilinear)</figcaption></figure>
+      </div>
+      <p><em>Nearest neighbor is faster but produces jagged edges, while bilinear interpolation yields smoother, higher-quality results.</em></p>
+    </section>
+
+    <section class="card" id="A4">
+      <h2>A.4 — Blending into a Mosaic</h2>
+      <p>Once the warped images were aligned, I composited them into mosaics using weighted averaging. Each image had an alpha mask that decreased near the borders to reduce seams. The results below show three mosaics.</p>
+      <div class="grid.three">
+        <figure><img src="./media/mosaic1.jpg" onclick="openLightbox(this.src)"><figcaption>Mosaic 1 — Indoor Scene</figcaption></figure>
+        <figure><img src="./media/mosaic2.jpg" onclick="openLightbox(this.src)"><figcaption>Mosaic 2 — Outdoor Panorama</figcaption></figure>
+        <figure><img src="./media/mosaic3.jpg" onclick="openLightbox(this.src)"><figcaption>Mosaic 3 — Architectural Scene</figcaption></figure>
+      </div>
+      <p><em>Feathering and alpha weighting help eliminate harsh transitions between images. For wider scenes, non-planar mapping (e.g. cylindrical) would further improve alignment.</em></p>
+    </section>
+
+    <section class="card" id="conclusion">
+      <h2>Conclusion</h2>
+      <p>
+        This project introduced the geometry of planar transformations through homographies and provided practical experience in image rectification and mosaicing. 
+        Implementing inverse warping and custom interpolation gave me a deeper understanding of image resampling, while blending techniques emphasized the importance of 
+        compositing for seamless results.
+      </p>
+      <p><strong>Thanks for viewing my project!</strong> — Kourosh Salahi</p>
+    </section>
+
+  </main>
+
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <script>
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
