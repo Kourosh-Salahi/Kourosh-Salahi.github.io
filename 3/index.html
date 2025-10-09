@@ -67,12 +67,12 @@
       <h2>A.1 — Shooting and Digitizing Pictures</h2>
       <p>Three sets of images were captured by rotating the camera about a fixed point to produce overlapping projective views. These serve as the base inputs for mosaicing.</p>
       <div class="grid.three">
-        <figure><img src="./images/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Left Image</figcaption></figure>
-        <figure><img src="./images/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Right Image</figcaption></figure>
-        <figure><img src="./images/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Left Image</figcaption></figure>
-        <figure><img src="./images/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Right Image</figcaption></figure>
-        <figure><img src="./images/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering — Left Image</figcaption></figure>
-        <figure><img src="./images/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering — Right Image</figcaption></figure>
+        <figure><img src="./media/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Left Image</figcaption></figure>
+        <figure><img src="./media/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Right Image</figcaption></figure>
+        <figure><img src="./media/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Left Image</figcaption></figure>
+        <figure><img src="./media/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Right Image</figcaption></figure>
+        <figure><img src="./media/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering — Left Image</figcaption></figure>
+        <figure><img src="./media/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering — Right Image</figcaption></figure>
       </div>
       <p><em>Each pair was shot with ~50% overlap to ensure stable correspondence estimation.</em></p>
     </section>
@@ -82,8 +82,8 @@
       <h2>A.2 — Recovering Homographies</h2>
       <p>I implemented <code>computeH(im1_pts, im2_pts)</code> to estimate the homography via least-squares from manually selected point correspondences. Below are visualizations of the correspondences for two sets.</p>
       <div class="grid.two">
-        <figure><img src="./images/eng_correspondence.png" onclick="openLightbox(this.src)"><figcaption>Engineering Correspondences</figcaption></figure>
-        <figure><img src="./images/pan_correspondence.png" onclick="openLightbox(this.src)"><figcaption>Panorama Correspondences</figcaption></figure>
+        <figure><img src="./media/eng_correspondence.png" onclick="openLightbox(this.src)"><figcaption>Engineering Correspondences</figcaption></figure>
+        <figure><img src="./media/pan_correspondence.png" onclick="openLightbox(this.src)"><figcaption>Panorama Correspondences</figcaption></figure>
       </div>
       <p><em>Homographies were normalized to ensure stability. Using more than 4 points improved numerical accuracy.</em></p>
     </section>
@@ -93,14 +93,14 @@
       <h2>A.3 — Warping Images</h2>
       <p>Using the recovered homography, I implemented inverse warping with both nearest-neighbor and bilinear interpolation. The examples below show rectification results for <em>Painting</em> and <em>Interstellar</em> images.</p>
       <div class="grid.two">
-        <figure><img src="./images/painting_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Painting</figcaption></figure>
-        <figure><img src="./out_images/nn_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
-        <figure><img src="./out_images/bil_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
+        <figure><img src="./media/painting_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Painting</figcaption></figure>
+        <figure><img src="./media/nn_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
+        <figure><img src="./media/bil_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
       </div>
       <div class="grid.two">
-        <figure><img src="./images/interstellar_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Interstellar</figcaption></figure>
-        <figure><img src="./out_images/nn_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
-        <figure><img src="./out_images/bil_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
+        <figure><img src="./media/interstellar_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Interstellar</figcaption></figure>
+        <figure><img src="./media/nn_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
+        <figure><img src="./media/bil_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
       </div>
       <p><em>Bilinear interpolation provides smoother intensity transitions, while nearest neighbor is faster but jagged. Both verify the correctness of inverse warping.</em></p>
     </section>
@@ -110,21 +110,21 @@
       <h2>A.4 — Creating the Mosaic</h2>
       <p>Each pair of warped images was composited into a mosaic using alpha blending to reduce visible seams. The following results show the source images alongside their final mosaics.</p>
       <div class="grid.three">
-        <figure><img src="./images/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Left</figcaption></figure>
-        <figure><img src="./images/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Right</figcaption></figure>
-        <figure><img src="./out_images/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Grimes Mosaic</figcaption></figure>
+        <figure><img src="./media/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Left</figcaption></figure>
+        <figure><img src="./media/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Right</figcaption></figure>
+        <figure><img src="./media/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Grimes Mosaic</figcaption></figure>
       </div>
 
       <div class="grid.three">
-        <figure><img src="./images/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Left</figcaption></figure>
-        <figure><img src="./images/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Right</figcaption></figure>
-        <figure><img src="./out_images/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Mosaic</figcaption></figure>
+        <figure><img src="./media/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Left</figcaption></figure>
+        <figure><img src="./media/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Right</figcaption></figure>
+        <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Mosaic</figcaption></figure>
       </div>
 
       <div class="grid.three">
-        <figure><img src="./images/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Left</figcaption></figure>
-        <figure><img src="./images/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Right</figcaption></figure>
-        <figure><img src="./out_images/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Mosaic</figcaption></figure>
+        <figure><img src="./media/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Left</figcaption></figure>
+        <figure><img src="./media/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Right</figcaption></figure>
+        <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Mosaic</figcaption></figure>
       </div>
       <p><em>The feathered averaging reduces intensity seams and produces smooth transitions between overlapping regions.</em></p>
     </section>
