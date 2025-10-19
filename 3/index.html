@@ -292,10 +292,10 @@
       <div class="grid.two">
         <figure><img src="./media/Harris_std_eng.png" onclick="openLightbox(this.src)"><figcaption>Harris Corners Overlay Standard</figcaption></figure>
         <figure><img src="./media/Harris_std_500_eng.png" onclick="openLightbox(this.src)"><figcaption>Harris Corners top 500 </figcaption></figure>
-        <figure><img src="./media/anms_500_eng.png" onclick="openLightbox(this.src)"><figcaption>Adaptive Non-Maximal Suppression (ANMS) top 500</figcaption></figure>
+        <figure><img src="./media/ANMS_500_eng.png" onclick="openLightbox(this.src)"><figcaption>Adaptive Non-Maximal Suppression (ANMS) top 500</figcaption></figure>
       </div>
 
-      <p><em>ANMS prunes redundant detections, ensuring a spatially uniform set of keypoints.</em></p>
+      <p><em>ANMS makes it so that we keep the points that are most useful while still distributing them throughout the image.</em></p>
       <h3>Deliverables</h3>
       <ul>
         <li>Show detected corners overlaid on image</li>
@@ -309,9 +309,8 @@
       <p>For each detected corner, I sampled a 40×40 window centered on the feature, blurred it, and downsampled to an 8×8 descriptor. Each patch was bias/gain normalized to zero mean and unit variance, improving robustness to illumination changes.</p>
 
       <div class="grid.three">
-        <figure><img src="./media/descriptor_1.png" onclick="openLightbox(this.src)"><figcaption>Feature Patch #1</figcaption></figure>
-        <figure><img src="./media/descriptor_2.png" onclick="openLightbox(this.src)"><figcaption>Feature Patch #2</figcaption></figure>
-        <figure><img src="./media/descriptor_3.png" onclick="openLightbox(this.src)"><figcaption>Feature Patch #3</figcaption></figure>
+        <figure><img src="./media/descriptors_eng.png" onclick="openLightbox(this.src)"><figcaption>Feature Patch #1</figcaption></figure>
+        <figure><img src="./media/descriptors_pan.png" onclick="openLightbox(this.src)"><figcaption>Feature Patch #2</figcaption></figure>
       </div>
 
       <p><em>Descriptors were extracted without rotation invariance for simplicity, following Brown et al., 2005.</em></p>
@@ -327,8 +326,8 @@
       <p>Descriptors between two images were matched using the ratio test from Lowe (SIFT). For each feature in image A, the nearest and second-nearest descriptors in image B were found; matches were retained if <code>d1/d2 &lt; 0.6</code>.</p>
 
       <div class="grid.two">
-        <figure><img src="./media/matches_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Matches</figcaption></figure>
-        <figure><img src="./media/matches_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Matches</figcaption></figure>
+        <figure><img src="./media/matches.png" onclick="openLightbox(this.src)"><figcaption>Panorama Matches</figcaption></figure>
+        <figure><img src="./media/descriptors_pan_two_images.png" onclick="openLightbox(this.src)"><figcaption>Engineering Matches</figcaption></figure>
       </div>
 
       <p><em>Only consistent matches were preserved, reducing false correspondences significantly.</em></p>
@@ -343,16 +342,16 @@
       <h2>B.4 — RANSAC for Robust Homography</h2>
       <p>I implemented 4-point RANSAC to estimate homographies while rejecting outlier matches. At each iteration, a random 4-point subset generated a candidate <code>H</code>; inliers were counted based on reprojection error &lt; 3 px. The best-inlier model was then refined via least-squares.</p>
 
-      <div class="grid.two">
-        <figure><img src="./media/ransac_inliers.png" onclick="openLightbox(this.src)"><figcaption>Inlier Matches (RANSAC)</figcaption></figure>
-        <figure><img src="./media/ransac_outliers.png" onclick="openLightbox(this.src)"><figcaption>Before RANSAC (Outliers Present)</figcaption></figure>
-      </div>
-
       <h3>Automatic vs. Manual Stitching</h3>
       <div class="grid.three">
-        <figure><img src="./media/mosaic_auto_pan.png" onclick="openLightbox(this.src)"><figcaption>Automatic Panorama</figcaption></figure>
-        <figure><img src="./media/mosaic_manual_pan.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
-        <figure><img src="./media/mosaic_auto_eng.png" onclick="openLightbox(this.src)"><figcaption>Automatic Engineering Mosaic</figcaption></figure>
+        <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Automatic Panorama</figcaption></figure>
+        <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
+        <figure><img src="./media/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Automatic Engineering Mosaic</figcaption></figure>
+      </div>
+      <div class="grid.three">
+        <figure><img src="./media/pan_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>Automatic Panorama</figcaption></figure>
+        <figure><img src="./media/eng_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
+        <figure><img src="./media/grimes_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>Automatic Engineering Mosaic</figcaption></figure>
       </div>
 
       <p><em>RANSAC reduced mismatches and produced nearly identical mosaics to manual point selection, validating the feature pipeline.</em></p>
