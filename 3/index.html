@@ -341,7 +341,7 @@
     <!-- B.4 -->
     <section class="card" id="B4">
       <h2>B.4 — RANSAC for Robust Homography</h2>
-      <p>I implemented 4-point RANSAC to estimate homographies while rejecting outlier matches. At each iteration, a random 4-point subset generated a candidate <code>H</code>; inliers were counted based on reprojection error &lt; 3 px. The best-inlier model was then refined via least-squares.</p>
+      <p>I implemented 4-point RANSAC to estimate homographies while rejecting outlier matches. At each iteration, a random 4-point subset generated a candidate <code>H</code>; inliers were counted based on reprojection error &lt; 3 px. The best-inlier model was then refined via least-squares on the set of all inlier points.</p>
 
       <h3>Automatic vs. Manual Stitching</h3>
       <div class="grid.three">
