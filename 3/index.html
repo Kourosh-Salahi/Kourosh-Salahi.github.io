@@ -306,7 +306,7 @@
     <!-- B.2 -->
     <section class="card" id="B2">
       <h2>B.2 — Feature Descriptor Extraction</h2>
-      <p>For each detected corner, I sampled a 40×40 window centered on the feature, blurred it, and downsampled to an 8×8 descriptor. Each patch was bias/gain normalized to zero mean and unit variance, improving robustness to illumination changes.</p>
+      <p>For each detected corner, I sampled a 40×40 window centered on the feature downsampled to an 8×8 descriptor. Each patch was bias/gain normalized to zero mean and unit variance, improving robustness to illumination changes.</p>
 
       <div class="grid.three">
         <figure><img src="./media/descriptors_eng.png" onclick="openLightbox(this.src)"><figcaption>Feature Patch #1</figcaption></figure>
@@ -323,7 +323,7 @@
     <!-- B.3 -->
     <section class="card" id="B3">
       <h2>B.3 — Feature Matching</h2>
-      <p>Descriptors between two images were matched using the ratio test from Lowe (SIFT). For each feature in image A, the nearest and second-nearest descriptors in image B were found; matches were retained if <code>d1/d2 &lt; 0.6</code>.</p>
+      <p>Descriptors between two images were matched using the ratio test from Lowe. For each feature in image A, the nearest and second-nearest descriptors in image B were found; matches were retained if <code>d1/d2 &lt; 0.7 </code>.</p>
 
       <div class="grid.two">
         <figure><img src="./media/matches.png" onclick="openLightbox(this.src)"><figcaption>Panorama Matches</figcaption></figure>
@@ -344,14 +344,14 @@
 
       <h3>Automatic vs. Manual Stitching</h3>
       <div class="grid.three">
-        <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Automatic Panorama</figcaption></figure>
-        <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
-        <figure><img src="./media/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Automatic Engineering Mosaic</figcaption></figure>
+        <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
+        <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Manual Engineering Building</figcaption></figure>
+        <figure><img src="./media/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Manual Grimes</figcaption></figure>
       </div>
       <div class="grid.three">
-        <figure><img src="./media/pan_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>Automatic Panorama</figcaption></figure>
-        <figure><img src="./media/eng_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
-        <figure><img src="./media/grimes_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>Automatic Engineering Mosaic</figcaption></figure>
+        <figure><img src="./media/pan_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Panorama</figcaption></figure>
+        <figure><img src="./media/eng_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Engineering Building</figcaption></figure>
+        <figure><img src="./media/grimes_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Grimes</figcaption></figure>
       </div>
 
       <p><em>RANSAC reduced mismatches and produced nearly identical mosaics to manual point selection, validating the feature pipeline.</em></p>
