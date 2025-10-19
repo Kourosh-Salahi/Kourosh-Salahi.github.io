@@ -283,6 +283,7 @@
       <h3>Edge Feathering</h3>
       <p>The feather mask fades to 0 near the edges, with a default distance of 20% distance away from the edges</p>
 
+      </section>
 
        <!-- B.1 -->
     <section class="card" id="B1">
@@ -323,14 +324,14 @@
     <!-- B.3 -->
     <section class="card" id="B3">
       <h2>B.3 — Feature Matching</h2>
-      <p>Descriptors between two images were matched using the ratio test from Lowe. For each feature in image A, the nearest and second-nearest descriptors in image B were found; matches were retained if <code>d1/d2 &lt; 0.7 </code>.</p>
+      <p>Descriptors between two images were matched using the ratio test from Lowe. For each feature in image A, the nearest and second-nearest descriptors in image B were found; matches were retained if <code>d1/d2 &lt; 0.7 </code> for d1 and d2 being the distance to the first and second nearest neighbor respectivly.</p>
 
       <div class="grid.two">
         <figure><img src="./media/matches.png" onclick="openLightbox(this.src)"><figcaption>Panorama Matches</figcaption></figure>
         <figure><img src="./media/descriptors_pan_two_images.png" onclick="openLightbox(this.src)"><figcaption>Engineering Matches</figcaption></figure>
       </div>
 
-      <p><em>Only consistent matches were preserved, reducing false correspondences significantly.</em></p>
+      <p><em>We see that there are still mismatched features. This will be taken care of in the next step, RANSAC</em></p>
       <h3>Deliverables</h3>
       <ul>
         <li>Show matched features between image pairs</li>
