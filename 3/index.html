@@ -27,8 +27,8 @@
     .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
     .subtitle { color:var(--muted); margin:0 0 10px; }
     .grid { display:grid; gap:16px; }
-    .grid.two { grid-template-columns:repeat(2,1fr); }
-    .grid.three { grid-template-columns:repeat(3,1fr); }
+    .grid two { grid-template-columns:repeat(2,1fr); }
+    .grid three { grid-template-columns:repeat(3,1fr); }
     figure { margin:0; cursor:zoom-in; }
     img { width:100%; max-height:250px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
     figcaption { font-size:14px; color:var(--muted); }
@@ -65,7 +65,7 @@
     <section class="card" id="A1">
       <h2>A.1 — Shooting and Digitizing Pictures</h2>
       <p>Three sets of overlapping images were taken by rotating the camera about a fixed center of projection. These serve as the input pairs for homography estimation and mosaicing.</p>
-      <div class="grid.three">
+      <div class="grid.two">
         <figure><img src="./media/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Left</figcaption></figure>
         <figure><img src="./media/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Right</figcaption></figure>
         <figure><img src="./media/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Left</figcaption></figure>
@@ -251,19 +251,19 @@
       <h2>A.4 — Creating the Mosaic</h2>
       <p>The warped images were composited into mosaics using alpha weighted blending with a feathered mask for each images alpha.</p>
 
-      <div class="grid.three">
+      <div class="grid three">
         <figure><img src="./media/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Left</figcaption></figure>
         <figure><img src="./media/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Right</figcaption></figure>
         <figure><img src="./media/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Grimes Mosaic</figcaption></figure>
       </div>
 
-      <div class="grid.three">
+      <div class="grid three">
         <figure><img src="./media/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Left</figcaption></figure>
         <figure><img src="./media/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Right</figcaption></figure>
         <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Mosaic</figcaption></figure>
       </div>
 
-      <div class="grid.three">
+      <div class="grid three">
         <figure><img src="./media/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Left</figcaption></figure>
         <figure><img src="./media/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Right</figcaption></figure>
         <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Mosaic</figcaption></figure>
@@ -309,9 +309,9 @@
       <h2>B.2 — Feature Descriptor Extraction</h2>
       <p>For each detected corner, I sampled a 40×40 window centered on the feature downsampled to an 8×8 descriptor. Each patch was bias/gain normalized to zero mean and unit variance, improving robustness to illumination changes.</p>
 
-      <div class="grid.three">
-        <figure><img src="./media/descriptors_eng.png" onclick="openLightbox(this.src)"><figcaption>Feature Patch #1</figcaption></figure>
-        <figure><img src="./media/descriptors_pan.png" onclick="openLightbox(this.src)"><figcaption>Feature Patch #2</figcaption></figure>
+      <div class="grid three">
+        <figure><img src="./media/descriptors_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Building Feature Descriptors</figcaption></figure>
+        <figure><img src="./media/descriptors_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Feature Descriptors</figcaption></figure>
       </div>
 
       <p><em>Descriptors were extracted without rotation invariance for simplicity, following Brown et al., 2005.</em></p>
@@ -328,10 +328,10 @@
 
       <div class="grid.two">
         <figure><img src="./media/matches.png" onclick="openLightbox(this.src)"><figcaption>Panorama Matches</figcaption></figure>
-        <figure><img src="./media/descriptors_pan_two_images.png" onclick="openLightbox(this.src)"><figcaption>Engineering Matches</figcaption></figure>
+        <figure><img src="./media/descriptors_pan_two_images.png" onclick="openLightbox(this.src)"><figcaption>Matched Patches across each image</figcaption></figure>
       </div>
 
-      <p><em>We see that there are still mismatched features. This will be taken care of in the next step, RANSAC</em></p>
+      <p><em>We see that there are still mismatched features. This will be taken care of in the next step, RANSAC. Interesting to see how many of the matched feature patches were still matched despite slight rotations, such as patch 7. This is likely because of the blurring, which makes small rotations less noticable when doing calculations.</em></p>
       <h3>Deliverables</h3>
       <ul>
         <li>Show matched features between image pairs</li>
@@ -344,12 +344,12 @@
       <p>I implemented 4-point RANSAC to estimate homographies while rejecting outlier matches. At each iteration, a random 4-point subset generated a candidate <code>H</code>; inliers were counted based on reprojection error &lt; 3 px. The best-inlier model was then refined via least-squares on the set of all inlier points.</p>
 
       <h3>Automatic vs. Manual Stitching</h3>
-      <div class="grid.three">
+      <div class="grid three">
         <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
         <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Manual Engineering Building</figcaption></figure>
         <figure><img src="./media/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Manual Grimes</figcaption></figure>
       </div>
-      <div class="grid.three">
+      <div class="grid three">
         <figure><img src="./media/pan_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Panorama</figcaption></figure>
         <figure><img src="./media/eng_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Engineering Building</figcaption></figure>
         <figure><img src="./media/grimes_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Grimes</figcaption></figure>
