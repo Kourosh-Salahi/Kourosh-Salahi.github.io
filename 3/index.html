@@ -65,7 +65,7 @@
     <section class="card" id="A1">
       <h2>A.1 — Shooting and Digitizing Pictures</h2>
       <p>Three sets of overlapping images were taken by rotating the camera about a fixed center of projection. These serve as the input pairs for homography estimation and mosaicing.</p>
-      <div class="grid.two">
+      <div class="grid two">
         <figure><img src="./media/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Left</figcaption></figure>
         <figure><img src="./media/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Right</figcaption></figure>
         <figure><img src="./media/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Left</figcaption></figure>
@@ -231,13 +231,13 @@
       <h2>A.3 — Warping Images</h2>
       <p>With the recovered homographies, I implemented inverse warping using both nearest-neighbor and bilinear interpolation.</p>
 
-      <div class="grid.two">
+      <div class="grid three">
         <figure><img src="./media/painting_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Painting</figcaption></figure>
         <figure><img src="./media/nn_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
         <figure><img src="./media/bil_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
       </div>
 
-      <div class="grid.two">
+      <div class="grid three">
         <figure><img src="./media/interstellar_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Interstellar</figcaption></figure>
         <figure><img src="./media/nn_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
         <figure><img src="./media/bil_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
@@ -290,7 +290,7 @@
       <h2>B.1 — Harris Corner Detection</h2>
       <p>The Harris Corner Detector identifies points of strong local intensity variation. Using the provided <code>harris.py</code> helper, I detected corners and visualized them on each input image.</p>
 
-      <div class="grid.two">
+      <div class="grid three">
         <figure><img src="./media/Harris_std_eng.png" onclick="openLightbox(this.src)"><figcaption>Harris Corners Overlay Standard</figcaption></figure>
         <figure><img src="./media/Harris_std_500_eng.png" onclick="openLightbox(this.src)"><figcaption>Harris Corners top 500 </figcaption></figure>
         <figure><img src="./media/ANMS_500_eng.png" onclick="openLightbox(this.src)"><figcaption>Adaptive Non-Maximal Suppression (ANMS) top 500</figcaption></figure>
@@ -309,7 +309,7 @@
       <h2>B.2 — Feature Descriptor Extraction</h2>
       <p>For each detected corner, I sampled a 40×40 window centered on the feature downsampled to an 8×8 descriptor. Each patch was bias/gain normalized to zero mean and unit variance, improving robustness to illumination changes.</p>
 
-      <div class="grid three">
+      <div class="grid two">
         <figure><img src="./media/descriptors_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Building Feature Descriptors</figcaption></figure>
         <figure><img src="./media/descriptors_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Feature Descriptors</figcaption></figure>
       </div>
@@ -326,7 +326,7 @@
       <h2>B.3 — Feature Matching</h2>
       <p>Descriptors between two images were matched using the ratio test from Lowe. For each feature in image A, the nearest and second-nearest descriptors in image B were found; matches were retained if <code>d1/d2 &lt; 0.7 </code> for d1 and d2 being the distance to the first and second nearest neighbor respectivly.</p>
 
-      <div class="grid.two">
+      <div class="grid two">
         <figure><img src="./media/matches.png" onclick="openLightbox(this.src)"><figcaption>Panorama Matches</figcaption></figure>
         <figure><img src="./media/descriptors_pan_two_images.png" onclick="openLightbox(this.src)"><figcaption>Matched Patches across each image</figcaption></figure>
       </div>
