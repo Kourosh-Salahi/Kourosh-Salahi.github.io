@@ -343,7 +343,7 @@
       <h2>B.4 — RANSAC for Robust Homography</h2>
       <p>I implemented 4-point RANSAC to estimate homographies while rejecting outlier matches. At each iteration, a random 4-point subset generated a candidate <code>H</code>; inliers were counted based on reprojection error &lt; 3 px. The best-inlier model was then refined via least-squares on the set of all inlier points.</p>
 
-      <h3>Automatic vs. Manual Stitching</h3>
+      <h3>Manual v.s. RANSAC Stitching</h3>
       <div class="grid three">
         <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
         <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Manual Engineering Building</figcaption></figure>
