@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS180 Project 4 — Neural Radiance Fields</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #111836;
+      --muted: #a0aec0;
+      --ink: #e6eefc;
+      --accent: #8ab4ff;
+    }
+
+    body {
+      margin:0;
+      font-family:Inter,system-ui,sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      line-height:1.6;
+    }
+
+    .container { max-width:1100px; margin:0 auto; padding:20px; }
+
+    header {
+      padding:32px 20px;
+      background:linear-gradient(to bottom,rgba(11,16,32,0.95),rgba(11,16,32,0.7));
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
+    .brand h1 { font-size:18px; margin:0; font-weight:800; }
+
+    nav { margin-left:auto; font-size:14px; display:flex; gap:12px; }
+    nav a { color:var(--accent); text-decoration:none; }
+    nav a:hover { text-decoration:underline; }
+
+    .card {
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:18px;
+      padding:20px;
+      margin-bottom:30px;
+    }
+
+    .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
+    .subtitle { color:var(--muted); margin:0 0 10px; }
+
+    .grid { display:grid; gap:16px; }
+    .grid.two { grid-template-columns:repeat(2,1fr); }
+    .grid.three { grid-template-columns:repeat(3,1fr); }
+    .grid.four { grid-template-columns:repeat(4,1fr); }
+
+    figure { margin:0; cursor:zoom-in; }
+    img {
+      width:100%;
+      max-height:250px;
+      object-fit:contain;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    figcaption { font-size:14px; color:var(--muted); }
+
+    pre {
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.08);
+      padding:14px;
+      border-radius:12px;
+      overflow:auto;
+      font-size:13px;
+      white-space:pre-wrap;
+    }
+    code { font-family:"Courier New", monospace; color:#9ed0ff; }
+
+    .lightbox {
+      display:none;
+      position:fixed;
+      top:0; left:0; right:0; bottom:0;
+      background:rgba(7,10,22,0.9);
+      z-index:1000;
+      justify-content:center;
+      align-items:center;
+      padding:40px;
+    }
+    .lightbox img {
+      max-width:90%;
+      max-height:90%;
+      border-radius:18px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6);
+      cursor:zoom-out;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container brand">
+      <span class="dot"></span>
+      <h1>CS180 • Project 4 · NeRF</h1>
+      <nav>
+        <a href="#part0">Part 0</a>
+        <a href="#part1">Part 1</a>
+        <a href="#part2">Part 2</a>
+        <a href="#part26">My NeRF</a>
+        <a href="#conclusion">Conclusion</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="card">
+      <h2 class="hero-title">Neural Radiance Fields</h2>
+      <p class="subtitle">By <strong>Kourosh Salahi</strong> · CS180/280A: Computer Vision & Computational Photography</p>
+      <p>
+        In this project, I build a complete NeRF pipeline from scratch: camera calibration,
+        pose estimation, ray sampling, neural field construction, volume rendering,
+        and training NeRFs on both the Lego dataset and my own captured object.
+      </p>
+    </section>
+
+    <!-- PART 0 -->
+    <section class="card" id="part0">
+      <h2>Part 0 — Camera Calibration & Dataset Capture</h2>
+      <p>I used OpenCV’s ArUco system to detect markers, calibrate intrinsics, estimate extrinsics, and visualize camera poses in 3D using Viser.</p>
+
+      <h3>Camera Frustums Visualization</h3>
+      <div class="grid.two">
+        <figure><img src="./media/part0_cam1.jpeg" onclick="openLightbox(this.src)"><figcaption>Camera Cloud View 1</figcaption></figure>
+        <figure><img src="./media/part0_cam2.jpeg" onclick="openLightbox(this.src)"><figcaption>Camera Cloud View 2</figcaption></figure>
+      </div>
+
+      <p>These visualizations confirm correct pose estimation, correct orientation, and consistent intrinsics.</p>
+    </section>
+
+    <!-- PART 1 -->
+    <section class="card" id="part1">
+      <h2>Part 1 — Neural Field Fitting (2D)</h2>
+
+      <h3>Model Architecture</h3>
+      <pre><code>
+MLP:
+- Positional Encoding: L = 10 (42-dim input)
+- Layers: 4 hidden layers
+- Width: 256
+- Activation: ReLU, final Sigmoid
+- Optimizer: Adam (lr = 1e-2)
+- Batch size: 10,000
+      </code></pre>
+
+      <h3>Training Progression — Provided Test Image</h3>
+      <div class="grid.three">
+        <figure><img src="./media/nf_test_0.jpeg" onclick="openLightbox(this.src)"><figcaption>Iteration 0</figcaption></figure>
+        <figure><img src="./media/nf_test_500.jpeg" onclick="openLightbox(this.src)"><figcaption>Iteration 500</figcaption></figure>
+        <figure><img src="./media/nf_test_3000.jpeg" onclick="openLightbox(this.src)"><figcaption>Iteration 3000</figcaption></figure>
+      </div>
+
+      <h3>Training Progression — My Image</h3>
+      <div class="grid.three">
+        <figure><img src="./media/nf_own_0.jpeg" onclick="openLightbox(this.src)"><figcaption>Iteration 0</figcaption></figure>
+        <figure><img src="./media/nf_own_500.jpeg" onclick="openLightbox(this.src)"><figcaption>Iteration 500</figcaption></figure>
+        <figure><img src="./media/nf_own_3000.jpeg" onclick="openLightbox(this.src)"><figcaption>Iteration 3000</figcaption></figure>
+      </div>
+
+      <h3>Final Results — Positional Encoding × Width</h3>
+      <div class="grid.two">
+        <figure><img src="./media/nf_L4_w128.jpeg"></figure>
+        <figure><img src="./media/nf_L10_w128.jpeg"></figure>
+        <figure><img src="./media/nf_L4_w256.jpeg"></figure>
+        <figure><img src="./media/nf_L10_w256.jpeg"></figure>
+      </div>
+
+      <h3>PSNR Curve</h3>
+      <figure><img src="./media/nf_psnr.jpeg" onclick="openLightbox(this.src)"></figure>
+    </section>
+
+    <!-- PART 2 -->
+    <section class="card" id="part2">
+      <h2>Part 2 — Full Neural Radiance Field (Lego)</h2>
+
+      <h3>Ray Visualization</h3>
+      <figure><img src="./media/lego_rays.jpeg" onclick="openLightbox(this.src)"><figcaption>Rays + Samples + Cameras</figcaption></figure>
+
+      <h3>Training Progression</h3>
+      <div class="grid.three">
+        <figure><img src="./media/lego_train_100.jpeg"></figure>
+        <figure><img src="./media/lego_train_500.jpeg"></figure>
+        <figure><img src="./media/lego_train_1000.jpeg"></figure>
+      </div>
+
+      <h3>Validation PSNR Curve</h3>
+      <figure><img src="./media/lego_psnr.jpeg" onclick="openLightbox(this.src)"></figure>
+
+      <h3>Spherical Rendering</h3>
+      <figure><img src="./media/lego_video.gif" onclick="openLightbox(this.src)"></figure>
+      <p><em>Generated using the provided 60 test poses.</em></p>
+    </section>
+
+    <!-- PART 2.6 -->
+    <section class="card" id="part26">
+      <h2>Part 2.6 — NeRF on My Own Captured Object</h2>
+
+      <h3>Training Loss Curve</h3>
+      <figure><img src="./media/myobj_loss.jpeg" onclick="openLightbox(this.src)"></figure>
+
+      <h3>Training Progression</h3>
+      <div class="grid.three">
+        <figure><img src="./media/myobj_0.jpeg"></figure>
+        <figure><img src="./media/myobj_200.jpeg"></figure>
+        <figure><img src="./media/myobj_1000.jpeg"></figure>
+      </div>
+
+      <h3>Novel-View Rendering GIF</h3>
+      <figure><img src="./media/myobj_render.gif" onclick="openLightbox(this.src)"></figure>
+
+      <p>
+        For real data, I increased ray samples to 64 and lowered near/far
+        bounds to fit the scale. This improved density stability and produced smooth
+        geometry reconstruction.
+      </p>
+    </section>
+
+    <!-- Conclusion -->
+    <section class="card" id="conclusion">
+      <h2>Conclusion</h2>
+      <p>
+        This project built NeRF fully from scratch — from camera calibration to
+        volume rendering. Implementing queries, sampling, neural fields, and
+        rendering pipelines gave a deep understanding of radiance fields and
+        differentiable rendering.
+      </p>
+      <p><strong>Thank you for viewing!</strong></p>
+    </section>
+
+  </main>
+
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="">
+  </div>
+
+  <script>
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
