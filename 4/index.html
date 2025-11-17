@@ -227,7 +227,7 @@ def train(width, L, fp, k, epochs):
 
   <div class="grid.one" style="margin-top:15px;">
     <figure>
-      <img src="media/Tractor_many_views2.png" onclick="openLightbox(this.src)">
+      <img src="media/Tractor_many_views_2.png" onclick="openLightbox(this.src)">
       <figcaption>Camera cluster with sample points</figcaption>
     </figure>
   </div>
@@ -320,53 +320,6 @@ def train(width, L, fp, k, epochs):
     and view directions.
   </p>
 
-  <pre><code>
-class Model(nn.Module):
-  def __init__(self, L_r, L_x):
-    super().__init__()
-    self.L_r = L_r
-    self.L_x = L_x
-    input_dim_x = 3 + 6 * L_x  # PE for points
-    input_dim_r = 3 + 6 * L_r  # PE for directions
-
-    self.pts_linears = nn.ModuleList()
-    self.pts_linears.append(nn.Linear(input_dim_x, 256))
-    for i in range(7):
-      if i == 3:
-        self.pts_linears.append(nn.Linear(256 + input_dim_x, 256))  # skip connection
-      else:
-        self.pts_linears.append(nn.Linear(256, 256))
-
-    self.sigma_linear = nn.Linear(256, 1)
-
-    self.feature_linear = nn.Linear(256, 256)
-
-    self.rgb_linear = nn.Linear(256 + input_dim_r, 128)
-    self.rgb_linear_out = nn.Linear(128, 3)
-
-    self.relu = nn.ReLU()
-    self.sigmoid = nn.Sigmoid()
-
-  def forward(self, x, r):
-    x_encoded = PE(x, self.L_x)
-    r_encoded = PE(r, self.L_r)
-
-    h = x_encoded
-    for i, l in enumerate(self.pts_linears):
-      h = self.relu(l(h))
-      if i == 3:
-        h = torch.cat([h, x_encoded], dim=-1)
-
-    sigma = self.relu(self.sigma_linear(h))
-
-    feature = self.relu(self.feature_linear(h))
-    h_rgb = torch.cat([feature, r_encoded], dim=-1)
-    h_rgb = self.relu(self.rgb_linear(h_rgb))
-    rgb = self.sigmoid(self.rgb_linear_out(h_rgb))
-
-    return sigma, rgb
-  </code></pre>
-
   <h3>Hyperparameter & Implementation Adjustments</h3>
   <ul>
     <li><strong>near = 0.2</strong> and <strong>far = 0.5</strong>  
@@ -394,20 +347,33 @@ class Model(nn.Module):
     </figure>
   </div>
 
-  <h3>Intermediate Training Renders</h3>
-  <p>
-    Below are snapshots of the NeRF’s output at various training stages. These
-    help verify volume rendering and reveal whether density/color predictions are
-    evolving correctly.
-  </p>
+<!-- PART 2.6 — Intermediate Renders -->
+<h3>Intermediate Training Renders</h3>
+<p>
+  Below are snapshots of the NeRF’s output at various stages of training.
+  These demonstrate how density and color predictions refine over time.
+</p>
 
-  <div class="grid.five">
-    <figure><img src="media/car_int_1.png"><figcaption>iter 1</figcaption></figure>
-    <figure><img src="media/car_int_2.png"><figcaption>iter 2</figcaption></figure>
-    <figure><img src="media/car_int_3.png"><figcaption>iter 3</figcaption></figure>
-    <figure><img src="media/car_int_4.png"><figcaption>iter 4</figcaption></figure>
-    <figure><img src="media/car_int_5.png"><figcaption>iter 5</figcaption></figure>
-  </div>
+<div class="grid.five">
+  <figure><img src="media/car_iter0.png"><figcaption>iter 0</figcaption></figure>
+  <figure><img src="media/car_iter200.png"><figcaption>iter 200</figcaption></figure>
+  <figure><img src="media/car_iter400.png"><figcaption>iter 400</figcaption></figure>
+  <figure><img src="media/car_iter600.png"><figcaption>iter 600</figcaption></figure>
+  <figure><img src="media/car_iter800.png"><figcaption>iter 800</figcaption></figure>
+
+  <figure><img src="media/car_iter1000.png"><figcaption>iter 1000</figcaption></figure>
+  <figure><img src="media/car_iter1200.png"><figcaption>iter 1200</figcaption></figure>
+  <figure><img src="media/car_iter1400.png"><figcaption>iter 1400</figcaption></figure>
+  <figure><img src="media/car_iter1600.png"><figcaption>iter 1600</figcaption></figure>
+  <figure><img src="media/car_iter1800.png"><figcaption>iter 1800</figcaption></figure>
+</div>
+
+<h3>Reference Image</h3>
+<figure>
+  <img src="media/car_iterref.png">
+  <figcaption>Ground Truth Reference</figcaption>
+</figure>
+
 
   <h3>Novel-View Rendering (Final)</h3>
   <p>
