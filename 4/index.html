@@ -141,20 +141,22 @@ def train(width, L, fp, k, epochs):
       <h3>Final Results </h3>
       <p>Four combinations of PE frequency (L ∈ {4,10}) and width (W ∈ {64,256}), all at iter1999. Please note all image captions are below each image</p>
 
-      <div class="grid.two">
-        <figure><img src="media/fox_64_4_iter1999.png"><figcaption>W=64, L=4</figcaption></figure>
-        <figure><img src="media/fox_64_10_iter1999.png"><figcaption>W=64, L=10</figcaption></figure>
-        <figure><img src="media/fox_256_4_iter1999.png"><figcaption>W=256, L=4</figcaption></figure>
-        <figure><img src="media/fox_256_10_iter1999.png"><figcaption>W=256, L=10</figcaption></figure>
-      </div>
+    <div class="grid.two">
+      <figure><figcaption>W=64, L=4</figcaption><img src="media/fox_64_4_iter1999.png"></figure>
+      <figure><figcaption>W=64, L=10</figcaption><img src="media/fox_64_10_iter1999.png"></figure>
+      <figure><figcaption>W=256, L=4</figcaption><img src="media/fox_256_4_iter1999.png"></figure>
+      <figure><figcaption>W=256, L=10</figcaption><img src="media/fox_256_10_iter1999.png"></figure>
+    </div>
+    
+    <h3>PSNR Curves (Fox)</h3>
+    
+    <div class="grid.two">
+      <figure><figcaption>W=64, L=4</figcaption><img src="media/fox_psnr_64_4.png"></figure>
+      <figure><figcaption>W=64, L=10</figcaption><img src="media/fox_psnr_64_10.png"></figure>
+      <figure><figcaption>W=256, L=4</figcaption><img src="media/fox_psnr_256_4.png"></figure>
+      <figure><figcaption>W=256, L=10</figcaption><img src="media/fox_psnr_256_10.png"></figure>
+    </div>
 
-      <h3>PSNR Curves (Fox)</h3>
-      <div class="grid.two">
-        <figure><img src="media/fox_psnr_64_4.png"><figcaption>W=64, L=4</figcaption></figure>
-        <figure><img src="media/fox_psnr_64_10.png"><figcaption>W=64, L=10</figcaption></figure>
-        <figure><img src="media/fox_psnr_256_4.png"><figcaption>W=256, L = 4</figcaption></figure>
-        <figure><img src="media/fox_psnr_256_10.png"><figcaption>W = 256, L = 10</figcaption></figure>
-      </div>
     </section>
 
     <!-- PART 2 -->
@@ -204,31 +206,31 @@ def train(width, L, fp, k, epochs):
   </p>
 
   <div class="grid.two">
-    <figure>
+    <figure>      <figcaption>Rays from one view (sampled)</figcaption>
       <img src="media/Tractor_single.png" onclick="openLightbox(this.src)">
-      <figcaption>Rays from one view (sampled)</figcaption>
+
     </figure>
-    <figure>
+    <figure>      <figcaption>Different region of same camera</figcaption>
       <img src="media/Tractor_single_2.png" onclick="openLightbox(this.src)">
-      <figcaption>Different region of same camera</figcaption>
+
     </figure>
   </div>
 
   <div class="grid.two" style="margin-top:15px;">
-    <figure>
+    <figure>      <figcaption>Top-left pixel rays</figcaption>
       <img src="media/Tractor_single_3.png" onclick="openLightbox(this.src)">
-      <figcaption>Top-left pixel rays</figcaption>
+
     </figure>
-    <figure>
+    <figure>      <figcaption>All cameras + 100 rays</figcaption>
       <img src="media/Tractor_many views.png" onclick="openLightbox(this.src)">
-      <figcaption>All cameras + 100 rays</figcaption>
+
     </figure>
   </div>
 
   <div class="grid.one" style="margin-top:15px;">
-    <figure>
+    <figure>      <figcaption>Camera cluster with sample points</figcaption>
       <img src="media/Tractor_many_views_2.png" onclick="openLightbox(this.src)">
-      <figcaption>Camera cluster with sample points</figcaption>
+
     </figure>
   </div>
 
@@ -264,38 +266,38 @@ def train(width, L, fp, k, epochs):
   <h3>Training Progression (0 → 1400 iterations)</h3>
   <p>The following results correspond to iterations: <strong>0, 200, 400, 600, 800, 1000, 1200, 1400</strong>.</p>
 
-  <div class="grid.four">
-    <figure><img src="media/tractor_training1.png"><figcaption>iter 0</figcaption></figure>
-    <figure><img src="media/tractor_training2.png"><figcaption>iter 200</figcaption></figure>
-    <figure><img src="media/tractor_training3.png"><figcaption>iter 400</figcaption></figure>
-    <figure><img src="media/tractor_training4.png"><figcaption>iter 600</figcaption></figure>
+<div class="grid.four">
+  <figure><figcaption>iter 0</figcaption><img src="media/tractor_training1.png"></figure>
+  <figure><figcaption>iter 200</figcaption><img src="media/tractor_training2.png"></figure>
+  <figure><figcaption>iter 400</figcaption><img src="media/tractor_training3.png"></figure>
+  <figure><figcaption>iter 600</figcaption><img src="media/tractor_training4.png"></figure>
 
-    <figure><img src="media/tractor_training5.png"><figcaption>iter 800</figcaption></figure>
-    <figure><img src="media/tractor_training6.png"><figcaption>iter 1000</figcaption></figure>
-    <figure><img src="media/tractor_training7.png"><figcaption>iter 1200</figcaption></figure>
-    <figure><img src="media/tractor_training8.png"><figcaption>iter 1400</figcaption></figure>
-  </div>
+  <figure><figcaption>iter 800</figcaption><img src="media/tractor_training5.png"></figure>
+  <figure><figcaption>iter 1000</figcaption><img src="media/tractor_training6.png"></figure>
+  <figure><figcaption>iter 1200</figcaption><img src="media/tractor_training7.png"></figure>
+  <figure><figcaption>iter 1400</figcaption><img src="media/tractor_training8.png"></figure>
+</div>
+
 
   <!-- PSNR Curves -->
   <h3>PSNR Curves</h3>
   <p>I show both the training PSNR and validation PSNR curves:</p>
 
   <div class="grid.two">
-    <figure>
+    <figure>      <figcaption>Training PSNR</figcaption>
       <img src="media/Tractor_PSNR.png" onclick="openLightbox(this.src)">
-      <figcaption>Training PSNR</figcaption>
+
     </figure>
-    <figure>
+    <figure> <figcaption>Validation PSNR</figcaption>
       <img src="media/Tractor_PSNR_Validation.png" onclick="openLightbox(this.src)">
-      <figcaption>Validation PSNR</figcaption>
+      
     </figure>
   </div>
 
   <!-- Spherical Render -->
   <h3>Spherical Rendering (Novel Views)</h3>
-  <figure>
+  <figure>    <figcaption>Rendered novel-view orbit of Lego</figcaption>
     <img src="media/Tractor_nerf_rotation.gif" onclick="openLightbox(this.src)">
-    <figcaption>Rendered novel-view orbit of Lego</figcaption>
   </figure>
 
 </section>
@@ -337,13 +339,13 @@ def train(width, L, fp, k, epochs):
   <h3>Training Loss Over Time</h3>
 
   <div class="grid.two">
-    <figure>
+    <figure>      <figcaption>MSE Loss Curve</figcaption>
+
       <img src="media/car_mse.png" onclick="openLightbox(this.src)">
-      <figcaption>MSE Loss Curve</figcaption>
     </figure>
-    <figure>
+    <figure>      <figcaption>PSNR Over Training</figcaption>
+
       <img src="media/car_psnr.png" onclick="openLightbox(this.src)">
-      <figcaption>PSNR Over Training</figcaption>
     </figure>
   </div>
 
@@ -355,23 +357,24 @@ def train(width, L, fp, k, epochs):
 </p>
 
 <div class="grid.five">
-  <figure><img src="media/car_iter0.png"><figcaption>iter 0</figcaption></figure>
-  <figure><img src="media/car_iter200.png"><figcaption>iter 200</figcaption></figure>
-  <figure><img src="media/car_iter400.png"><figcaption>iter 400</figcaption></figure>
-  <figure><img src="media/car_iter600.png"><figcaption>iter 600</figcaption></figure>
-  <figure><img src="media/car_iter800.png"><figcaption>iter 800</figcaption></figure>
+  <figure><figcaption>iter 0</figcaption><img src="media/car_iter0.png"></figure>
+  <figure><figcaption>iter 200</figcaption><img src="media/car_iter200.png"></figure>
+  <figure><figcaption>iter 400</figcaption><img src="media/car_iter400.png"></figure>
+  <figure><figcaption>iter 600</figcaption><img src="media/car_iter600.png"></figure>
+  <figure><figcaption>iter 800</figcaption><img src="media/car_iter800.png"></figure>
 
-  <figure><img src="media/car_iter1000.png"><figcaption>iter 1000</figcaption></figure>
-  <figure><img src="media/car_iter1200.png"><figcaption>iter 1200</figcaption></figure>
-  <figure><img src="media/car_iter1400.png"><figcaption>iter 1400</figcaption></figure>
-  <figure><img src="media/car_iter1600.png"><figcaption>iter 1600</figcaption></figure>
-  <figure><img src="media/car_iter1800.png"><figcaption>iter 1800</figcaption></figure>
+  <figure><figcaption>iter 1000</figcaption><img src="media/car_iter1000.png"></figure>
+  <figure><figcaption>iter 1200</figcaption><img src="media/car_iter1200.png"></figure>
+  <figure><figcaption>iter 1400</figcaption><img src="media/car_iter1400.png"></figure>
+  <figure><figcaption>iter 1600</figcaption><img src="media/car_iter1600.png"></figure>
+  <figure><figcaption>iter 1800</figcaption><img src="media/car_iter1800.png"></figure>
 </div>
 
+
 <h3>Reference Image</h3>
-<figure>
+<figure>  <figcaption>Ground Truth Reference</figcaption>
+
   <img src="media/car_iterref.png">
-  <figcaption>Ground Truth Reference</figcaption>
 </figure>
 
 
@@ -383,9 +386,9 @@ def train(width, L, fp, k, epochs):
     The final rendered GIF is shown below:
   </p>
 
-  <figure>
+  <figure>    <figcaption>Novel-view orbit of my reconstructed NeRF</figcaption>
+
     <img src="media/MY_nerf_rotation2.gif" onclick="openLightbox(this.src)">
-    <figcaption>Novel-view orbit of my reconstructed NeRF</figcaption>
   </figure>
 
   <p class="subtitle">
