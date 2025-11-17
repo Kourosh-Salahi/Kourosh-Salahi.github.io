@@ -7,95 +7,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --bg: #0b1020;
-      --card: #111836;
-      --muted: #a0aec0;
-      --ink: #e6eefc;
-      --accent: #8ab4ff;
-    }
-
-    body {
-      margin:0;
-      font-family:Inter,system-ui,sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-      line-height:1.6;
-    }
-
+    :root { --bg:#0b1020; --card:#111836; --muted:#a0aec0; --ink:#e6eefc; --accent:#8ab4ff; }
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
     .container { max-width:1100px; margin:0 auto; padding:20px; }
-
-    header {
-      padding:32px 20px;
-      background:linear-gradient(to bottom,rgba(11,16,32,0.95),rgba(11,16,32,0.7));
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      position:sticky;
-      top:0;
-      z-index:10;
-    }
-
+    header { padding:32px 20px; background:linear-gradient(to bottom,rgba(11,16,32,0.95),rgba(11,16,32,0.7)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; z-index:10; }
     .brand { display:flex; align-items:center; gap:12px; }
     .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
     .brand h1 { font-size:18px; margin:0; font-weight:800; }
-
     nav { margin-left:auto; font-size:14px; display:flex; gap:12px; }
     nav a { color:var(--accent); text-decoration:none; }
     nav a:hover { text-decoration:underline; }
-
-    .card {
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:18px;
-      padding:20px;
-      margin-bottom:30px;
-    }
-
+    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:30px; }
     .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
     .subtitle { color:var(--muted); margin:0 0 10px; }
-
     .grid { display:grid; gap:16px; }
     .grid.two { grid-template-columns:repeat(2,1fr); }
     .grid.three { grid-template-columns:repeat(3,1fr); }
     .grid.four { grid-template-columns:repeat(4,1fr); }
-
     figure { margin:0; cursor:zoom-in; }
-    img {
-      width:100%;
-      max-height:250px;
-      object-fit:contain;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.08);
-    }
+    img { width:100%; max-height:250px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
     figcaption { font-size:14px; color:var(--muted); }
-
-    pre {
-      background:rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.08);
-      padding:14px;
-      border-radius:12px;
-      overflow:auto;
-      font-size:13px;
-      white-space:pre-wrap;
-    }
+    pre { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; overflow:auto; font-size:13px; white-space:pre-wrap; }
     code { font-family:"Courier New", monospace; color:#9ed0ff; }
-
-    .lightbox {
-      display:none;
-      position:fixed;
-      top:0; left:0; right:0; bottom:0;
-      background:rgba(7,10,22,0.9);
-      z-index:1000;
-      justify-content:center;
-      align-items:center;
-      padding:40px;
-    }
-    .lightbox img {
-      max-width:90%;
-      max-height:90%;
-      border-radius:18px;
-      box-shadow:0 20px 60px rgba(0,0,0,0.6);
-      cursor:zoom-out;
-    }
+    .lightbox { display:none; position:fixed; inset:0; background:rgba(7,10,22,0.9); z-index:1000; justify-content:center; align-items:center; padding:40px; }
+    .lightbox img { max-width:90%; max-height:90%; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,0.6); cursor:zoom-out; }
   </style>
 </head>
 
@@ -119,26 +54,31 @@
     <!-- HERO -->
     <section class="card">
       <h2 class="hero-title">Neural Radiance Fields</h2>
-      <p class="subtitle">By <strong>Kourosh Salahi</strong> · CS180/280A: Computer Vision & Computational Photography</p>
+      <p class="subtitle">By <strong>Kourosh Salahi</strong> · CS180 / 280A</p>
       <p>
-        In this project, I build a complete NeRF pipeline from scratch: camera calibration,
-        pose estimation, ray sampling, neural field construction, volume rendering,
-        and training NeRFs on both the Lego dataset and my own captured object.
+        This project implements NeRF completely from scratch: camera calibration,
+        pose estimation, ray sampling, neural fields, volume rendering,
+        and training NeRFs on both the classic Lego dataset and my own captured data.
       </p>
     </section>
 
     <!-- PART 0 -->
     <section class="card" id="part0">
       <h2>Part 0 — Camera Calibration & Dataset Capture</h2>
-      <p>I used OpenCV’s ArUco system to detect markers, calibrate intrinsics, estimate extrinsics, and visualize camera poses in 3D using Viser.</p>
 
       <h3>Camera Frustums Visualization</h3>
       <div class="grid.two">
-        <figure><img src="media/vis_cam1.png" onclick="openLightbox(this.src)"><figcaption>Camera Cloud View 1</figcaption></figure>
-        <figure><img src="media/vis_cam2.png" onclick="openLightbox(this.src)"><figcaption>Camera Cloud View 2</figcaption></figure>
+        <figure><img src="media/vis_cam1.png" onclick="openLightbox(this.src)"><figcaption>Viser camera view 1</figcaption></figure>
+        <figure><img src="media/vis_cam2.png" onclick="openLightbox(this.src)"><figcaption>Viser camera view 2</figcaption></figure>
       </div>
 
-      <p>These visualizations confirm correct pose estimation, correct orientation, and consistent intrinsics.</p>
+      <h3>Calibration Visualization</h3>
+      <figure>
+        <img src="media/calibration_vis.png" onclick="openLightbox(this.src)">
+        <figcaption>Detected ArUco corners used for calibration</figcaption>
+      </figure>
+
+      <p>Calibration → PnP → undistortion → dataset creation was implemented exactly per spec (see code in write-up).</p>
     </section>
 
     <!-- PART 1 -->
@@ -146,104 +86,364 @@
       <h2>Part 1 — Neural Field Fitting (2D)</h2>
 
       <h3>Model Architecture</h3>
+      <p>Below is the exact model used for my best results (width=256, L=10):</p>
+
       <pre><code>
-MLP:
-- Positional Encoding: L = 10 (42-dim input)
-- Layers: 4 hidden layers
-- Width: 256
-- Activation: ReLU, final Sigmoid
-- Optimizer: Adam (lr = 1e-2)
-- Batch size: 10,000
+def train(width, L, fp, k, epochs):
+
+  model = nn.Sequential(
+    nn.Linear(4*L + 2, width),
+    nn.ReLU(),
+    nn.Linear(width, width),
+    nn.ReLU(),
+    nn.Linear(width, width),
+    nn.ReLU(),
+    nn.Linear(width, 3),
+    nn.Sigmoid()
+  )
+
+  optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
+  loss_fn = nn.MSELoss()
+
+  ...
       </code></pre>
 
-      <!-- Using available images to show progression -->
-      <h3>Training Progression — Provided Test Image</h3>
+      <h3>Training Progression — Fox (Width=256, L=10)</h3>
+      <p>Training iterations shown: 0 → 50 → 100 → 200 → 500 → 1000 → 1999.</p>
+
       <div class="grid.three">
-        <figure><img src="media/tractor_val1.png" onclick="openLightbox(this.src)"><figcaption>Iteration A</figcaption></figure>
-        <figure><img src="media/tractor_val3.png" onclick="openLightbox(this.src)"><figcaption>Iteration B</figcaption></figure>
-        <figure><img src="media/tractor_val5.png" onclick="openLightbox(this.src)"><figcaption>Iteration C</figcaption></figure>
+        <figure><img src="media/fox_256_10_iter0.png"></figure>
+        <figure><img src="media/fox_256_10_iter50.png"></figure>
+        <figure><img src="media/fox_256_10_iter100.png"></figure>
+
+        <figure><img src="media/fox_256_10_iter200.png"></figure>
+        <figure><img src="media/fox_256_10_iter500.png"></figure>
+        <figure><img src="media/fox_256_10_iter1000.png"></figure>
+
+        <figure><img src="media/fox_256_10_iter1999.png"></figure>
       </div>
 
-      <h3>Training Progression — My Image</h3>
+      <h3>Training Progression — Monkey (Width=256, L=10)</h3>
+      <p>Training iterations shown: 0 → 50 → 100 → 200 → 500 → 1000 → 1999.</p>
+
       <div class="grid.three">
-        <figure><img src="media/tractor_val7.png" onclick="openLightbox(this.src)"><figcaption>Iteration A</figcaption></figure>
-        <figure><img src="media/tractor_val8.png" onclick="openLightbox(this.src)"><figcaption>Iteration B</figcaption></figure>
-        <figure><img src="media/tractor_val9.png" onclick="openLightbox(this.src)"><figcaption>Iteration C</figcaption></figure>
+        <figure><img src="media/monkey_iter0.png"></figure>
+        <figure><img src="media/monkey_iter50.png"></figure>
+        <figure><img src="media/monkey_iter100.png"></figure>
+
+        <figure><img src="media/monkey_iter200.png"></figure>
+        <figure><img src="media/monkey_iter500.png"></figure>
+        <figure><img src="media/monkey_iter1000.png"></figure>
+
+        <figure><img src="media/monkey_iter1999.png"></figure>
       </div>
 
-      <h3>Final Results — Positional Encoding × Width</h3>
+      <h3>Final Results </h3>
+      <p>Four combinations of PE frequency (L ∈ {4,10}) and width (W ∈ {64,256}), all at iter1999. Please note all image captions are below each image</p>
+
       <div class="grid.two">
-        <figure><img src="media/tractor_val2.png"></figure>
-        <figure><img src="media/tractor_val4.png"></figure>
-        <figure><img src="media/tractor_val6.png"></figure>
-        <figure><img src="media/tractor_val10.png"></figure>
+        <figure><img src="media/fox_64_4_iter1999.png"><figcaption>W=64, L=4</figcaption></figure>
+        <figure><img src="media/fox_64_10_iter1999.png"><figcaption>W=64, L=10</figcaption></figure>
+        <figure><img src="media/fox_256_4_iter1999.png"><figcaption>W=256, L=4</figcaption></figure>
+        <figure><img src="media/fox_256_10_iter1999.png"><figcaption>W=256, L=10</figcaption></figure>
       </div>
 
-      <h3>PSNR Curve</h3>
-      <figure><img src="media/Tractor_PSNR.png" onclick="openLightbox(this.src)"></figure>
+      <h3>PSNR Curves (Fox)</h3>
+      <div class="grid.two">
+        <figure><img src="media/fox_psnr_64_4.png"><figcaption>W=64, L=4</figcaption></figure>
+        <figure><img src="media/fox_psnr_64_10.png"><figcaption>W=64, L=10</figcaption></figure>
+        <figure><img src="media/fox_psnr_256_4.png"><figcaption>W=256, L = 4</figcaption></figure>
+        <figure><img src="media/fox_psnr_256_10.png"><figcaption>W = 256, L = 10</figcaption></figure>
+      </div>
     </section>
 
     <!-- PART 2 -->
-    <section class="card" id="part2">
-      <h2>Part 2 — Full Neural Radiance Field (Lego)</h2>
+<section class="card" id="part2">
+  <h2>Part 2 — Neural Radiance Field on Multi-View Lego</h2>
 
-      <h3>Ray Visualization</h3>
-      <figure><img src="media/Tractor_many_views_2.png" onclick="openLightbox(this.src)"><figcaption>Rays + Samples + Cameras</figcaption></figure>
+  <p>
+    In this section, I implemented a full NeRF pipeline following the project
+    specification: converting pixels → camera coordinates → world coordinates → rays,
+    sampling points along rays, evaluating a 3D radiance field MLP, and applying
+    differentiable volume rendering to match the multi-view images.
+  </p>
 
-      <h3>Training Progression</h3>
-      <div class="grid.three">
-        <figure><img src="media/Tractor_single.png"></figure>
-        <figure><img src="media/Tractor_single_2.png"></figure>
-        <figure><img src="media/Tractor_single_3.png"></figure>
-      </div>
+  <!-- 2.1 Implementation Summary -->
+  <h3>2.1 Camera → Ray Pipeline</h3>
+  <p>
+    <strong>Camera-to-World Transform:</strong> I implemented <code>transform(c2w, x_c)</code>
+    which converts camera-space points to world-space using homogeneous coordinates.
+    Verified with:
+    <code>x == transform(inv(c2w), transform(c2w, x))</code>.
+  </p>
+  <p>
+    <strong>Pixel → Camera:</strong> Using the intrinsic matrix <code>K</code>, I inverted the
+    projection equation to compute 3D camera-space coordinates from pixel coordinates
+    with a chosen depth <code>1</code>.
+  </p>
+  <p>
+    <strong>Pixel → Ray:</strong> For each pixel <code>(u, v)</code>, I computed:
+    ray origin = camera position  
+    ray direction = normalized( transform(c2w, pixel_to_camera(K, uv, 1)) − origin ).
+  </p>
 
-      <h3>Validation PSNR Curve</h3>
-      <figure><img src="media/Tractor_PSNR_Validation.png" onclick="openLightbox(this.src)"></figure>
+  <!-- 2.2 Implementation Summary -->
+  <h3>2.2 Sampling Rays & Points</h3>
+  <p>
+    For each training step, I uniformly sampled random pixels across all images
+    (flattened global sampling). Each ray was discretized into
+    <strong>64 samples</strong> between <code>near = 2.0</code> and <code>far = 6.0</code>.
+    During training I added uniform jitter to sample intervals to avoid aliasing.
+  </p>
 
-      <h3>Spherical Rendering</h3>
-      <figure><img src="media/Tractor_nerf_rotation.gif" onclick="openLightbox(this.src)"></figure>
-      <p><em>Generated using the provided 60 test poses.</em></p>
-    </section>
+  <!-- 2.3 Implementation Summary -->
+  <h3>2.3 Dataloader + Viser Visualizations</h3>
+  <p>
+    My dataloader returns <code>(ray_o, ray_d, pixel_color)</code>.  
+    I validated correctness using Viser visualizations.
+  </p>
 
-    <!-- PART 2.6 -->
-    <section class="card" id="part26">
-      <h2>Part 2.6 — NeRF on My Own Captured Object</h2>
+  <div class="grid.two">
+    <figure>
+      <img src="media/Tractor_single.png" onclick="openLightbox(this.src)">
+      <figcaption>Rays from one view (sampled)</figcaption>
+    </figure>
+    <figure>
+      <img src="media/Tractor_single_2.png" onclick="openLightbox(this.src)">
+      <figcaption>Different region of same camera</figcaption>
+    </figure>
+  </div>
 
-      <!-- No explicit loss curve image in the list; keep GIF + sample intermediates from available set -->
-      <h3>Training Loss Curve</h3>
-      <figure><img src="media/calibration_vis.png" onclick="openLightbox(this.src)"><figcaption>(Placeholder plot)</figcaption></figure>
+  <div class="grid.two" style="margin-top:15px;">
+    <figure>
+      <img src="media/Tractor_single_3.png" onclick="openLightbox(this.src)">
+      <figcaption>Top-left pixel rays</figcaption>
+    </figure>
+    <figure>
+      <img src="media/Tractor_many views.png" onclick="openLightbox(this.src)">
+      <figcaption>All cameras + 100 rays</figcaption>
+    </figure>
+  </div>
 
-      <h3>Training Progression</h3>
-      <div class="grid.three">
-        <figure><img src="media/tractor_val8.png"></figure>
-        <figure><img src="media/tractor_val9.png"></figure>
-        <figure><img src="media/tractor_val10.png"></figure>
-      </div>
+  <div class="grid.one" style="margin-top:15px;">
+    <figure>
+      <img src="media/Tractor_many_views2.png" onclick="openLightbox(this.src)">
+      <figcaption>Camera cluster with sample points</figcaption>
+    </figure>
+  </div>
 
-      <h3>Novel-View Rendering GIF</h3>
-      <figure><img src="media/MY_nerf_rotation.gif" onclick="openLightbox(this.src)"></figure>
+  <!-- 2.4 Implementation Summary -->
+  <h3>2.4 Neural Radiance Field MLP</h3>
+  <p>
+    I implemented the NeRF MLP with the following structure:
+  </p>
+  <ul>
+    <li>Inputs: Positional-encoded 3D position (<code>L=10</code>) and ray direction (<code>L=4</code>)</li>
+    <li>8-layer fully-connected MLP, width 256</li>
+    <li>Skip connection at layer 4 (concatenate input PE again)</li>
+    <li>Outputs:
+      <ul>
+        <li><strong>σ</strong> (density) using ReLU</li>
+        <li><strong>RGB</strong> using Sigmoid</li>
+      </ul>
+    </li>
+  </ul>
 
-      <p>
-        For real data, I increased ray samples to 64 and lowered near/far
-        bounds to fit the scale. This improved density stability and produced smooth
-        geometry reconstruction.
-      </p>
-    </section>
+  <!-- 2.5 Implementation Summary -->
+  <h3>2.5 Volume Rendering</h3>
+  <p>
+    I implemented the discrete volume rendering equation:
+  </p>
+  <pre><code>C = Σ T_i (1 − exp(−σ_i Δt)) · c_i</code></pre>
+  <p>
+    where transmittance <code>T_i = exp(−Σ_{j < i} σ_j Δt)</code>.
+    My implementation matches the reference test exactly.
+  </p>
+
+  <!-- Training Progression -->
+  <h3>Training Progression (0 → 1400 iterations)</h3>
+  <p>The following results correspond to iterations: <strong>0, 200, 400, 600, 800, 1000, 1200, 1400</strong>.</p>
+
+  <div class="grid.four">
+    <figure><img src="media/tractor_training1.png"><figcaption>iter 0</figcaption></figure>
+    <figure><img src="media/tractor_training2.png"><figcaption>iter 200</figcaption></figure>
+    <figure><img src="media/tractor_training3.png"><figcaption>iter 400</figcaption></figure>
+    <figure><img src="media/tractor_training4.png"><figcaption>iter 600</figcaption></figure>
+
+    <figure><img src="media/tractor_training5.png"><figcaption>iter 800</figcaption></figure>
+    <figure><img src="media/tractor_training6.png"><figcaption>iter 1000</figcaption></figure>
+    <figure><img src="media/tractor_training7.png"><figcaption>iter 1200</figcaption></figure>
+    <figure><img src="media/tractor_training8.png"><figcaption>iter 1400</figcaption></figure>
+  </div>
+
+  <!-- PSNR Curves -->
+  <h3>PSNR Curves</h3>
+  <p>I show both the training PSNR and validation PSNR curves:</p>
+
+  <div class="grid.two">
+    <figure>
+      <img src="media/Tractor_PSNR.png" onclick="openLightbox(this.src)">
+      <figcaption>Training PSNR</figcaption>
+    </figure>
+    <figure>
+      <img src="media/Tractor_PSNR_Validation.png" onclick="openLightbox(this.src)">
+      <figcaption>Validation PSNR</figcaption>
+    </figure>
+  </div>
+
+  <!-- Spherical Render -->
+  <h3>Spherical Rendering (Novel Views)</h3>
+  <figure>
+    <img src="media/Tractor_nerf_rotation.gif" onclick="openLightbox(this.src)">
+    <figcaption>Rendered novel-view orbit of Lego</figcaption>
+  </figure>
+
+</section>
+
+<!-- PART 2.6 -->
+<section class="card" id="part26">
+  <h2>Part 2.6 — NeRF Trained on My Own Captured Object</h2>
+
+  <p>
+    For this section, I trained a full Neural Radiance Field using the dataset
+    captured in Part&nbsp;0. This involved using my own calibrated images and
+    camera poses, then training a NeRF model identical in structure to Part 2,
+    with adjustments to near/far ranges and sampling strategy due to the much
+    smaller physical scale of the scene.
+  </p>
+
+  <h3>Model Architecture & Training Setup</h3>
+
+  <p>
+    I used a custom NeRF architecture with skip connection, separate density/color
+    branches, and independent positional encoding frequencies for 3D sample points
+    and view directions.
+  </p>
+
+  <pre><code>
+class Model(nn.Module):
+  def __init__(self, L_r, L_x):
+    super().__init__()
+    self.L_r = L_r
+    self.L_x = L_x
+    input_dim_x = 3 + 6 * L_x  # PE for points
+    input_dim_r = 3 + 6 * L_r  # PE for directions
+
+    self.pts_linears = nn.ModuleList()
+    self.pts_linears.append(nn.Linear(input_dim_x, 256))
+    for i in range(7):
+      if i == 3:
+        self.pts_linears.append(nn.Linear(256 + input_dim_x, 256))  # skip connection
+      else:
+        self.pts_linears.append(nn.Linear(256, 256))
+
+    self.sigma_linear = nn.Linear(256, 1)
+
+    self.feature_linear = nn.Linear(256, 256)
+
+    self.rgb_linear = nn.Linear(256 + input_dim_r, 128)
+    self.rgb_linear_out = nn.Linear(128, 3)
+
+    self.relu = nn.ReLU()
+    self.sigmoid = nn.Sigmoid()
+
+  def forward(self, x, r):
+    x_encoded = PE(x, self.L_x)
+    r_encoded = PE(r, self.L_r)
+
+    h = x_encoded
+    for i, l in enumerate(self.pts_linears):
+      h = self.relu(l(h))
+      if i == 3:
+        h = torch.cat([h, x_encoded], dim=-1)
+
+    sigma = self.relu(self.sigma_linear(h))
+
+    feature = self.relu(self.feature_linear(h))
+    h_rgb = torch.cat([feature, r_encoded], dim=-1)
+    h_rgb = self.relu(self.rgb_linear(h_rgb))
+    rgb = self.sigmoid(self.rgb_linear_out(h_rgb))
+
+    return sigma, rgb
+  </code></pre>
+
+  <h3>Hyperparameter & Implementation Adjustments</h3>
+  <ul>
+    <li><strong>near = 0.2</strong> and <strong>far = 0.5</strong>  
+      (real-world scene was much smaller than Lego dataset)</li>
+    <li><strong>64 samples per ray</strong>, jittered during training</li>
+    <li><strong>Positional encoding:</strong> L<sub>x</sub> = 10 for positions, L<sub>r</sub> = 4 for directions</li>
+    <li><strong>Adam optimizer:</strong> lr = 5e-4</li>
+  </ul>
+
+  <p>
+    These adjustments were essential to avoid the model sampling empty space and to
+    keep rays bounded within the tight capture volume around the object.
+  </p>
+
+  <h3>Training Loss Over Time</h3>
+
+  <div class="grid.two">
+    <figure>
+      <img src="media/car_mse.png" onclick="openLightbox(this.src)">
+      <figcaption>MSE Loss Curve</figcaption>
+    </figure>
+    <figure>
+      <img src="media/car_psnr.png" onclick="openLightbox(this.src)">
+      <figcaption>PSNR Over Training</figcaption>
+    </figure>
+  </div>
+
+  <h3>Intermediate Training Renders</h3>
+  <p>
+    Below are snapshots of the NeRF’s output at various training stages. These
+    help verify volume rendering and reveal whether density/color predictions are
+    evolving correctly.
+  </p>
+
+  <div class="grid.five">
+    <figure><img src="media/car_int_1.png"><figcaption>iter 1</figcaption></figure>
+    <figure><img src="media/car_int_2.png"><figcaption>iter 2</figcaption></figure>
+    <figure><img src="media/car_int_3.png"><figcaption>iter 3</figcaption></figure>
+    <figure><img src="media/car_int_4.png"><figcaption>iter 4</figcaption></figure>
+    <figure><img src="media/car_int_5.png"><figcaption>iter 5</figcaption></figure>
+  </div>
+
+  <h3>Novel-View Rendering (Final)</h3>
+  <p>
+    After training, I generated a 360° orbit animation by using the provided
+    “look-at-origin” camera generation code, producing a smooth camera path around
+    the object. Because my Aruco tag was so big, I pointed it towards a different corner rather than the origin corner. Thus, I had to change the logic for the roation function to rotate along a different world point.
+    The final rendered GIF is shown below:
+  </p>
+
+  <figure>
+    <img src="media/MY_nerf_rotation2.gif" onclick="openLightbox(this.src)">
+    <figcaption>Novel-view orbit of my reconstructed NeRF</figcaption>
+  </figure>
+
+  <p class="subtitle">
+    These results demonstrate that my custom-captured dataset can successfully train
+    a NeRF despite real-world noise, lens distortion, uneven lighting, and limited
+    viewpoints.
+  </p>
+</section>
+
 
     <!-- Conclusion -->
     <section class="card" id="conclusion">
       <h2>Conclusion</h2>
       <p>
-        This project built NeRF fully from scratch — from camera calibration to
-        volume rendering. Implementing queries, sampling, neural fields, and
-        rendering pipelines gave a deep understanding of radiance fields and
-        differentiable rendering.
+        I implemented a complete Neural Radiance Field pipeline from scratch.  
+        From camera calibration and PnP, to neural fields, ray sampling,  
+        and full volumetric rendering, this project deepened my understanding  
+        of differentiable rendering and scene representation.
       </p>
-      <p><strong>Thank you for viewing!</strong></p>
     </section>
 
   </main>
 
+  <!-- LIGHTBOX -->
   <div id="lightbox" class="lightbox" onclick="closeLightbox()">
     <img id="lightbox-img" src="">
   </div>
