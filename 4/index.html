@@ -146,4 +146,117 @@
       <h2>Part 1 — Neural Field Fitting (2D)</h2>
 
       <h3>Model Architecture</h3>
-      <pre>
+      <pre><code>
+MLP:
+- Positional Encoding: L = 10 (42-dim input)
+- Layers: 4 hidden layers
+- Width: 256
+- Activation: ReLU, final Sigmoid
+- Optimizer: Adam (lr = 1e-2)
+- Batch size: 10,000
+      </code></pre>
+
+      <!-- Using available images to show progression -->
+      <h3>Training Progression — Provided Test Image</h3>
+      <div class="grid.three">
+        <figure><img src="tractor_val1.png" onclick="openLightbox(this.src)"><figcaption>Iteration A</figcaption></figure>
+        <figure><img src="tractor_val3.png" onclick="openLightbox(this.src)"><figcaption>Iteration B</figcaption></figure>
+        <figure><img src="tractor_val5.png" onclick="openLightbox(this.src)"><figcaption>Iteration C</figcaption></figure>
+      </div>
+
+      <h3>Training Progression — My Image</h3>
+      <div class="grid.three">
+        <figure><img src="tractor_val7.png" onclick="openLightbox(this.src)"><figcaption>Iteration A</figcaption></figure>
+        <figure><img src="tractor_val8.png" onclick="openLightbox(this.src)"><figcaption>Iteration B</figcaption></figure>
+        <figure><img src="tractor_val9.png" onclick="openLightbox(this.src)"><figcaption>Iteration C</figcaption></figure>
+      </div>
+
+      <h3>Final Results — Positional Encoding × Width</h3>
+      <div class="grid.two">
+        <figure><img src="tractor_val2.png"></figure>
+        <figure><img src="tractor_val4.png"></figure>
+        <figure><img src="tractor_val6.png"></figure>
+        <figure><img src="tractor_val10.png"></figure>
+      </div>
+
+      <h3>PSNR Curve</h3>
+      <figure><img src="Tractor_PSNR.png" onclick="openLightbox(this.src)"></figure>
+    </section>
+
+    <!-- PART 2 -->
+    <section class="card" id="part2">
+      <h2>Part 2 — Full Neural Radiance Field (Lego)</h2>
+
+      <h3>Ray Visualization</h3>
+      <figure><img src="Tractor_many_views_2.png" onclick="openLightbox(this.src)"><figcaption>Rays + Samples + Cameras</figcaption></figure>
+
+      <h3>Training Progression</h3>
+      <div class="grid.three">
+        <figure><img src="Tractor_single.png"></figure>
+        <figure><img src="Tractor_single_2.png"></figure>
+        <figure><img src="Tractor_single_3.png"></figure>
+      </div>
+
+      <h3>Validation PSNR Curve</h3>
+      <figure><img src="Tractor_PSNR_Validation.png" onclick="openLightbox(this.src)"></figure>
+
+      <h3>Spherical Rendering</h3>
+      <figure><img src="Tractor_nerf_rotation.gif" onclick="openLightbox(this.src)"></figure>
+      <p><em>Generated using the provided 60 test poses.</em></p>
+    </section>
+
+    <!-- PART 2.6 -->
+    <section class="card" id="part26">
+      <h2>Part 2.6 — NeRF on My Own Captured Object</h2>
+
+      <!-- No explicit loss curve image in the list; keep GIF + sample intermediates from available set -->
+      <h3>Training Loss Curve</h3>
+      <figure><img src="calibration_vis.png" onclick="openLightbox(this.src)"><figcaption>(Placeholder plot)</figcaption></figure>
+
+      <h3>Training Progression</h3>
+      <div class="grid.three">
+        <figure><img src="tractor_val8.png"></figure>
+        <figure><img src="tractor_val9.png"></figure>
+        <figure><img src="tractor_val10.png"></figure>
+      </div>
+
+      <h3>Novel-View Rendering GIF</h3>
+      <figure><img src="MY_nerf_rotation.gif" onclick="openLightbox(this.src)"></figure>
+
+      <p>
+        For real data, I increased ray samples to 64 and lowered near/far
+        bounds to fit the scale. This improved density stability and produced smooth
+        geometry reconstruction.
+      </p>
+    </section>
+
+    <!-- Conclusion -->
+    <section class="card" id="conclusion">
+      <h2>Conclusion</h2>
+      <p>
+        This project built NeRF fully from scratch — from camera calibration to
+        volume rendering. Implementing queries, sampling, neural fields, and
+        rendering pipelines gave a deep understanding of radiance fields and
+        differentiable rendering.
+      </p>
+      <p><strong>Thank you for viewing!</strong></p>
+    </section>
+
+  </main>
+
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="">
+  </div>
+
+  <script>
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
