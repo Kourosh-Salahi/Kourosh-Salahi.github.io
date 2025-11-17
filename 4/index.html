@@ -68,17 +68,15 @@
 
       <h3>Camera Frustums Visualization</h3>
       <div class="grid.two">
-        <figure><img src="media/vis_cam1.png" onclick="openLightbox(this.src)"><figcaption>Viser camera view 1</figcaption></figure>
-        <figure><img src="media/vis_cam2.png" onclick="openLightbox(this.src)"><figcaption>Viser camera view 2</figcaption></figure>
+        <figure><figcaption>Viser camera view 1</figcaption><img src="media/vis_cam1.png" onclick="openLightbox(this.src)"></figure>
+        <figure><figcaption>Viser camera view 2</figcaption><img src="media/vis_cam2.png" onclick="openLightbox(this.src)"></figure>
       </div>
 
       <h3>Calibration Visualization</h3>
-      <figure>
-        <img src="media/calibration_vis.png" onclick="openLightbox(this.src)">
-        <figcaption>Detected ArUco corners used for calibration</figcaption>
-      </figure>
+      <figure>        <figcaption>Detected ArUco corners used for calibration</figcaption>
 
-      <p>Calibration → PnP → undistortion → dataset creation was implemented exactly per spec (see code in write-up).</p>
+        <img src="media/calibration_vis.png" onclick="openLightbox(this.src)">
+      </figure>
     </section>
 
     <!-- PART 1 -->
@@ -141,20 +139,22 @@ def train(width, L, fp, k, epochs):
       <h3>Final Results </h3>
       <p>Four combinations of PE frequency (L ∈ {4,10}) and width (W ∈ {64,256}), all at iter1999. Please note all image captions are below each image</p>
 
-      <div class="grid.two">
-        <figure><img src="media/fox_64_4_iter1999.png"><figcaption>W=64, L=4</figcaption></figure>
-        <figure><img src="media/fox_64_10_iter1999.png"><figcaption>W=64, L=10</figcaption></figure>
-        <figure><img src="media/fox_256_4_iter1999.png"><figcaption>W=256, L=4</figcaption></figure>
-        <figure><img src="media/fox_256_10_iter1999.png"><figcaption>W=256, L=10</figcaption></figure>
-      </div>
+    <div class="grid.two">
+      <figure><figcaption>W=64, L=4</figcaption><img src="media/fox_64_4_iter1999.png"></figure>
+      <figure><figcaption>W=64, L=10</figcaption><img src="media/fox_64_10_iter1999.png"></figure>
+      <figure><figcaption>W=256, L=4</figcaption><img src="media/fox_256_4_iter1999.png"></figure>
+      <figure><figcaption>W=256, L=10</figcaption><img src="media/fox_256_10_iter1999.png"></figure>
+    </div>
+    
+    <h3>PSNR Curves (Fox)</h3>
+    
+    <div class="grid.two">
+      <figure><figcaption>W=64, L=4</figcaption><img src="media/fox_psnr_64_4.png"></figure>
+      <figure><figcaption>W=64, L=10</figcaption><img src="media/fox_psnr_64_10.png"></figure>
+      <figure><figcaption>W=256, L=4</figcaption><img src="media/fox_psnr_256_4.png"></figure>
+      <figure><figcaption>W=256, L=10</figcaption><img src="media/fox_psnr_256_10.png"></figure>
+    </div>
 
-      <h3>PSNR Curves (Fox)</h3>
-      <div class="grid.two">
-        <figure><img src="media/fox_psnr_64_4.png"><figcaption>W=64, L=4</figcaption></figure>
-        <figure><img src="media/fox_psnr_64_10.png"><figcaption>W=64, L=10</figcaption></figure>
-        <figure><img src="media/fox_psnr_256_4.png"><figcaption>W=256, L = 4</figcaption></figure>
-        <figure><img src="media/fox_psnr_256_10.png"><figcaption>W = 256, L = 10</figcaption></figure>
-      </div>
     </section>
 
     <!-- PART 2 -->
@@ -162,141 +162,240 @@ def train(width, L, fp, k, epochs):
   <h2>Part 2 — Neural Radiance Field on Multi-View Lego</h2>
 
   <p>
-    In this section, I implemented a full NeRF pipeline following the project
-    specification: converting pixels → camera coordinates → world coordinates → rays,
-    sampling points along rays, evaluating a 3D radiance field MLP, and applying
-    differentiable volume rendering to match the multi-view images.
+    In this section, I implemented a complete NeRF pipeline: converting image pixels to
+    3D world-space rays, sampling points along those rays, evaluating a radiance field
+    network, and performing differentiable volume rendering to optimize the model
+    against multiple posed RGB images.
   </p>
 
   <!-- 2.1 Implementation Summary -->
   <h3>2.1 Camera → Ray Pipeline</h3>
+
   <p>
-    <strong>Camera-to-World Transform:</strong> I implemented <code>transform(c2w, x_c)</code>
-    which converts camera-space points to world-space using homogeneous coordinates.
-    Verified with:
-    <code>x == transform(inv(c2w), transform(c2w, x))</code>.
-  </p>
-  <p>
-    <strong>Pixel → Camera:</strong> Using the intrinsic matrix <code>K</code>, I inverted the
-    projection equation to compute 3D camera-space coordinates from pixel coordinates
-    with a chosen depth <code>1</code>.
-  </p>
-  <p>
-    <strong>Pixel → Ray:</strong> For each pixel <code>(u, v)</code>, I computed:
-    ray origin = camera position  
-    ray direction = normalized( transform(c2w, pixel_to_camera(K, uv, 1)) − origin ).
+    <strong>Camera-to-World Transform:</strong>
+    I implemented a general <code>transform(c2w, x_c)</code> function that converts
+    camera-space coordinates to world-space using homogeneous coordinates.
+    I verified correctness by ensuring the round-trip identity
+    <code>x == transform(inv(c2w), transform(c2w, x))</code> holds for random test points.
   </p>
 
-  <!-- 2.2 Implementation Summary -->
+  <p>
+    <strong>Pixel → Camera Coordinates:</strong>
+    Each pixel coordinate is unprojected by inverting the pinhole camera model:
+    subtracting the principal point, dividing by focal length, and assigning a unit depth.
+    This produces a batch of 3D points in camera coordinates.
+  </p>
+
+  <p>
+    <strong>Pixel → Ray:</strong>
+    For each pixel <code>(u, v)</code>, the ray origin is simply the translation component
+    of <code>c2w</code>, and the ray direction is obtained by transforming the camera-space
+    point into world space and normalizing:
+    <br>
+    <code>ray_d = normalize( transform(c2w, x_cam) − origin )</code>.
+  </p>
+
+
+  <!-- 2.2 Sampling -->
   <h3>2.2 Sampling Rays & Points</h3>
+
   <p>
-    For each training step, I uniformly sampled random pixels across all images
-    (flattened global sampling). Each ray was discretized into
-    <strong>64 samples</strong> between <code>near = 2.0</code> and <code>far = 6.0</code>.
-    During training I added uniform jitter to sample intervals to avoid aliasing.
+    I implemented <strong>global random sampling</strong> across all pixels of all training images,
+    avoiding an image-by-image sampling loop. This produces highly uniform ray coverage.
+    Each sampled ray is discretized into <strong>64 points</strong> between
+    <code>near = 2.0</code> and <code>far = 6.0</code>.
+    During training, I add uniform jitter within each interval to avoid aliasing and
+    improve spatial coverage.
   </p>
 
-  <!-- 2.3 Implementation Summary -->
-  <h3>2.3 Dataloader + Viser Visualizations</h3>
+
+  <!-- 2.3 Dataloader -->
+  <h3>2.3 Dataloader + Precomputation + Viser Visualizations</h3>
+
   <p>
-    My dataloader returns <code>(ray_o, ray_d, pixel_color)</code>.  
-    I validated correctness using Viser visualizations.
+    To accelerate training, I built a preprocessing stage that:
+  </p>
+
+  <ul>
+    <li>enumerates every pixel in every image with a +0.5 center offset,</li>
+    <li>stores their RGB values,</li>
+    <li>stores a repeated copy of the camera extrinsic for each pixel,</li>
+    <li>precomputes world-space <code>ray_o</code> and <code>ray_d</code> for the entire dataset.</li>
+  </ul>
+
+  <p>
+    The dataloader then samples rays by simply indexing into these large flattened arrays.
+    I validated correctness of UV alignment, ray orientation, and frustum consistency
+    using Viser visualizations.
   </p>
 
   <div class="grid.two">
     <figure>
-      <img src="media/Tractor_single.png" onclick="openLightbox(this.src)">
       <figcaption>Rays from one view (sampled)</figcaption>
+      <img src="media/Tractor_single.png" onclick="openLightbox(this.src)">
     </figure>
     <figure>
-      <img src="media/Tractor_single_2.png" onclick="openLightbox(this.src)">
       <figcaption>Different region of same camera</figcaption>
+      <img src="media/Tractor_single_2.png" onclick="openLightbox(this.src)">
     </figure>
   </div>
 
   <div class="grid.two" style="margin-top:15px;">
     <figure>
-      <img src="media/Tractor_single_3.png" onclick="openLightbox(this.src)">
       <figcaption>Top-left pixel rays</figcaption>
+      <img src="media/Tractor_single_3.png" onclick="openLightbox(this.src)">
     </figure>
     <figure>
-      <img src="media/Tractor_many views.png" onclick="openLightbox(this.src)">
       <figcaption>All cameras + 100 rays</figcaption>
+      <img src="media/Tractor_many views.png" onclick="openLightbox(this.src)">
     </figure>
   </div>
 
   <div class="grid.one" style="margin-top:15px;">
     <figure>
-      <img src="media/Tractor_many_views_2.png" onclick="openLightbox(this.src)">
       <figcaption>Camera cluster with sample points</figcaption>
+      <img src="media/Tractor_many_views_2.png" onclick="openLightbox(this.src)">
     </figure>
   </div>
 
-  <!-- 2.4 Implementation Summary -->
+
   <h3>2.4 Neural Radiance Field MLP</h3>
-  <p>
-    I implemented the NeRF MLP with the following structure:
-  </p>
-  <ul>
-    <li>Inputs: Positional-encoded 3D position (<code>L=10</code>) and ray direction (<code>L=4</code>)</li>
-    <li>8-layer fully-connected MLP, width 256</li>
-    <li>Skip connection at layer 4 (concatenate input PE again)</li>
-    <li>Outputs:
-      <ul>
-        <li><strong>σ</strong> (density) using ReLU</li>
-        <li><strong>RGB</strong> using Sigmoid</li>
-      </ul>
-    </li>
-  </ul>
 
-  <!-- 2.5 Implementation Summary -->
-  <h3>2.5 Volume Rendering</h3>
-  <p>
-    I implemented the discrete volume rendering equation:
-  </p>
-  <pre><code>C = Σ T_i (1 − exp(−σ_i Δt)) · c_i</code></pre>
-  <p>
-    where transmittance <code>T_i = exp(−Σ_{j < i} σ_j Δt)</code>.
-    My implementation matches the reference test exactly.
-  </p>
+<p>
+  My NeRF model closely follows the original architecture: a deep point MLP with a
+  skip connection, a density head, and a separate view-dependent color head. Both 3D
+  sample locations and ray directions use sinusoidal positional encoding before being
+  fed into the network.
+</p>
 
-  <!-- Training Progression -->
+<figure style="max-width:500px;margin:0 auto 18px auto;">
+  <figcaption style="text-align:center;margin-bottom:6px;">NeRF MLP Diagram</figcaption>
+  <img src="media/mlp_nerf.png" onclick="openLightbox(this.src)">
+</figure>
+
+<ul>
+
+  <li>
+    <strong>Positional Encoding:</strong>
+    3D points are encoded using <code>L<sub>x</sub>=10</code>, giving
+    <code>3 + 6L = 63</code> channels.  
+    Ray directions use <code>L<sub>r</sub>=4</code>, producing
+    <code>3 + 6L = 27</code> channels.
+  </li>
+
+  <li>
+    <strong>Point MLP (σ + features):</strong>
+    The encoded 3D point is processed by an 8-layer MLP with width 256.  
+    At the 4th hidden layer (index 3), I concatenate the original positional encoding
+    back into the network, exactly matching:
+    <br>
+    <code>Linear(256 + input_dim_x → 256)</code>.  
+    This skip connection helps preserve high-frequency spatial detail.
+  </li>
+
+  <li>
+    <strong>Density Head (σ):</strong>
+    After the final point-layer, a <code>256 → 1</code> linear projection followed by ReLU
+    produces the volume density <code>σ</code>.
+  </li>
+
+  <li>
+    <strong>Color Head (rgb):</strong>
+    The point-MLP output is first transformed into a 256-D feature vector.  
+    This feature is concatenated with the encoded ray direction (27-D) and passed through:
+    <ul>
+      <li><code>(256 + input_dim_r) → 128</code> with ReLU,</li>
+      <li><code>128 → 3</code> with Sigmoid to produce RGB in <code>[0,1]</code>.</li>
+    </ul>
+  </li>
+
+  <li>
+    <strong>Outputs:</strong>
+    The network returns <code>σ</code> (density) and <code>rgb</code> (color).
+  </li>
+
+</ul>
+
+<!-- 2.5 Volume Rendering -->
+<h3>2.5 Volume Rendering</h3>
+
+<p>
+  I implemented NeRF’s differentiable volume rendering entirely in a vectorized
+  form. For each ray, the sampled densities <code>σ</code> and colors <code>rgb</code>
+  are combined using the standard NeRF weighting:
+</p>
+
+<pre><code>w_i = T_i · (1 − exp(−σ_i Δt))</code></pre>
+
+<p>
+  where the transmittance <code>T_i</code> is computed using a shifted cumulative sum of
+  the densities:
+</p>
+
+<pre><code>T_i = exp( − cumulative_sum(σ · Δt, shifted) )</code></pre>
+
+<p>
+  This matches the continuous volume rendering equation while remaining efficient,
+  since all rays and samples are processed in parallel. The final pixel color is:
+</p>
+
+<pre><code>C = Σ w_i · rgb_i</code></pre>
+
+<p>
+  This implementation corresponds exactly to my <code>volrend()</code> function, using
+  fully vectorized PyTorch operations without loops.
+</p>
+
+
+  <!-- 2.6 Training Progression -->
   <h3>Training Progression (0 → 1400 iterations)</h3>
-  <p>The following results correspond to iterations: <strong>0, 200, 400, 600, 800, 1000, 1200, 1400</strong>.</p>
+
+  <p>
+    Below are renders from the validation camera at key training iterations:
+    <strong>0, 200, 400, 600, 800, 1000, 1200, 1400</strong>.
+  </p>
 
   <div class="grid.four">
-    <figure><img src="media/tractor_training1.png"><figcaption>iter 0</figcaption></figure>
-    <figure><img src="media/tractor_training2.png"><figcaption>iter 200</figcaption></figure>
-    <figure><img src="media/tractor_training3.png"><figcaption>iter 400</figcaption></figure>
-    <figure><img src="media/tractor_training4.png"><figcaption>iter 600</figcaption></figure>
+    <figure><figcaption>iter 0</figcaption><img src="media/tractor_training1.png"></figure>
+    <figure><figcaption>iter 200</figcaption><img src="media/tractor_training2.png"></figure>
+    <figure><figcaption>iter 400</figcaption><img src="media/tractor_training3.png"></figure>
+    <figure><figcaption>iter 600</figcaption><img src="media/tractor_training4.png"></figure>
 
-    <figure><img src="media/tractor_training5.png"><figcaption>iter 800</figcaption></figure>
-    <figure><img src="media/tractor_training6.png"><figcaption>iter 1000</figcaption></figure>
-    <figure><img src="media/tractor_training7.png"><figcaption>iter 1200</figcaption></figure>
-    <figure><img src="media/tractor_training8.png"><figcaption>iter 1400</figcaption></figure>
+    <figure><figcaption>iter 800</figcaption><img src="media/tractor_training5.png"></figure>
+    <figure><figcaption>iter 1000</figcaption><img src="media/tractor_training6.png"></figure>
+    <figure><figcaption>iter 1200</figcaption><img src="media/tractor_training7.png"></figure>
+    <figure><figcaption>iter 1400</figcaption><img src="media/tractor_training8.png"></figure>
   </div>
 
-  <!-- PSNR Curves -->
+
+  <!-- PSNR -->
   <h3>PSNR Curves</h3>
-  <p>I show both the training PSNR and validation PSNR curves:</p>
+
+  <p>
+    I tracked PSNR on both the training set and the held-out validation set:
+  </p>
 
   <div class="grid.two">
     <figure>
-      <img src="media/Tractor_PSNR.png" onclick="openLightbox(this.src)">
       <figcaption>Training PSNR</figcaption>
+      <img src="media/Tractor_PSNR.png" onclick="openLightbox(this.src)">
     </figure>
     <figure>
-      <img src="media/Tractor_PSNR_Validation.png" onclick="openLightbox(this.src)">
       <figcaption>Validation PSNR</figcaption>
+      <img src="media/Tractor_PSNR_Validation.png" onclick="openLightbox(this.src)">
     </figure>
   </div>
 
+
   <!-- Spherical Render -->
   <h3>Spherical Rendering (Novel Views)</h3>
+
   <figure>
-    <img src="media/Tractor_nerf_rotation.gif" onclick="openLightbox(this.src)">
     <figcaption>Rendered novel-view orbit of Lego</figcaption>
+    <img src="media/Tractor_nerf_rotation.gif" onclick="openLightbox(this.src)">
   </figure>
+
+</section>
 
 </section>
 
@@ -337,13 +436,13 @@ def train(width, L, fp, k, epochs):
   <h3>Training Loss Over Time</h3>
 
   <div class="grid.two">
-    <figure>
+    <figure>      <figcaption>MSE Loss Curve</figcaption>
+
       <img src="media/car_mse.png" onclick="openLightbox(this.src)">
-      <figcaption>MSE Loss Curve</figcaption>
     </figure>
-    <figure>
+    <figure>      <figcaption>PSNR Over Training</figcaption>
+
       <img src="media/car_psnr.png" onclick="openLightbox(this.src)">
-      <figcaption>PSNR Over Training</figcaption>
     </figure>
   </div>
 
@@ -355,23 +454,24 @@ def train(width, L, fp, k, epochs):
 </p>
 
 <div class="grid.five">
-  <figure><img src="media/car_iter0.png"><figcaption>iter 0</figcaption></figure>
-  <figure><img src="media/car_iter200.png"><figcaption>iter 200</figcaption></figure>
-  <figure><img src="media/car_iter400.png"><figcaption>iter 400</figcaption></figure>
-  <figure><img src="media/car_iter600.png"><figcaption>iter 600</figcaption></figure>
-  <figure><img src="media/car_iter800.png"><figcaption>iter 800</figcaption></figure>
+  <figure><figcaption>iter 0</figcaption><img src="media/car_iter0.png"></figure>
+  <figure><figcaption>iter 200</figcaption><img src="media/car_iter200.png"></figure>
+  <figure><figcaption>iter 400</figcaption><img src="media/car_iter400.png"></figure>
+  <figure><figcaption>iter 600</figcaption><img src="media/car_iter600.png"></figure>
+  <figure><figcaption>iter 800</figcaption><img src="media/car_iter800.png"></figure>
 
-  <figure><img src="media/car_iter1000.png"><figcaption>iter 1000</figcaption></figure>
-  <figure><img src="media/car_iter1200.png"><figcaption>iter 1200</figcaption></figure>
-  <figure><img src="media/car_iter1400.png"><figcaption>iter 1400</figcaption></figure>
-  <figure><img src="media/car_iter1600.png"><figcaption>iter 1600</figcaption></figure>
-  <figure><img src="media/car_iter1800.png"><figcaption>iter 1800</figcaption></figure>
+  <figure><figcaption>iter 1000</figcaption><img src="media/car_iter1000.png"></figure>
+  <figure><figcaption>iter 1200</figcaption><img src="media/car_iter1200.png"></figure>
+  <figure><figcaption>iter 1400</figcaption><img src="media/car_iter1400.png"></figure>
+  <figure><figcaption>iter 1600</figcaption><img src="media/car_iter1600.png"></figure>
+  <figure><figcaption>iter 1800</figcaption><img src="media/car_iter1800.png"></figure>
 </div>
 
+
 <h3>Reference Image</h3>
-<figure>
+<figure>  <figcaption>Ground Truth Reference</figcaption>
+
   <img src="media/car_iterref.png">
-  <figcaption>Ground Truth Reference</figcaption>
 </figure>
 
 
@@ -383,9 +483,9 @@ def train(width, L, fp, k, epochs):
     The final rendered GIF is shown below:
   </p>
 
-  <figure>
+  <figure>    <figcaption>Novel-view orbit of my reconstructed NeRF</figcaption>
+
     <img src="media/MY_nerf_rotation2.gif" onclick="openLightbox(this.src)">
-    <figcaption>Novel-view orbit of my reconstructed NeRF</figcaption>
   </figure>
 
   <p class="subtitle">
