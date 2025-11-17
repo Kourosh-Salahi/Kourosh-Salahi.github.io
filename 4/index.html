@@ -68,14 +68,14 @@
 
       <h3>Camera Frustums Visualization</h3>
       <div class="grid.two">
-        <figure><img src="media/vis_cam1.png" onclick="openLightbox(this.src)"><figcaption>Viser camera view 1</figcaption></figure>
-        <figure><img src="media/vis_cam2.png" onclick="openLightbox(this.src)"><figcaption>Viser camera view 2</figcaption></figure>
+        <figure><figcaption>Viser camera view 1</figcaption><img src="media/vis_cam1.png" onclick="openLightbox(this.src)"></figure>
+        <figure><figcaption>Viser camera view 2</figcaption><img src="media/vis_cam2.png" onclick="openLightbox(this.src)"></figure>
       </div>
 
       <h3>Calibration Visualization</h3>
-      <figure>
+      <figure>        <figcaption>Detected ArUco corners used for calibration</figcaption>
+
         <img src="media/calibration_vis.png" onclick="openLightbox(this.src)">
-        <figcaption>Detected ArUco corners used for calibration</figcaption>
       </figure>
 
       <p>Calibration → PnP → undistortion → dataset creation was implemented exactly per spec (see code in write-up).</p>
