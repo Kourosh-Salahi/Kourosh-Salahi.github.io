@@ -138,8 +138,8 @@ def train(width, L, fp, k, epochs):
         <figure><img src="media/monkey_iter1999.png"></figure>
       </div>
 
-      <h3>Final Results (2×2 Grid)</h3>
-      <p>Four combinations of PE frequency (L ∈ {4,10}) and width (W ∈ {64,256}), all at iter1999:</p>
+      <h3>Final Results </h3>
+      <p>Four combinations of PE frequency (L ∈ {4,10}) and width (W ∈ {64,256}), all at iter1999. Please note all image captions are below each image</p>
 
       <div class="grid.two">
         <figure><img src="media/fox_64_4_iter1999.png"><figcaption>W=64, L=4</figcaption></figure>
@@ -150,52 +150,155 @@ def train(width, L, fp, k, epochs):
 
       <h3>PSNR Curves (Fox)</h3>
       <div class="grid.two">
-        <figure><img src="media/fox_psnr_64_4.png"></figure>
-        <figure><img src="media/fox_psnr_64_10.png"></figure>
-        <figure><img src="media/fox_psnr_256_4.png"></figure>
-        <figure><img src="media/fox_psnr_256_10.png"></figure>
+        <figure><img src="media/fox_psnr_64_4.png"><figcaption>W=64, L=4</figcaption></figure>
+        <figure><img src="media/fox_psnr_64_10.png"><figcaption>W=64, L=10</figcaption></figure>
+        <figure><img src="media/fox_psnr_256_4.png"><figcaption>W=256, L = 4</figcaption></figure>
+        <figure><img src="media/fox_psnr_256_10.png"><figcaption>W = 256, L = 10</figcaption></figure>
       </div>
     </section>
 
     <!-- PART 2 -->
-    <section class="card" id="part2">
-      <h2>Part 2 — Full Neural Radiance Field (Lego)</h2>
+<section class="card" id="part2">
+  <h2>Part 2 — Neural Radiance Field on Multi-View Lego</h2>
 
-      <h3>Ray Visualization</h3>
-      <figure><img src="media/Tractor_many_views_2.png"></figure>
+  <p>
+    In this section, I implemented a full NeRF pipeline following the project
+    specification: converting pixels → camera coordinates → world coordinates → rays,
+    sampling points along rays, evaluating a 3D radiance field MLP, and applying
+    differentiable volume rendering to match the multi-view images.
+  </p>
 
-      <h3>Training Progression</h3>
-      <div class="grid.four">
-        <figure><img src="media/tractor_training1.jpeg"></figure>
-        <figure><img src="media/tractor_training2.jpeg"></figure>
-        <figure><img src="media/tractor_training3.jpeg"></figure>
-        <figure><img src="media/tractor_training4.jpeg"></figure>
-        <figure><img src="media/tractor_training5.jpeg"></figure>
-        <figure><img src="media/tractor_training6.jpeg"></figure>
-        <figure><img src="media/tractor_training7.jpeg"></figure>
-        <figure><img src="media/tractor_training8.jpeg"></figure>
-      </div>
+  <!-- 2.1 Implementation Summary -->
+  <h3>2.1 Camera → Ray Pipeline</h3>
+  <p>
+    <strong>Camera-to-World Transform:</strong> I implemented <code>transform(c2w, x_c)</code>
+    which converts camera-space points to world-space using homogeneous coordinates.
+    Verified with:
+    <code>x == transform(inv(c2w), transform(c2w, x))</code>.
+  </p>
+  <p>
+    <strong>Pixel → Camera:</strong> Using the intrinsic matrix <code>K</code>, I inverted the
+    projection equation to compute 3D camera-space coordinates from pixel coordinates
+    with a chosen depth <code>1</code>.
+  </p>
+  <p>
+    <strong>Pixel → Ray:</strong> For each pixel <code>(u, v)</code>, I computed:
+    ray origin = camera position  
+    ray direction = normalized( transform(c2w, pixel_to_camera(K, uv, 1)) − origin ).
+  </p>
 
-      <h3>Validation PSNR Curve</h3>
-      <figure><img src="media/Tractor_PSNR_Validation.png"></figure>
+  <!-- 2.2 Implementation Summary -->
+  <h3>2.2 Sampling Rays & Points</h3>
+  <p>
+    For each training step, I uniformly sampled random pixels across all images
+    (flattened global sampling). Each ray was discretized into
+    <strong>64 samples</strong> between <code>near = 2.0</code> and <code>far = 6.0</code>.
+    During training I added uniform jitter to sample intervals to avoid aliasing.
+  </p>
 
-      <h3>Spherical Rendering</h3>
-      <figure><img src="media/Tractor_nerf_rotation.gif"></figure>
-    </section>
+  <!-- 2.3 Implementation Summary -->
+  <h3>2.3 Dataloader + Viser Visualizations</h3>
+  <p>
+    My dataloader returns <code>(ray_o, ray_d, pixel_color)</code>.  
+    I validated correctness using Viser visualizations.
+  </p>
 
-    <!-- PART 2.6 -->
-    <section class="card" id="part26">
-      <h2>Part 2.6 — NeRF on My Own Captured Object</h2>
+  <div class="grid.two">
+    <figure>
+      <img src="media/Tractor_single.png" onclick="openLightbox(this.src)">
+      <figcaption>Rays from one view (sampled)</figcaption>
+    </figure>
+    <figure>
+      <img src="media/Tractor_single2.png" onclick="openLightbox(this.src)">
+      <figcaption>Different region of same camera</figcaption>
+    </figure>
+  </div>
 
-      <h3>Training Loss Curve</h3>
-      <figure><img src="media/calibration_vis.png"></figure>
+  <div class="grid.two" style="margin-top:15px;">
+    <figure>
+      <img src="media/Tractor_single3.png" onclick="openLightbox(this.src)">
+      <figcaption>Top-left pixel rays</figcaption>
+    </figure>
+    <figure>
+      <img src="media/Tractor_many_views.png" onclick="openLightbox(this.src)">
+      <figcaption>All cameras + 100 rays</figcaption>
+    </figure>
+  </div>
 
-      <h3>Training Progression</h3>
-      <div class="grid.three">
-        <figure><img src="media/tractor_val8.png"></figure>
-        <figure><img src="media/tractor_val9.png"></figure>
-        <figure><img src="media/tractor_val10.png"></figure>
-      </div>
+  <div class="grid.one" style="margin-top:15px;">
+    <figure>
+      <img src="media/Tractor_many_views2.png" onclick="openLightbox(this.src)">
+      <figcaption>Camera cluster with sample points</figcaption>
+    </figure>
+  </div>
+
+  <!-- 2.4 Implementation Summary -->
+  <h3>2.4 Neural Radiance Field MLP</h3>
+  <p>
+    I implemented the NeRF MLP with the following structure:
+  </p>
+  <ul>
+    <li>Inputs: Positional-encoded 3D position (<code>L=10</code>) and ray direction (<code>L=4</code>)</li>
+    <li>8-layer fully-connected MLP, width 256</li>
+    <li>Skip connection at layer 4 (concatenate input PE again)</li>
+    <li>Outputs:
+      <ul>
+        <li><strong>σ</strong> (density) using ReLU</li>
+        <li><strong>RGB</strong> using Sigmoid</li>
+      </ul>
+    </li>
+  </ul>
+
+  <!-- 2.5 Implementation Summary -->
+  <h3>2.5 Volume Rendering</h3>
+  <p>
+    I implemented the discrete volume rendering equation:
+  </p>
+  <pre><code>C = Σ T_i (1 − exp(−σ_i Δt)) · c_i</code></pre>
+  <p>
+    where transmittance <code>T_i = exp(−Σ_{j < i} σ_j Δt)</code>.
+    My implementation matches the reference test exactly.
+  </p>
+
+  <!-- Training Progression -->
+  <h3>Training Progression (0 → 1400 iterations)</h3>
+  <p>The following results correspond to iterations: <strong>0, 200, 400, 600, 800, 1000, 1200, 1400</strong>.</p>
+
+  <div class="grid.four">
+    <figure><img src="media/tractor_training1.png"><figcaption>iter 0</figcaption></figure>
+    <figure><img src="media/tractor_training2.png"><figcaption>iter 200</figcaption></figure>
+    <figure><img src="media/tractor_training3.png"><figcaption>iter 400</figcaption></figure>
+    <figure><img src="media/tractor_training4.png"><figcaption>iter 600</figcaption></figure>
+
+    <figure><img src="media/tractor_training5.png"><figcaption>iter 800</figcaption></figure>
+    <figure><img src="media/tractor_training6.png"><figcaption>iter 1000</figcaption></figure>
+    <figure><img src="media/tractor_training7.png"><figcaption>iter 1200</figcaption></figure>
+    <figure><img src="media/tractor_training8.png"><figcaption>iter 1400</figcaption></figure>
+  </div>
+
+  <!-- PSNR Curves -->
+  <h3>PSNR Curves</h3>
+  <p>I show both the training PSNR and validation PSNR curves:</p>
+
+  <div class="grid.two">
+    <figure>
+      <img src="media/Tractor_PSNR.png" onclick="openLightbox(this.src)">
+      <figcaption>Training PSNR</figcaption>
+    </figure>
+    <figure>
+      <img src="media/Tractor_PSNR_Validation.png" onclick="openLightbox(this.src)">
+      <figcaption>Validation PSNR</figcaption>
+    </figure>
+  </div>
+
+  <!-- Spherical Render -->
+  <h3>Spherical Rendering (Novel Views)</h3>
+  <figure>
+    <img src="media/Tractor_nerf_rotation.gif" onclick="openLightbox(this.src)">
+    <figcaption>Rendered novel-view orbit of Lego</figcaption>
+  </figure>
+
+</section>
 
       <h3>Novel View GIF</h3>
       <figure><img src="media/MY_nerf_rotation.gif"></figure>
