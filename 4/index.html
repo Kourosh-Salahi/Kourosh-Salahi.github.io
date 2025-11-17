@@ -209,18 +209,18 @@ def train(width, L, fp, k, epochs):
       <figcaption>Rays from one view (sampled)</figcaption>
     </figure>
     <figure>
-      <img src="media/Tractor_single2.png" onclick="openLightbox(this.src)">
+      <img src="media/Tractor_single_2.png" onclick="openLightbox(this.src)">
       <figcaption>Different region of same camera</figcaption>
     </figure>
   </div>
 
   <div class="grid.two" style="margin-top:15px;">
     <figure>
-      <img src="media/Tractor_single3.png" onclick="openLightbox(this.src)">
+      <img src="media/Tractor_single_3.png" onclick="openLightbox(this.src)">
       <figcaption>Top-left pixel rays</figcaption>
     </figure>
     <figure>
-      <img src="media/Tractor_many_views.png" onclick="openLightbox(this.src)">
+      <img src="media/Tractor_many views.png" onclick="openLightbox(this.src)">
       <figcaption>All cameras + 100 rays</figcaption>
     </figure>
   </div>
@@ -300,9 +300,135 @@ def train(width, L, fp, k, epochs):
 
 </section>
 
-      <h3>Novel View GIF</h3>
-      <figure><img src="media/MY_nerf_rotation.gif"></figure>
-    </section>
+<!-- PART 2.6 -->
+<section class="card" id="part26">
+  <h2>Part 2.6 — NeRF Trained on My Own Captured Object</h2>
+
+  <p>
+    For this section, I trained a full Neural Radiance Field using the dataset
+    captured in Part&nbsp;0. This involved using my own calibrated images and
+    camera poses, then training a NeRF model identical in structure to Part 2,
+    with adjustments to near/far ranges and sampling strategy due to the much
+    smaller physical scale of the scene.
+  </p>
+
+  <h3>Model Architecture & Training Setup</h3>
+
+  <p>
+    I used a custom NeRF architecture with skip connection, separate density/color
+    branches, and independent positional encoding frequencies for 3D sample points
+    and view directions.
+  </p>
+
+  <pre><code>
+class Model(nn.Module):
+  def __init__(self, L_r, L_x):
+    super().__init__()
+    self.L_r = L_r
+    self.L_x = L_x
+    input_dim_x = 3 + 6 * L_x  # PE for points
+    input_dim_r = 3 + 6 * L_r  # PE for directions
+
+    self.pts_linears = nn.ModuleList()
+    self.pts_linears.append(nn.Linear(input_dim_x, 256))
+    for i in range(7):
+      if i == 3:
+        self.pts_linears.append(nn.Linear(256 + input_dim_x, 256))  # skip connection
+      else:
+        self.pts_linears.append(nn.Linear(256, 256))
+
+    self.sigma_linear = nn.Linear(256, 1)
+
+    self.feature_linear = nn.Linear(256, 256)
+
+    self.rgb_linear = nn.Linear(256 + input_dim_r, 128)
+    self.rgb_linear_out = nn.Linear(128, 3)
+
+    self.relu = nn.ReLU()
+    self.sigmoid = nn.Sigmoid()
+
+  def forward(self, x, r):
+    x_encoded = PE(x, self.L_x)
+    r_encoded = PE(r, self.L_r)
+
+    h = x_encoded
+    for i, l in enumerate(self.pts_linears):
+      h = self.relu(l(h))
+      if i == 3:
+        h = torch.cat([h, x_encoded], dim=-1)
+
+    sigma = self.relu(self.sigma_linear(h))
+
+    feature = self.relu(self.feature_linear(h))
+    h_rgb = torch.cat([feature, r_encoded], dim=-1)
+    h_rgb = self.relu(self.rgb_linear(h_rgb))
+    rgb = self.sigmoid(self.rgb_linear_out(h_rgb))
+
+    return sigma, rgb
+  </code></pre>
+
+  <h3>Hyperparameter & Implementation Adjustments</h3>
+  <ul>
+    <li><strong>near = 0.2</strong> and <strong>far = 0.5</strong>  
+      (real-world scene was much smaller than Lego dataset)</li>
+    <li><strong>64 samples per ray</strong>, jittered during training</li>
+    <li><strong>Positional encoding:</strong> L<sub>x</sub> = 10 for positions, L<sub>r</sub> = 4 for directions</li>
+    <li><strong>Adam optimizer:</strong> lr = 5e-4</li>
+  </ul>
+
+  <p>
+    These adjustments were essential to avoid the model sampling empty space and to
+    keep rays bounded within the tight capture volume around the object.
+  </p>
+
+  <h3>Training Loss Over Time</h3>
+
+  <div class="grid.two">
+    <figure>
+      <img src="media/car_mse.png" onclick="openLightbox(this.src)">
+      <figcaption>MSE Loss Curve</figcaption>
+    </figure>
+    <figure>
+      <img src="media/car_psnr.png" onclick="openLightbox(this.src)">
+      <figcaption>PSNR Over Training</figcaption>
+    </figure>
+  </div>
+
+  <h3>Intermediate Training Renders</h3>
+  <p>
+    Below are snapshots of the NeRF’s output at various training stages. These
+    help verify volume rendering and reveal whether density/color predictions are
+    evolving correctly.
+  </p>
+
+  <div class="grid.five">
+    <figure><img src="media/car_int_1.png"><figcaption>iter 1</figcaption></figure>
+    <figure><img src="media/car_int_2.png"><figcaption>iter 2</figcaption></figure>
+    <figure><img src="media/car_int_3.png"><figcaption>iter 3</figcaption></figure>
+    <figure><img src="media/car_int_4.png"><figcaption>iter 4</figcaption></figure>
+    <figure><img src="media/car_int_5.png"><figcaption>iter 5</figcaption></figure>
+  </div>
+
+  <h3>Novel-View Rendering (Final)</h3>
+  <p>
+    After training, I generated a 360° orbit animation by using the provided
+    “look-at-origin” camera generation code, producing a smooth camera path around
+    the object. Because my Aruco tag was so big, I pointed it towards a different corner rather than the origin corner. Thus, I had to change the logic for the roation function to rotate along a different world point.
+    The final rendered GIF is shown below:
+  </p>
+
+  <figure>
+    <img src="media/MY_nerf_rotation2.gif" onclick="openLightbox(this.src)">
+    <figcaption>Novel-view orbit of my reconstructed NeRF</figcaption>
+  </figure>
+
+  <p class="subtitle">
+    These results demonstrate that my custom-captured dataset can successfully train
+    a NeRF despite real-world noise, lens distortion, uneven lighting, and limited
+    viewpoints.
+  </p>
+</section>
+
 
     <!-- Conclusion -->
     <section class="card" id="conclusion">
