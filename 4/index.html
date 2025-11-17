@@ -67,6 +67,9 @@
       <h2>Part 0 — Camera Calibration & Dataset Capture</h2>
 
       <h3>Camera Frustums Visualization</h3>
+            <p>
+        After calibrating my camera through a grid of aruco tags, and taking multiple photos of my object from different views, I was able to estimate camera poses, as visualized below.
+      </p>
       <div class="grid.two">
         <figure><figcaption>Viser camera view 1</figcaption><img src="media/vis_cam1.png" onclick="openLightbox(this.src)"></figure>
         <figure><figcaption>Viser camera view 2</figcaption><img src="media/vis_cam2.png" onclick="openLightbox(this.src)"></figure>
@@ -83,28 +86,24 @@
     <section class="card" id="part1">
       <h2>Part 1 — Neural Field Fitting (2D)</h2>
 
-      <h3>Model Architecture</h3>
-      <p>Below is the exact model used for my best results (width=256, L=10):</p>
+        <h3>Model Architecture</h3>
+        <p>
+          For image fitting, I used a fully-connected network with width <strong>256</strong> and
+          positional encoding <strong>L = 10</strong>. The model takes the 2D coordinates
+          (after PE, dimension <code>4L + 2</code>) and passes them through three
+          hidden layers:
+        </p>
+        
+        <ul>
+          <li>Input: <code>4L + 2</code>-dim positional-encoded coordinates</li>
+          <li>Hidden layers: 3 × (Linear → ReLU), each of width 256</li>
+          <li>Output layer: Linear → Sigmoid (predicts RGB in [0,1])</li>
+        </ul>
+        
+        <p>
+          Training used Adam with learning rate <code>1e-2</code> and MSE loss.
+        </p>
 
-      <pre><code>
-def train(width, L, fp, k, epochs):
-
-  model = nn.Sequential(
-    nn.Linear(4*L + 2, width),
-    nn.ReLU(),
-    nn.Linear(width, width),
-    nn.ReLU(),
-    nn.Linear(width, width),
-    nn.ReLU(),
-    nn.Linear(width, 3),
-    nn.Sigmoid()
-  )
-
-  optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
-  loss_fn = nn.MSELoss()
-
-  ...
-      </code></pre>
 
       <h3>Training Progression — Fox (Width=256, L=10)</h3>
       <p>Training iterations shown: 0 → 50 → 100 → 200 → 500 → 1000 → 1999.</p>
@@ -122,7 +121,7 @@ def train(width, L, fp, k, epochs):
       </div>
 
       <h3>Final Results </h3>
-      <p>Four combinations of PE frequency (L ∈ {4,10}) and width (W ∈ {64,256}), all at iter1999. Please note all image captions are below each image</p>
+      <p>Four combinations of PE frequency (L ∈ {4,10}) and width (W ∈ {64,256}), all at iter1999. It seems as though Positional encoding has the highest effect on our overall image ouput quality.</p>
 
     <div class="grid.two">
       <figure><figcaption>W=64, L=4</figcaption><img src="media/fox_64_4_iter1999.png"></figure>
@@ -156,7 +155,7 @@ def train(width, L, fp, k, epochs):
         <figure><img src="media/monkey_iter1000.png"></figure>
 
         <figure><img src="media/monkey_iter1999.png"></figure>
-        <figure><figcaption>PSNR for my image</figcaption><img src="media/monkeyPSNR.png"></figure>
+        <figure><figcaption>PSNR for my image</figcaption><img src="media/monkey PSNR.png"></figure>
         
       </div>
 
@@ -176,42 +175,72 @@ def train(width, L, fp, k, epochs):
   <!-- 2.1 Implementation Summary -->
   <h3>2.1 Camera → Ray Pipeline</h3>
 
-  <p>
-    <strong>Camera-to-World Transform:</strong>
-    I implemented a general <code>transform(c2w, x_c)</code> function that converts
-    camera-space coordinates to world-space using homogeneous coordinates.
-    I verified correctness by ensuring the round-trip identity
-    <code>x == transform(inv(c2w), transform(c2w, x))</code> holds for random test points.
-  </p>
+<ul>
+  <li>
+    <strong>pixel_to_camera(K, uv):</strong>
+    I convert pixel coordinates to camera coordinates by analytically inverting
+    the pinhole intrinsics. For each pixel <code>(u, v)</code>, I compute:
+    <code>(x, y, z) = ((u - ox)/fx, (v - oy)/fy, 1)</code>.
+  </li>
 
-  <p>
-    <strong>Pixel → Camera Coordinates:</strong>
-    Each pixel coordinate is unprojected by inverting the pinhole camera model:
-    subtracting the principal point, dividing by focal length, and assigning a unit depth.
-    This produces a batch of 3D points in camera coordinates.
-  </p>
+  <li>
+    <strong>transform(c2w, x_c):</strong>
+    My world-space transform builds homogeneous coordinates explicitly.  
+    Given <code>x_c ∈ ℝ<sup>N×3</sup></code>, I append a column of ones,
+    reshape to <code>(N, 4, 1)</code>, then left-multiply by the camera-to-world matrix:
+    <pre><code>c2w @ [x, y, z, 1]^T → [X, Y, Z, 1]^T</code></pre>
+    The result is squeezed back to <code>(N, 3)</code>.
+    This implementation matches the mathematical camera transform exactly and
+    is fully vectorized across all points.
+  </li>
 
-  <p>
-    <strong>Pixel → Ray:</strong>
-    For each pixel <code>(u, v)</code>, the ray origin is simply the translation component
-    of <code>c2w</code>, and the ray direction is obtained by transforming the camera-space
-    point into world space and normalizing:
+  <li>
+    <strong>pixel_to_ray(K, c2w, uv):</strong>
+    After converting pixel locations to camera coordinates and transforming them
+    into world space, (using the previous two functions) I compute:
     <br>
-    <code>ray_d = normalize( transform(c2w, x_cam) − origin )</code>.
-  </p>
+    <code>ray_o = c2w[:3, 3]</code> as the origin would simply be the translation of the camera to world frame,
+    and  
+    <code>ray_d = normalize(x_w − ray_o)</code>, as the ray direction would be the difference between our world point and the position of the camera in the world frame.
+    This yields the origin and direction of each ray used during training.
+  </li>
+</ul>
+
+<p>
+  Together, these steps implement the full pixel → camera → world → ray pipeline
+  required for NeRF training.
+</p>
 
 
-  <!-- 2.2 Sampling -->
-  <h3>2.2 Sampling Rays & Points</h3>
+<!-- 2.2 Sampling -->
+<h3>2.2 Sampling Rays & Points</h3>
 
-  <p>
-    I implemented <strong>global random sampling</strong> across all pixels of all training images,
-    avoiding an image-by-image sampling loop. This produces highly uniform ray coverage.
-    Each sampled ray is discretized into <strong>64 points</strong> between
-    <code>near = 2.0</code> and <code>far = 6.0</code>.
-    During training, I add uniform jitter within each interval to avoid aliasing and
-    improve spatial coverage.
-  </p>
+<p>
+  I use <strong>global ray sampling</strong>, where all pixels from all training images are
+  flattened into a single pool. Each pixel is recorded with a +0.5 offset so that sampling
+  occurs at the pixel center. At every iteration, I randomly choose <em>N</em> pixel indices,
+  giving uniformly distributed rays across all views.
+</p>
+
+<p>
+  For each selected pixel, I compute its ray origin and direction from the previous pixel_to_ray method. Each ray is then discretized into <strong>n_samples = 64</strong> points
+  between <code>near = 2.0</code> and <code>far = 6.0</code> using:
+</p>
+
+<p style="text-align:center;">
+  <code>x = r_o + r_d · t</code>
+</p>
+
+<p>
+  During training I ensure that 
+  every portion of the ray is eventually sampled and prevent the network from overfitting to 
+  fixed depths by adding random noise within each interval (i.e., t<sub>i</sub> ← t<sub>i</sub> + ε·Δt). 
+  This ensures that over training, every part of the ray contributes to the reconstruction. The values <code>n_samples</code>, <code>near</code>, and <code>far</code> are 
+  parameters in my implementation, and I later change them for different scenes (e.g., my real 
+  dataset uses a smaller range), since the optimal sampling bounds depend heavily on object scale 
+  and the physical capture setup.
+</p>
+
 
 
   <!-- 2.3 Dataloader -->
@@ -282,7 +311,7 @@ def train(width, L, fp, k, epochs):
 
   <li>
     <strong>Positional Encoding:</strong>
-    3D points are encoded using <code>L<sub>x</sub>=10</code>, giving
+    For my implementation, 3D points are encoded using <code>L<sub>x</sub>=10</code>, giving
     <code>3 + 6L = 63</code> channels.  
     Ray directions use <code>L<sub>r</sub>=4</code>, producing
     <code>3 + 6L = 27</code> channels.
@@ -325,15 +354,15 @@ def train(width, L, fp, k, epochs):
 <h3>2.5 Volume Rendering</h3>
 
 <p>
-  I implemented NeRF’s differentiable volume rendering entirely in a vectorized
+  I implemented volume rendering entirely in a vectorized
   form. For each ray, the sampled densities <code>σ</code> and colors <code>rgb</code>
-  are combined using the standard NeRF weighting:
+  are combined using the weighting:
 </p>
 
 <pre><code>w_i = T_i · (1 − exp(−σ_i Δt))</code></pre>
 
 <p>
-  where the transmittance <code>T_i</code> is computed using a shifted cumulative sum of
+  where the transmittance <code>T_i</code> is computed using a shifted cumulative sum (up until but excluding value i) of
   the densities:
 </p>
 
@@ -345,11 +374,6 @@ def train(width, L, fp, k, epochs):
 </p>
 
 <pre><code>C = Σ w_i · rgb_i</code></pre>
-
-<p>
-  This implementation corresponds exactly to my <code>volrend()</code> function, using
-  fully vectorized PyTorch operations without loops.
-</p>
 
 
   <!-- 2.6 Training Progression -->
