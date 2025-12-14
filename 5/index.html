@@ -141,6 +141,10 @@
     </figure>
   </div>
 
+
+  <section class="card">  <h2>Part 1.1: Implementing the Forward Process</h2>  <p>   The forward diffusion process, $x_t$, was implemented to take a clean image, $x_0$, and add noise to it according to the specified variance schedule. This function is defined by:   $$x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} z$$   where $z \sim \mathcal{N}(0, I)$ is sampled Gaussian noise, and $\bar{\alpha}_t$ is the cumulative product of the $\alpha$ values up to time $t$.   </p><p>   In the forward(im, t) function, the implementation referenced the provided $\bar{\alpha}_t$ values stored in the alphas_cumprod tensor.   <ol>      <li>I first retrieved the required $\bar{\alpha}_t$ value by indexing the alphas_cumprod tensor: alpha_t_bar = alphas_cumprod[t].</li>      <li>Next, I generated the Gaussian noise tensor $z$ using torch.randn_like(im), ensuring it matched the shape and device of the input image.</li>      <li>Finally, I applied the formula using PyTorch tensor operations:        $$\text{noisy\_im} = \text{im} \cdot \sqrt{\text{alpha\_t\_bar}} + z \cdot \sqrt{1 - \text{alpha\_t\_bar}}$$      </li>   </ol>   This function was used to generate the noisy Campanile images at specified timesteps $t \in [250, 500, 750]$.  </p></section>
+  
+
   <!-- PART 1.2 -->
   <h3>1.2 — Classical Gaussian Denoising</h3>
   <div class="grid.three">
@@ -160,6 +164,16 @@
      
     </figure>
   </div>
+
+  <section class="card">
+  <h2>Part 1.2: Classical Denoising (Gaussian Blur)</h2>
+  <p>
+   Classical denoising was performed by applying a Gaussian blur filter to the noisy images generated in Part 1.1. This task highlighted the limitations of classical methods for high-level Gaussian noise removal.
+   </p><p>
+   The implementation used torchvision.transforms.functional.gaussian_blur. For each noisy image $x_t$ (at $t=[250, 500, 750]$), I experimented with different kernel_size and sigma values to achieve the "best" possible denoising result, despite the expected poor performance. For example, a setting like kernel_size=5 and sigma=2.0 was applied. The resulting images demonstrate that blurring removes high-frequency noise but simultaneously destroys image details and fails to recover the underlying clean structure, especially at high noise levels ($t=750$).
+  </p>
+</section>
+  
 
   <!-- PART 1.3 -->
   <h3>1.3 — One-Step Denoising</h3>
@@ -182,6 +196,8 @@
       
     </figure>
   </div>
+
+  <section class="card">  <h2>Part 1.3: One-Step Denoising</h2>  <p>   This section introduced the use of the pretrained DeepFloyd UNet denoiser (stage_1.unet) for estimating and removing noise in a single step, using the provided prompt embedding for "a high quality photo."   </p><p>   Given a noisy image $x_t$ and timestep $t$, the UNet predicts the noise $\epsilon_{\theta}(x_t, t, c)$. The clean image estimate, $\hat{x}_0$, is then calculated using the relationship derived from the forward process (Equation A.2):   $$\hat{x}_0 = \frac{1}{\sqrt{\bar{\alpha}_t}} \left( x_t - \sqrt{1 - \bar{\alpha}_t} \epsilon_{\theta} \right)$$   </p><p>   Implementation Steps:   <ol>      <li>$x_t$ and $t$ were moved to the correct device (cuda) and converted to half precision (.half()).</li>      <li>The UNet was called: output = stage_1.unet(x_t, t, encoder_hidden_states=prompt_embeds, return_dict=False)[0].</li>      <li>The noise estimate $\epsilon_{\theta}$ was extracted from the first three channels of the output: noise_pred = output[:, :3, :, :].</li>      <li>The clean image estimate $\hat{x}_0$ was computed using the formula above.</li>   </ol>   This procedure showed significantly better results than Gaussian blurring, validating the power of the learned denoiser. All calculations were wrapped in a with torch.no_grad(): block to save memory.  </p></section>
 
   <!-- PART 1.4 -->
   <h3>1.4 — Iterative Denoising</h3>
@@ -214,6 +230,8 @@
     </figure>
   </div>
 
+  <section class="card">  <h2>Part 1.4: Iterative Denoising (DDIM)</h2>  <p>   Iterative denoising uses a schedule of accelerated timesteps to denoise a noisy image over multiple steps.   </p><p>   Timestep Construction: I first created strided_timesteps, starting at 990 and decreasing with a stride of 30 until 0 (e.g., 990, 960, 930, ..., 30, 0). The DeepFloyd scheduler was initialized with these steps: stage_1.scheduler.set_timesteps(timesteps=strided_timesteps).   </p><p>   iterative_denoise(im_noisy, i_start) Function: This function looped backward from the starting index i_start. For each step $i \rightarrow i+1$ (from more noisy $t$ to less noisy $t&#39;$), the UNet predicted the noise $\epsilon_{\theta}$. The next, less noisy state $x_{t&#39;}$ was computed using the provided DDIM formula:   $$x_{t&#39;} = \sqrt{\bar{\alpha}_{t&#39;}} \hat{x}_0 + \sqrt{1 - \bar{\alpha}_{t&#39;} - \sigma_t^2} \epsilon_{\theta} + \sigma_t z$$   The $\hat{x}_0$ estimate was derived from the noise prediction, and the $\sigma_t z$ term (which accounts for stochasticity or variance) was handled by the provided add_variance utility function, using the predicted variance channels from the UNet output. This iterative application resulted in a high-quality clean image, demonstrating the stability of the DDIM-style sampling over the single-step method.  </p></section>
+
   <!-- PART 1.5 -->
   <h3>1.5 — Diffusion Model Sampling</h3>
 
@@ -225,6 +243,21 @@
     <figure><figcaption>Sample 5</figcaption><img src="media/diff_model_section_1_5_img_5.png"></figure>
   </div>
 
+  <section class="card">
+  <h2>Part 1.5: Diffusion Model Sampling</h2>
+  <p>
+   Image generation from scratch was achieved by setting the starting point of the iterative_denoise function to pure Gaussian noise and setting i_start = 0 (or i_start corresponding to the largest timestep).
+   </p><p>
+   Implementation Steps:
+   <ol>
+      <li>Initialization: A noise tensor $x_{T}$ of shape $(1, 3, 64, 64)$ was created using torch.randn and moved to the correct device/dtype.</li>
+      <li>Execution: The iterative_denoise function was called with this noise and the starting index for the largest timestep in strided_timesteps.</li>
+      <li>Conditioning: The text prompt embedding for "a high quality photo" was used as the single conditioning input to the UNet at each step.</li>
+   </ol>
+   While functional, the resulting images were observed to be of moderate quality, leading directly to the need for Classifier-Free Guidance in the next section.
+  </p>
+</section>
+
   <!-- PART 1.6 -->
   <h3>1.6 — Classifier-Free Guidance</h3>
 
@@ -235,6 +268,9 @@
     <figure><figcaption>CFG sample 4</figcaption><img src="media/cfg_section_1_6_img_4.png"></figure>
     <figure><figcaption>CFG sample 5</figcaption><img src="media/cfg_section_1_6_img_5.png"></figure>
   </div>
+
+<section class="card">  <h2>Part 1.6: Classifier-Free Guidance (CFG)</h2>  <p>   Classifier-Free Guidance was implemented in the iterative_denoise_cfg function to boost the alignment between the generated image and the text prompt.   </p><p>   Implementation Details: At each step $t$:   <ol>      <li>The UNet was executed twice:        <ul>          <li>Conditional run using the prompt embedding $c$: $\epsilon_c = \text{UNet}(x_t, t, c)$.</li>          <li>Unconditional run using the null prompt embedding $\emptyset$: $\epsilon_\emptyset = \text{UNet}(x_t, t, \emptyset)$.</li>        </ul>      </li>      <li>The new, guided noise estimate $\tilde{\epsilon}$ was calculated using the CFG formula with a scale $s=7.0$:        $$\tilde{\epsilon} = \epsilon_{\emptyset} + s \cdot (\epsilon_{c} - \epsilon_{\emptyset})$$      </li>      <li>$\tilde{\epsilon}$ was then used in the DDIM sampling equation (from Part 1.4) to calculate $x_{t&#39;}$. The conditional variance channels (from the $\epsilon_c$ output) were used with the add_variance utility.</li>   </ol>   The resulting samples for "a high quality photo" demonstrated significantly improved quality and coherence compared to the unconditional samples from Part 1.5.  </p></section>
+  
   <!-- PART 1.7 — IMAGE-TO-IMAGE (Campanile SDEdit) -->
   <h3>1.7 — Image-to-Image Translation (SDEdit)</h3>
 
@@ -257,6 +293,8 @@
     <img src="media/original_campanile.png">
     
   </figure>
+
+  
 
   <div class="grid.four">
     <figure><figcaption>i_start=1</figcaption><img src="media/i2i_GGBridge_section_1_7_im_1.png"></figure>
@@ -428,6 +466,9 @@
     <figure><figcaption>Sponge fries output. Prompt was: A student with a shirt that says "BERKELEY CS" putting fries into a bag. I'm preparing for when AI takes all the CS jobs.</figcaption><img src="media/section_1_7_3_sponge_fries.png"></figure>
   </div>
 
+
+  <section class="card">  <h2>Part 1.7: Image-to-image Translation (SDEdit)</h2>  <h3>1.7.1 Editing Hand-Drawn and Web Images</h3>  <p>   SDEdit was implemented by combining the forward process (Part 1.1) with the iterative_denoise_cfg sampler (Part 1.6). This technique allows for semantic editing while preserving low-frequency structural details of the input image.   </p><p>   The core procedure involved:   <ol>      <li>Applying noise to the input image $x_0$ using the forward(x_0, t_{start}) function to obtain $x_{t_{start}}$. The starting timestep $t_{start}$ was determined by the i_start index (e.g., $i\_start=10$ corresponds to $t_{start}=990 - 10 \times 30 = 690$).</li>      <li>Passing $x_{t_{start}}$ into the iterative_denoise_cfg function, starting the reverse process from $t_{start}$ down to $t=0$.</li>   </ol>   By varying $t_{start}$ (from low indices like 1 to high indices like 20), I demonstrated the trade-off between preservation (low $t_{start}$) and creative change (high $t_{start}$) for the Campanile, web, and hand-drawn images. The conditional prompt, such as "a high quality photo" or a custom description, guides the hallucinated details.  </p>  <h3>1.7.2 Inpainting (RePaint)</h3>  <p>   Inpainting was implemented by modifying the iterative_denoise_cfg function to incorporate the mask constraint at every step (following the RePaint methodology).   </p><p>   Implementation Steps:   <ol>      <li>The input image $x_0$ was first converted into a noisy starting image $x_{t_{start}}$ using the forward function. The original image was also diffused to all intermediate timesteps $x_{t&#39;}$ for reference using the forward function.</li>      <li>Inside the denoising loop, after computing the model's new sample $x_{t&#39;}^{\text{model}}$ (the output of the DDIM step):        <ul>          <li>The final $x_{t&#39;}$ was calculated by blending the model's prediction in the masked area with the original image's diffused content in the unmasked area (where the content must be preserved):            $$x_{t&#39;} = M \odot x_{t&#39;}^{\text{model}} + (1 - M) \odot \text{forward}(x_0, t&#39;)$$          </li>        </ul>      </li>      <li>The mask $M$ was inverted to ensure the model's prediction fills the hole (where $M=1$ in the above formula), while the known content is copied from the noisy original image (where $M=0$).</li>   </ol>   This ensured that the model only generated content where the mask was active, using the surrounding context for guidance.  </p>  <h3>1.7.3 Text-Conditional Image-to-image Translation</h3>  <p>   This was a direct extension of SDEdit (Part 1.7.1), but using a creative, descriptive text prompt (e.g., changing the Campanile into a "Rocket Ship") instead of the weak "a high quality photo."   </p><p>   The implementation reused the iterative_denoise_cfg function exactly as before, with the only change being the conditional prompt embedding $c$. The CFG mechanism ensured the new prompt guided the generation toward the semantic content of the text, while the starting noise level ($t_{start}$) still dictated how much of the original image's structure was retained. Higher noise levels successfully transformed the Campanile's structure into a rocket silhouette while retaining its spatial position.  </p></section>
+
   <!-- PART 1.8 — VISUAL ANAGRAMS -->
   <section id="anagrams">
   <h3>1.8 — Visual Anagrams</h3>
@@ -461,6 +502,25 @@
   </div>
   </section>
 
+
+  <section class="card">
+  <h2>Part 1.8: Visual Anagrams</h2>
+  <p>
+   The visual_anagrams function was implemented to create images that transform into a different image when flipped upside down. This required modifying the noise prediction step to average two distinct conditional predictions.
+   </p><p>
+   Implementation Steps (inside the denoising loop):
+   <ol>
+      <li>Compute the conditional noise $\epsilon_{c_1}$ using the current noisy image $x_t$ and the first prompt embedding $c_1$ (e.g., "old man").</li>
+      <li>Flip $x_t$ upside down using torch.flip(x_t, dims=[2, 3]) to get $x_t^{\text{flip}}$.</li>
+      <li>Compute the conditional noise $\epsilon_{c_2}$ using $x_t^{\text{flip}}$ and the second prompt embedding $c_2$ (e.g., "camp fire").</li>
+      <li>Flip $\epsilon_{c_2}$ back to its original orientation: $\epsilon_{c_2}^{\text{flip}} = \text{flip}(\epsilon_{c_2})$.</li>
+      <li>Average the noise estimates: $\tilde{\epsilon} = 0.5 \cdot (\epsilon_{c_1} + \epsilon_{c_2}^{\text{flip}})$.</li>
+      <li>Use this averaged noise $\tilde{\epsilon}$ in the DDIM reverse step to calculate $x_{t&#39;}$.</li>
+   </ol>
+   This averaging mechanism forces the final image to satisfy the constraints of both prompts simultaneously in their respective orientations.
+  </p>
+</section>
+
   <!-- PART 1.9 — HYBRID IMAGES -->
   <section id="hybrids">
   <h3>1.9 — Hybrid Images</h3>
@@ -479,9 +539,42 @@
 
 </section> <!-- end Part A -->
 
+
+  <section class="card">
+  <h2>Part 1.9: Hybrid Images (Factorized Diffusion)</h2>
+  <p>
+   The make_hybrids function implemented a "Factorized Diffusion" approach to create hybrid images that display different content based on viewing distance (combining high and low frequencies from two prompts).
+   </p><p>
+   Implementation Steps (inside the denoising loop):
+   <ol>
+      <li>Compute two separate conditional noise estimates: $\epsilon_{c_1}$ (e.g., "skull") and $\epsilon_{c_2}$ (e.g., "waterfall") using their respective prompt embeddings.</li>
+      <li>Apply a Low-Pass Filter (Gaussian Blur) to $\epsilon_{c_1}$: $\epsilon_{\text{low}} = \text{GaussianBlur}(\epsilon_{c_1})$. A kernel size of 33 and $\sigma=2$ was used, as recommended, via torchvision.transforms.functional.gaussian_blur.</li>
+      <li>Compute the High-Pass noise from $\epsilon_{c_2}$: $\epsilon_{\text{high}} = \epsilon_{c_2} - \text{GaussianBlur}(\epsilon_{c_2})$.</li>
+      <li>Average the noise estimates: $\tilde{\epsilon} = 0.5 \cdot (\epsilon_{\text{low}} + \epsilon_{\text{high}})$.</li>
+      <li>Use this combined noise $\tilde{\epsilon}$ in the DDIM reverse step to calculate $x_{t&#39;}$.</li>
+   </ol>
+   This final sample contains the low-frequency structural information of the first prompt and the high-frequency texture/detail of the second prompt, achieving the hybrid image effect.
+  </p>
+</section>
+
 <!-- PART B -->
 <section class="card" id="partb">
   <h2>Part B — Flow Matching from Scratch</h2>
+
+  <section class="card">
+  <h2>Part 1.1: Implementing the UNet</h2>
+  <p>
+   The UNet architecture was implemented from scratch using PyTorch modules, adhering to the structure shown in Figure 1, which utilizes downsampling, upsampling, and skip connections.
+   </p><p>
+   Structure: The model comprised an encoder (downsampling path), a bottleneck, and a decoder (upsampling path). The core components were:
+   <ol>
+      <li>Conv Blocks (Conv, DownConv, UpConv): These were built using sequences of nn.Conv2d, nn.BatchNorm2d (BN), and nn.GELU activation. Downsampling was handled by the DownConv block using a stride of 2 (or an explicit nn.AvgPool2d followed by convolution). Upsampling (UpConv) utilized nn.ConvTranspose2d with a stride of 2 to reverse the downsampling operation.</li>
+      <li>Skip Connections: The feature maps from the downsampling path were stored and later concatenated channel-wise (torch.cat()) with the corresponding upsampled feature maps in the decoder. This is crucial for retaining spatial details.</li>
+      <li>Flatten/Unflatten: The deepest part of the network used an nn.AvgPool2d(kernel_size=7) for Flatten and a final nn.ConvTranspose2d for Unflatten to handle the $28 \times 28$ input resolution as it reduces to $7 \times 7$ after two downsampling steps (e.g., $28 \rightarrow 14 \rightarrow 7$).</li>
+   </ol>
+   The input and output channels were set to 1 for the grayscale MNIST images, with the hidden dimension $D$ (set to 128) controlling the network's capacity.
+  </p>
+</section>
 
   <!-- PART B — 1.2 — One-Step Denoising -->
   <h3>1.2 — One-Step Denoising UNet Training</h3>
@@ -527,6 +620,25 @@
     All of the outputs look like a blend of all of the different possible numbers, which makes sense since our loss is bringing our output closer the the mean of the overall data The observation that the model's output resembles a blurry blend of all possible digits (the 'average MNIST digit') is a direct consequence of the Mean Squared Error (MSE) loss used for training. Mathematically, the MSE loss drives the model to predict the conditional mean of the data distribution. When the input is pure noise, the model is unable to condition its output on any specific digit class, leading its optimal prediction to converge to the global mean of the entire MNIST dataset
   </p>
 
+
+  <section class="card">  <h2>Part 1.2: Using the UNet to Train a Denoiser</h2>  <h3>1.2.1 Training</h3>  <p>   The objective was to train the UNet, $f_{\theta}(x_t)$, to predict the clean image $x_0$ from a noisy sample $x_t$, minimizing the L2 loss: $\mathcal{L} = \| f_{\theta}(x_t) - x_0 \|^2$.   </p><p>   Data and Noising: The MNIST training set was loaded using torchvision.datasets.MNIST. Crucially, the noising process was implemented within the training loop, ensuring a different random noise level $\sigma$ and noise $z$ were applied to $x_0$ for every batch/epoch:   $$x_t = x_0 + \sigma z$$   where $\sigma$ was fixed at $0.5$ for this part, and $z \sim \mathcal{N}(0, I)$.   </p><p>   Training Loop:   <ol>      <li>The UNet was initialized with $D=128$. The nn.MSELoss() was used.</li>      <li>The Adam optimizer was used with a learning rate of $1\text{e-}4$.</li>      <li>For each batch $(x_0, \text{labels})$: $x_t$ was computed by adding noise $z \sim \mathcal{N}(0, I)$ scaled by $\sigma=0.5$.</li>      <li>The UNet predicted the clean image: $\hat{x}_0 = \text{UNet}(x_t)$.</li>      <li>Loss was computed: $\text{loss} = \text{MSE}(\hat{x}_0, x_0)$.</li>      <li>Standard backpropagation followed: loss.backward(), optimizer.step().</li>   </ol>   The training loss curve showed a consistent decrease over 5 epochs, and the samples after 5 epochs demonstrated reasonable recovery of the digit shapes from the $\sigma=0.5$ noisy inputs.  </p>  <h3>1.2.2 Out-of-Distribution Testing</h3>  <p>   After training the $\sigma=0.5$ denoiser, its robustness was tested on out-of-distribution noise levels $\sigma \in [0.1, 0.9]$.   </p><p>   Observation: The denoiser performed well near its training distribution (e.g., $\sigma=0.4$ to $0.6$). However, for very low noise ($\sigma=0.1$), the output retained a slight blurring, as the model was trained to over-denoise inputs. For very high noise ($\sigma=0.9$), the output became severely corrupted or blurred, demonstrating the limitations of a single-step denoiser trained for a single noise level.  </p>  <h3>1.2.3 Denoising Pure Noise</h3>  <p>   To attempt image generation, the UNet was retrained with the objective of denoising pure noise ($\sigma \rightarrow \infty$) to a clean image $x_0$. This was implemented by setting $x_t = z$ (pure noise) in the training loop, effectively training the network to map $z \sim \mathcal{N}(0, I)$ directly to $x_0$.   </p><p>   Patterns Observed: The model quickly converged to an output resembling a blurred average of all MNIST digits. The generated outputs were typically blurry, centrally located gray shapes that vaguely captured the average structure of a digit.   </p><p>   Explanation: With an L2 (MSE) loss, training the model to predict $x_0$ from pure noise $z$ causes the model to learn the conditional mean, $E[x_0 | z]$, which in this case simplifies to approximating $E[x_0]$ (the mean of the data distribution) because $z$ contains no information about the specific $x_0$. Since the pure noise input is the same for all samples, the model learns a single output that minimizes the squared distance to all training examples. This optimal single point is the mean of the entire MNIST dataset, resulting in a representation of the "average digit."  </p></section>
+
+
+  <section class="card">
+  <h2>Part 2.1: Adding Time Conditioning to UNet</h2>
+  <p>
+   To enable iterative flow matching, the UNet was modified to accept the scalar timestep $t \in [0, 1]$ as an input.
+   </p><p>
+   Implementation of FCBlock: This helper class was built with nn.Linear(F_in, F_out), followed by a $\text{GELU}$ and another $\text{Linear}$ layer, as suggested by Figure 5.
+   </p><p>
+   Time Injection: The scalar $t$ (normalized to $[0, 1]$) was processed by two instances of FCBlock (fc1_t and fc2_t) to produce time-dependent modulation vectors $t_1$ and $t_2$. These vectors were then broadcast-multiplied into the UNet's feature maps at specific locations:
+   <ol>
+      <li>Unflatten Modulation: The feature map before the final upsampling (unflatten) was scaled by $t_1$: unflatten = unflatten * t1.</li>
+      <li>Up1 Modulation: The feature map after the first upsampling block (up1) was scaled by $t_2$: up1 = up1 * t2.</li>
+   </ol>
+   This scaling mechanism conditions the convolutional features on the current time step $t$, allowing the UNet, $v_{\theta}(x_t, t)$, to learn the time-dependent flow field.
+  </p>
+</section>
   <!-- PART B — 2.2 — Time-Conditioned UNet -->
   <h3>2.2 — Training the Time-Conditioned UNet</h3>
 
@@ -536,13 +648,33 @@
     
   </figure>
 
+  <section class="card">  <h2>Part 2.2: Training the Flow Matching UNet</h2>  <p>   The UNet was trained to predict the flow field $v_t$ from the noisy sample $x_t$ to the clean sample $x_0$, using the objective $\mathcal{L} = \| v_{\theta}(x_t, t) - v_t(x_t) \|^2$.   </p><p>   Flow Definition: The target flow was defined by the straight path:   $$v_t(x_t) = \frac{d x_t}{d t} = \frac{d}{d t} ( (1 - t) z + t x_0 ) = x_0 - z$$   where $x_t = (1-t)z + t x_0$, and $z \sim \mathcal{N}(0, I)$.   </p><p>   Training Loop Details:   <ol>      <li>Model $D=64$, batch size 64. Adam optimizer with $\text{lr}=1\text{e-}2$.</li>      <li>For each batch $(x_0, \text{labels})$:        <ul>          <li>Sample $t \sim \mathcal{U}[0, 1]$ and $z \sim \mathcal{N}(0, I)$.</li>          <li>Compute noisy sample: $x_t = (1 - t) z + t x_0$.</li>          <li>Target flow: $v_t = x_0 - z$.</li>          <li>Model prediction: $\hat{v}_t = \text{UNet}(x_t, t)$.</li>          <li>Loss: $\text{loss} = \text{MSE}(\hat{v}_t, v_t)$.</li>        </ul>      </li>      <li>A torch.optim.lr_scheduler.ExponentialLR with $\gamma=0.995$ was used, and scheduler.step() was called after every epoch to gradually reduce the learning rate.</li>   </ol>   The loss curve showed a stable, steady decrease as the model learned the complex time-dependent velocity field.  </p></section>
+
+  
   <!-- PART B — 2.3 — Sampling -->
   <h3>2.3 — Sampling from the Time-Conditioned UNet</h3>
 
   <div class="grid.three">
     <figure><figcaption>Samples after 1, 5, 10 epochs</figcaption><img src="media/part_b_2_3_samples.png"></figure>
   </div>
+  <section class="card">  <h2>Part 2.3: Sampling from the UNet</h2>  <p>   Sampling utilized the trained time-conditioned UNet in an iterative process to solve the probability flow ODE (Algorithm B.2).   </p><p>   Sampling Algorithm: The process started with pure noise $x_0 = z \sim \mathcal{N}(0, I)$. We then iteratively moved through discrete timesteps $\Delta t$ (e.g., $N=50$ steps). The next state $x_{i+1}$ was estimated using the current model-predicted flow $\hat{v}_i$:   $$x_{i+1} = x_i + \hat{v}_{\theta}(x_i, t_i) \cdot \Delta t$$   where $\Delta t$ is a small, negative time step (since we are integrating backward in time). This effectively moves the sample $x_i$ along the predicted velocity vector field towards $x_{final}$. The results after 10 epochs showed legible but often still noisy or blurry digits, confirming the model learned the basic flow but required further refinement or conditioning.  </p></section>
 
+
+  <section class="card">
+  <h2>Part 2.4: Adding Class-Conditioning to UNet</h2>
+  <p>
+   To improve generation quality and control, the UNet was further conditioned on the target digit class $c \in \{0, \dots, 9\}$.
+   </p><p>
+   Class Vector Implementation: The class $c$ was converted into a one-hot vector (10 dimensions) before being processed by the class FCBlocks.
+   </p><p>
+   Conditional Injection (Modulation): Two sets of FCBlocks were used: $(\text{fc1\_t}, \text{fc2\_t})$ for time, and $(\text{fc1\_c}, \text{fc2\_c})$ for class. The time modulation $(t_1, t_2)$ and class modulation $(c_1, c_2)$ were combined additively and multiplicatively with the feature maps:
+   <ol>
+      <li>Unflatten Modulation: unflatten = c1 * unflatten + t1</li>
+      <li>Up1 Modulation: up1 = c2 * up1 + t2</li>
+   </ol>
+   Unconditional Training: To enable Classifier-Free Guidance (CFG) during sampling, a dropout mechanism was implemented in the training loop where, $10\%$ of the time ($\rho=0.1$), the class conditioning vector $c$ was set to 0, training the model to predict the flow unconditionally.
+  </p>
+</section>
   <!-- PART B — 2.5 — Class-Conditioned -->
   <h3>2.5 — Class-Conditioned UNet Training</h3>
 
@@ -551,6 +683,13 @@
     <img src="media/part_b_2_5_loss.png">
     
   </figure>
+
+  <section class="card">
+  <h2>Part 2.5: Training the Class-Conditioned UNet</h2>
+  <p>
+   Training followed the same flow matching algorithm (Part 2.2), with the addition of the class conditioning $c$ and the dropout mechanism (Algorithm B.3). The use of class conditioning allowed for faster convergence and higher-quality results. The loss curve showed a similar stable decay, but generally reached a lower final loss than the time-only model, indicating a more precise fit to the data distribution.
+  </p>
+</section>
 
   <!-- PART B — 2.6 — Sampling with CFG -->
   <h3>2.6 — Sampling with Classifier-Free Guidance</h3>
@@ -579,6 +718,8 @@
    When I removed the learning-rate scheduler, I also switched the optimizer from Adam to AdamW and reduced the learning rate by a factor of 10. Without scheduling, the model no longer benefits from gradual learning-rate decay, which normally stabilizes late-stage training. AdamW helps counterbalance this by decoupling weight decay from gradient updates, preventing parameter drift and reducing overfitting. Lowering the learning rate compensates for the absence of warmup and decay, making the optimization steps less volatile.
   </p>
 </section>
+
+  
   
 
 </section> <!-- end Part B -->
