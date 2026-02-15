@@ -461,6 +461,73 @@
   <p class="subtitle">February 14, 2026</p>
 </section>
 
+
+<!-- MEDIA & DEMONSTRATIONS -->
+<section class="card" id="media">
+  <h2>Media & Demonstrations</h2>
+  <p>
+    Visual demonstrations of reward hacking behavior detected using the Laplacian-based approach.
+  </p>
+
+  <!-- Reward Hacking Signatures -->
+  <h3>Reward Hacking Detection Signatures</h3>
+  <p>Visualization of the Laplacian signatures that indicate reward hacking behavior in RL agents.</p>
+  
+  <div class="grid two">
+    <figure>
+      <img src="./media/hacking_signature.png" alt="Primary hacking signature">
+      <figcaption>Primary reward hacking signature - high Laplacian magnitude indicating fragile exploitation</figcaption>
+    </figure>
+    <figure>
+      <img src="./media/hacking_signature1.png" alt="Alternative hacking signature">
+      <figcaption>Alternative hacking pattern - showing diffusion-dominated regions in state space</figcaption>
+    </figure>
+  </div>
+
+  <!-- Video Demonstrations -->
+  <h3>Agent Behavior: Reward Hacking Episodes</h3>
+  <p>Videos demonstrating agents exhibiting reward hacking behavior across multiple episodes. Notice the characteristic patterns of exploiting environmental loopholes rather than learning robust policies.</p>
+  
+  <div class="grid two">
+    <figure>
+      <video controls style="width:100%; max-height:400px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
+        <source src="./media/hacked_agent-episode-0.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <figcaption>Episode 0: Initial reward hacking behavior detected</figcaption>
+    </figure>
+    <figure>
+      <video controls style="width:100%; max-height:400px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
+        <source src="./media/hacked_agent-episode-1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <figcaption>Episode 1: Agent continues exploiting fragile reward structure</figcaption>
+    </figure>
+  </div>
+
+  <div class="grid two" style="margin-top: 20px;">
+    <figure>
+      <video controls style="width:100%; max-height:400px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
+        <source src="./media/hacked_agent-episode-2.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <figcaption>Episode 2: Persistent hacking pattern - high diffusion, low drift</figcaption>
+    </figure>
+    <figure>
+      <video controls style="width:100%; max-height:400px; border-radius:12px; border:1px solid rgba(255,255,255,0.08);">
+        <source src="./media/hacked_agent-episode-3.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <figcaption>Episode 3: Agent fighting environmental noise to maintain exploit</figcaption>
+    </figure>
+  </div>
+
+  <div class="interpretation" style="margin-top: 24px;">
+    <strong>Observation:</strong> In these episodes, the agent spends significant computational effort maintaining its position against stochastic perturbations rather than genuinely improving the value function. This is the hallmark of reward hacking - the Laplacian detector successfully identifies these fragile exploitation patterns.
+  </div>
+
+</section>
+
 </main>
 
 </body>
