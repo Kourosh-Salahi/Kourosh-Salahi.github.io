@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RL SDE Technical Writeup — Modeling Reinforcement Learning as SDEs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root { --bg:#0b1020; --card:#111836; --muted:#a0aec0; --ink:#e6eefc; --accent:#8ab4ff; }
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
+    .container { max-width:1100px; margin:0 auto; padding:20px; }
+    header { padding:32px 20px; background:linear-gradient(to bottom,rgba(11,16,32,0.95),rgba(11,16,32,0.7)); border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; z-index:10; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
+    .brand h1 { font-size:18px; margin:0; font-weight:800; }
+    nav { margin-left:auto; font-size:14px; display:flex; gap:12px; }
+    nav a { color:var(--accent); text-decoration:none; }
+    nav a:hover { text-decoration:underline; }
+    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:30px; }
+    .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
+    .subtitle { color:var(--muted); margin:0 0 10px; }
+    .grid { display:grid; gap:16px; }
+    .grid.two { grid-template-columns:repeat(2,1fr); }
+    .grid.three { grid-template-columns:repeat(3,1fr); }
+    .grid.four { grid-template-columns:repeat(4,1fr); }
+    .grid.five { grid-template-columns:repeat(5,1fr); }
+    figure { margin:0; }
+    img { width:100%; max-height:260px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
+    figcaption { font-size:14px; color:var(--muted); margin-top:4px; }
+    pre { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; overflow:auto; font-size:13px; white-space:pre-wrap; }
+    code { font-family:"Courier New", monospace; color:#9ed0ff; }
+    
+    .math-block { 
+      background:rgba(255,255,255,0.04); 
+      border-left:3px solid var(--accent); 
+      padding:16px 20px; 
+      margin:16px 0; 
+      border-radius:8px;
+      overflow-x: auto;
+    }
+    
+    .equation { 
+      font-family: 'Georgia', serif; 
+      font-style: italic; 
+      color: var(--ink);
+      margin: 8px 0;
+    }
+    
+    .interpretation { 
+      background:rgba(138,180,255,0.08); 
+      border-left:3px solid var(--accent); 
+      padding:12px 16px; 
+      margin:12px 0; 
+      border-radius:6px;
+    }
+    
+    ol, ul { 
+      line-height: 1.8; 
+      margin: 12px 0;
+    }
+    
+    li { 
+      margin: 8px 0; 
+    }
+    
+    h3 { 
+      color: var(--accent); 
+      margin-top: 24px; 
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    h4 { 
+      color: var(--ink); 
+      margin-top: 20px; 
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+  </style>
+
+  <!-- MathJax for rendering mathematical equations -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+</head>
+
+<body>
+  <header>
+    <div class="container brand">
+      <span class="dot"></span>
+      <h1>RL SDE Technical Writeup</h1>
+      <nav>
+        <a href="#overview">Overview</a>
+        <a href="#modeling">Modeling</a>
+        <a href="#derivation">Derivation</a>
+        <a href="#interpretation">Interpretation</a>
+        <a href="#contributions">Contributions</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+<!-- HERO -->
+<section class="card">
+  <h2 class="hero-title">Modeling Reinforcement Learning Trajectories as Stochastic Differential Equations</h2>
+  <p class="subtitle">By <strong>Jai Sharma, Rithwik Nukala, Christopher Sun, Kourosh Salahi</strong> · February 14, 2026</p>
+  <p>
+    This work models the trajectory of a Reinforcement Learning agent through state space as a Stochastic Differential Equation (SDE). 
+    We demonstrate how the diffusion term in the Hamilton-Jacobi-Bellman equation serves as an effective detector of reward hacking, 
+    and show how incorporating the Laplacian of the value function into the training loss can offset these effects.
+  </p>
+</section>
+
+<!-- OVERVIEW -->
+<section class="card" id="overview">
+  <h2>Project Overview</h2>
+  <p>
+    In Reinforcement Learning, agent trajectories contain both deterministic and stochastic components. The agent uses the value function 
+    to navigate the environment (signal), while the environment and policy introduce non-deterministic elements (noise). By modeling 
+    this as an SDE, we gain deeper insights into agent behavior and can detect problematic patterns like reward hacking.
+  </p>
+  
+  <div class="interpretation">
+    <strong>Key Insight:</strong> Reward hacking occurs when an agent exploits unsustainable loopholes in the environment. 
+    These exploits are characterized by high diffusion terms—the agent spends most of its effort fighting against environmental 
+    stochasticity to maintain its position, rather than genuinely improving the value function.
+  </div>
+</section>
+
+<!-- MODELING SECTION -->
+<section class="card" id="modeling">
+  <h2>1. Modeling the Agent's Trajectory</h2>
+  
+  <h3>The State SDE</h3>
+  <p>
+    We model the agent's trajectory through state space as a Stochastic Differential Equation:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$dX_t = f(X_t, u_t)dt + \sigma(X_t, u_t)dW_t$$
+    </div>
+  </div>
+  
+  <p>Where:</p>
+  <ul>
+    <li><strong>$X_t$</strong>: The state at time $t$</li>
+    <li><strong>$u_t$</strong>: The action taken at time $t$</li>
+    <li><strong>$f(X_t, u_t)$</strong>: The drift term, representing deterministic dynamics based on state and action</li>
+    <li><strong>$\sigma(X_t, u_t)$</strong>: The diffusion term, capturing environmental stochasticity</li>
+    <li><strong>$dW_t$</strong>: A Wiener process (Brownian motion) representing random fluctuations</li>
+  </ul>
+
+  <h3>The Value Function</h3>
+  <p>
+    At time $t$, the agent aims to maximize the present value of rewards from time $t$ to the horizon $H = \infty$:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$V(x, t) = \max_u \mathbb{E}\left[\int_t^\infty e^{-\rho(s-t)} r(X_s, u_s) ds \Big| X_t = x\right]$$
+    </div>
+  </div>
+  
+  <p>Where:</p>
+  <ul>
+    <li><strong>$\rho$</strong>: The discount rate determining how quickly future rewards decay</li>
+    <li><strong>$e^{-\rho(s-t)}$</strong>: The discount factor for finding present value of future rewards</li>
+    <li><strong>$r(X_s, u_s)$</strong>: The reward function for state-action pairs</li>
+  </ul>
+
+  <div class="interpretation">
+    <strong>Interpretation:</strong> The value of being in a state is the present value of total reward accumulated 
+    if the agent takes optimal actions for the rest of time.
+  </div>
+</section>
+
+<!-- DERIVATION SECTION -->
+<section class="card" id="derivation">
+  <h2>2. Deriving the Hamilton-Jacobi-Bellman Equation</h2>
+
+  <h3>Step 1: Taylor Expansion</h3>
+  <p>
+    We begin with a Taylor expansion of the value function with respect to time:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$V(x, t) \approx \max_u \left\{r(x, u)\Delta t + e^{-\rho\Delta t}\mathbb{E}[V(X_{t+\Delta t}, t + \Delta t)]\right\}$$
+    </div>
+  </div>
+  
+  <p>
+    This states that the value of the current state equals the immediate reward over a small time interval, 
+    plus the discounted expected value of the next state.
+  </p>
+
+  <h3>Step 2: Applying Itô's Lemma</h3>
+  <p>
+    Itô's Lemma allows us to express the differential of the value function:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$dV = \left(\frac{\partial V}{\partial t} + f\frac{\partial V}{\partial x} + \frac{1}{2}\sigma^2 \frac{\partial^2 V}{\partial x^2}\right)dt + \sigma\frac{\partial V}{\partial x}dW$$
+    </div>
+  </div>
+  
+  <p>
+    When taking expectations, the stochastic term ($dW$) vanishes, leaving only the deterministic drift.
+  </p>
+
+  <h3>Step 3: Substitution and Simplification</h3>
+  <p>
+    Plugging the Itô expansion into the Taylor approximation and using $e^{-\rho\Delta t} \approx 1 - \rho\Delta t$ for small $\Delta t$:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$V(x, t) \approx \max_u\left[r(x, u)\Delta t + (1 - \rho\Delta t)\left(V(x, t) + \left(\frac{\partial V}{\partial t} + f\frac{\partial V}{\partial x} + \frac{1}{2}\sigma^2 \frac{\partial^2 V}{\partial x^2}\right)\Delta t\right)\right]$$
+    </div>
+  </div>
+  
+  <p>Canceling $V(x, t)$ from both sides and dividing by $\Delta t$:</p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$0 = \max_u\left[r(x, u) - \rho V(x) + f(x, u)\frac{\partial V}{\partial x} + \frac{1}{2}\sigma^2 \frac{\partial^2 V}{\partial x^2}\right]$$
+    </div>
+  </div>
+
+  <h3>Step 4: The HJB Equation</h3>
+  <p>
+    Rearranging, we obtain the Hamilton-Jacobi-Bellman equation:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$\rho V(x) = \max_u\left[r(x, u) + \underbrace{f(x, u)\frac{\partial V}{\partial x}}_{\text{drift}} + \underbrace{\frac{1}{2}\sigma^2 \frac{\partial^2 V}{\partial x^2}}_{\text{diffusion}}\right]$$
+    </div>
+  </div>
+  
+  <p>This fundamental equation decomposes the value into:</p>
+  <ul>
+    <li><strong>Immediate reward</strong>: $r(x, u)$</li>
+    <li><strong>Drift contribution</strong>: How the deterministic dynamics affect value</li>
+    <li><strong>Diffusion contribution</strong>: How stochasticity affects value</li>
+  </ul>
+</section>
+
+<!-- INTERPRETATION SECTION -->
+<section class="card" id="interpretation">
+  <h2>3. Interpreting the Time Derivative</h2>
+  
+  <p>
+    The left-hand side of the HJB equation has an important interpretation. Consider that the discounted value is:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$V(x, t) = e^{-\rho t}\tilde{V}(x, t)$$
+    </div>
+  </div>
+  
+  <p>Taking the time derivative:</p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$\frac{\partial V}{\partial t} = -\rho e^{-\rho t}\tilde{V}(x, t) = -\rho V$$
+    </div>
+  </div>
+  
+  <p>Therefore:</p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$\rho V(x, t) = -\frac{\partial V}{\partial t}$$
+    </div>
+  </div>
+
+  <div class="interpretation">
+    <strong>Interpretation:</strong> As time passes, the agent's opportunity to increase value and reach the goal decreases. 
+    The agent should want to reach its objective as quickly as possible, as delay reduces the present value of future rewards.
+  </div>
+</section>
+
+<!-- REWARD HACKING SECTION -->
+<section class="card" id="reward-hacking">
+  <h2>4. Detecting Reward Hacking via the Diffusion Term</h2>
+  
+  <p>
+    In this project, we focus on the <strong>diffusion term</strong> as a signal for detecting reward hacking:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$\text{Diffusion Term} = \frac{1}{2}\sigma^2 \frac{\partial^2 V}{\partial x^2}$$
+    </div>
+  </div>
+  
+  <h3>What is Reward Hacking?</h3>
+  <p>
+    In Reinforcement Learning environments, <strong>reward hacking</strong> occurs when an agent finds loopholes to exploit 
+    that yield high rewards but are unsustainable. These exploits are characterized by:
+  </p>
+  
+  <ul>
+    <li>Little genuine signal in terms of improving the value function</li>
+    <li>The agent spending most effort offsetting random environmental fluctuations</li>
+    <li>High sensitivity to stochastic perturbations (large diffusion term)</li>
+    <li>Rewards that depend on maintaining a precarious position rather than robust policy</li>
+  </ul>
+
+  <h3>The Laplacian as a Detector</h3>
+  <p>
+    The second derivative $\frac{\partial^2 V}{\partial x^2}$ (the Laplacian in higher dimensions) measures the curvature 
+    of the value function. High curvature indicates:
+  </p>
+  
+  <ul>
+    <li>The value function is highly sensitive to small perturbations in state</li>
+    <li>The agent must work hard to maintain its position against noise</li>
+    <li>The reward is not robust to environmental stochasticity</li>
+  </ul>
+
+  <div class="interpretation">
+    <strong>Key Insight:</strong> If the Laplacian is large, the agent is likely exploiting a fragile reward structure 
+    rather than learning a genuinely valuable policy. The diffusion term quantifies this fragility.
+  </div>
+</section>
+
+<!-- CONTRIBUTIONS SECTION -->
+<section class="card" id="contributions">
+  <h2>5. Project Contributions</h2>
+  
+  <p>
+    This research demonstrates three key contributions to understanding and mitigating reward hacking in RL:
+  </p>
+
+  <h3>Contribution 1: Laplacian-based Detection</h3>
+  <div class="card" style="background:rgba(138,180,255,0.05); margin: 16px 0;">
+    <p>
+      <strong>The Laplacian of the value function with respect to the state is an effective detector of reward hacking.</strong>
+    </p>
+    <p>
+      By computing $\nabla^2 V$ during training or evaluation, we can identify when an agent is exploiting fragile reward structures. 
+      High Laplacian values indicate the agent is fighting against environmental noise rather than learning robust policies.
+    </p>
+  </div>
+
+  <h3>Contribution 2: Regularization via Laplacian</h3>
+  <div class="card" style="background:rgba(138,180,255,0.05); margin: 16px 0;">
+    <p>
+      <strong>We can offset the effects of reward hacking by adding a weighted Laplacian term to the training loss function.</strong>
+    </p>
+    <p>
+      By incorporating a penalty term proportional to $\|\nabla^2 V\|^2$ in the loss, we encourage the learned value function 
+      to be smoother and more robust to stochastic perturbations. This guides the agent away from fragile exploits.
+    </p>
+  </div>
+
+  <h3>Modified Training Objective</h3>
+  <p>
+    The regularized training loss becomes:
+  </p>
+  
+  <div class="math-block">
+    <div class="equation">
+      $$\mathcal{L} = \mathcal{L}_{\text{original}} + \lambda \|\nabla^2 V\|^2$$
+    </div>
+  </div>
+  
+  <p>
+    Where $\lambda$ is a hyperparameter controlling the strength of the regularization. This penalizes high curvature 
+    in the value function, encouraging the agent to find more stable, sustainable reward strategies.
+  </p>
+
+  <h3>Contribution 3: Theoretical Framework</h3>
+  <div class="card" style="background:rgba(138,180,255,0.05); margin: 16px 0;">
+    <p>
+      <strong>Connection between SDE theory and RL provides new theoretical insights.</strong>
+    </p>
+    <p>
+      By modeling RL trajectories as SDEs and deriving the HJB equation, we establish a rigorous mathematical framework 
+      for understanding the interplay between deterministic policy improvement (drift) and robustness to uncertainty (diffusion).
+    </p>
+  </div>
+</section>
+
+<!-- MATHEMATICAL SUMMARY -->
+<section class="card">
+  <h2>Mathematical Summary</h2>
+  
+  <h3>Key Equations</h3>
+  
+  <div class="math-block">
+    <h4>State SDE</h4>
+    <div class="equation">
+      $$dX_t = f(X_t, u_t)dt + \sigma(X_t, u_t)dW_t$$
+    </div>
+  </div>
+
+  <div class="math-block">
+    <h4>Value Function</h4>
+    <div class="equation">
+      $$V(x, t) = \max_u \mathbb{E}\left[\int_t^\infty e^{-\rho(s-t)} r(X_s, u_s) ds \Big| X_t = x\right]$$
+    </div>
+  </div>
+
+  <div class="math-block">
+    <h4>Hamilton-Jacobi-Bellman Equation</h4>
+    <div class="equation">
+      $$\rho V(x) = \max_u\left[r(x, u) + f(x, u)\frac{\partial V}{\partial x} + \frac{1}{2}\sigma^2 \frac{\partial^2 V}{\partial x^2}\right]$$
+    </div>
+  </div>
+
+  <div class="math-block">
+    <h4>Regularized Training Loss</h4>
+    <div class="equation">
+      $$\mathcal{L} = \mathcal{L}_{\text{RL}} + \lambda \|\nabla^2 V\|^2$$
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section class="card">
+  <h2>Conclusion</h2>
+  <p>
+    By modeling Reinforcement Learning trajectories as Stochastic Differential Equations, we gain powerful tools for 
+    understanding and mitigating reward hacking. The diffusion term in the HJB equation—specifically the Laplacian of 
+    the value function—serves as an effective detector of fragile reward exploits. Incorporating this insight into 
+    training through Laplacian regularization helps agents learn more robust, sustainable policies.
+  </p>
+  
+  <p>
+    This work bridges theoretical insights from stochastic calculus with practical RL challenges, opening new avenues 
+    for creating more reliable and trustworthy learning systems.
+  </p>
+  
+  <div class="interpretation">
+    <strong>Future Work:</strong> Extension to multi-dimensional state spaces, empirical validation across diverse 
+    RL environments, and development of adaptive regularization schemes that adjust $\lambda$ during training.
+  </div>
+</section>
+
+<!-- AUTHORS -->
+<section class="card">
+  <h2>Authors</h2>
+  <p>
+    <strong>Jai Sharma</strong> · <strong>Rithwik Nukala</strong> · <strong>Christopher Sun</strong> · <strong>Kourosh Salahi</strong>
+  </p>
+  <p class="subtitle">February 14, 2026</p>
+</section>
+
+</main>
+
+</body>
+</html>
