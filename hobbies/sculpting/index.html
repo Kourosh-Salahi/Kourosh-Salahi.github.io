@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sculpting. Kourosh Salahi</title>
+  <meta name="description" content="A gallery of things Kourosh has sculpted.">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..700;1,400..700&family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <a class="brand" href="../../">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M12 21V13M12 13l6-7M12 13L6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="2.2" fill="currentColor"/><circle cx="18" cy="6" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="6" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        Kourosh Salahi
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav class="nav" id="nav" aria-label="Sections">
+        <ul>
+          <li><a href="../../#experience">Experience</a></li>
+          <li><a href="../../#projects">Projects</a></li>
+          <li><a href="../../#hobbies">Hobbies</a>
+            <ul class="sub">
+              <li><a href="../../hobbies/fragrances/">Fragrances</a></li>
+              <li><a href="../../hobbies/sculpting/" class="current">Sculpting</a></li>
+            </ul>
+          </li>
+          <li><a href="../../writing/">Writing</a></li>
+          <li><a href="../../#links">Links</a></li>
+        </ul>
+        <div class="nav-foot"><span class="status">System online</span><span>Berkeley, California</span></div>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="page">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../../">Home</a><span class="sep">/</span><a href="../../#hobbies">Hobbies</a><span class="sep">/</span><span>Sculpting</span></nav>
+
+      <header class="article-head">
+        <h1>Sculpting</h1>
+        <p class="lede">Things I have made by hand. Finished pieces first, then a few in progress. Click any photo to see it larger.</p>
+        <div class="meta"><span><b>Pieces</b> Gallery</span><span><b>Materials</b> Clay, and whatever else is around</span></div>
+      </header>
+
+      <!--
+        HOW TO ADD A PIECE
+        1. Drop the photo in hobbies/sculpting/media/ (any aspect ratio; the gallery is a masonry layout).
+        2. Copy one <figure> block below, point it at the photo, and write a caption:
+           <figure><img class="zoom" src="media/piece-1.jpg" alt="Describe the piece" loading="lazy"><figcaption><b>Title</b>, material, year. One line about it.</figcaption></figure>
+        3. Delete the placeholder <figure> blocks once you have real photos.
+      -->
+
+      <div class="gallery">
+        <figure>
+          <div class="placeholder">Photo of a finished piece goes here.<br>Replace this block with an &lt;img&gt;.</div>
+          <figcaption><b>Title of the piece</b>, material, 2026. One line about what it is or what you were going for.</figcaption>
+        </figure>
+        <figure>
+          <div class="placeholder" style="aspect-ratio: 1">Another photo.</div>
+          <figcaption><b>Title</b>, material, year.</figcaption>
+        </figure>
+        <figure>
+          <div class="placeholder" style="aspect-ratio: 3 / 4">Another photo.</div>
+          <figcaption><b>Title</b>, material, year.</figcaption>
+        </figure>
+      </div>
+
+      <section class="section" id="in-progress" style="padding-top:56px">
+        <div class="section-head">
+          <h2>In progress</h2>
+        </div>
+        <p class="section-intro">Pieces that are not done yet. Same figure format as above.</p>
+        <div class="gallery">
+          <figure>
+            <div class="placeholder">Work-in-progress photo.</div>
+            <figcaption><b>Working title</b>. What is left to do.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span>Photos are my own.</span>
+        <span><a href="../../">Home</a></span>
+      </footer>
+    </div>
+  </main>
+</div>
+<script src="../../assets/js/site.js"></script>
+</body>
+</html>

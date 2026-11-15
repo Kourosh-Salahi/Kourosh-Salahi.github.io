@@ -1,87 +1,87 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CS180 Project 3</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0b1020;
-      --card: #111836;
-      --muted: #a0aec0;
-      --ink: #e6eefc;
-      --accent: #8ab4ff;
-    }
-    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
-    .container { max-width:1100px; margin:0 auto; padding:20px; }
-    header { padding:32px 20px; background:linear-gradient(to bottom,rgba(11,16,32,0.95),rgba(11,16,32,0.7)); border-bottom:1px solid rgba(255,255,255,0.08);}
-    .brand { display:flex; align-items:center; gap:12px; }
-    .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
-    .brand h1 { font-size:18px; margin:0; font-weight:800; }
-    nav { margin-left:auto; font-size:14px; display:flex; gap:12px; }
-    nav a { color:var(--accent); text-decoration:none; }
-    nav a:hover { text-decoration:underline; }
-    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:30px; }
-    h2 { margin-top:0; }
-    .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
-    .subtitle { color:var(--muted); margin:0 0 10px; }
-    .grid { display:grid; gap:16px; }
-    .grid.two { grid-template-columns:repeat(2,1fr); }
-    .grid.three { grid-template-columns:repeat(3,1fr); }
-    figure { margin:0; cursor:zoom-in; }
-    img { width:100%; max-height:250px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
-    figcaption { font-size:14px; color:var(--muted); }
-    pre { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; overflow:auto; font-size:13px; white-space:pre-wrap; }
-    code { font-family: "Courier New", monospace; color: #9ed0ff; }
-    .lightbox { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(7,10,22,0.9); z-index:1000; justify-content:center; align-items:center; padding:40px; }
-    .lightbox img { max-width:90%; max-height:90%; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,0.6); cursor:zoom-out; }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image warping and automatic mosaicing. Kourosh Salahi</title>
+  <meta name="description" content="CS 180 Project 3: homographies, inverse warping, feathered mosaics, then Harris corners, ANMS, feature matching and RANSAC for automatic stitching.">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..700;1,400..700&family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
 </head>
-
 <body>
-  <header>
-    <div class="container brand">
-      <span class="dot"></span>
-      <h1>CS180 · Project 3</h1>
-      <nav>
-        <a href="#A1">A.1</a>
-        <a href="#A2">A.2</a>
-        <a href="#A3">A.3</a>
-        <a href="#A4">A.4</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <a class="brand" href="../">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M12 21V13M12 13l6-7M12 13L6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="2.2" fill="currentColor"/><circle cx="18" cy="6" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="6" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        Kourosh Salahi
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav class="nav" id="nav" aria-label="Sections">
+        <ul>
+          <li><a href="../#experience">Experience</a></li>
+          <li><a href="../#projects" class="current">Projects</a></li>
+          <li><a href="../#hobbies">Hobbies</a>
+            <ul class="sub">
+              <li><a href="../hobbies/fragrances/">Fragrances</a></li>
+              <li><a href="../hobbies/sculpting/">Sculpting</a></li>
+            </ul>
+          </li>
+          <li><a href="../writing/">Writing</a></li>
+          <li><a href="../#links">Links</a></li>
+        </ul>
+        <div class="nav-foot"><span class="status">System online</span><span>Berkeley, California</span></div>
       </nav>
     </div>
-  </header>
+  </aside>
 
-  <main class="container">
+  <main class="content">
+    <div class="page">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../">Home</a><span class="sep">/</span><a href="../#projects">Projects</a><span class="sep">/</span><span>CS 180, Project 3</span></nav>
 
-    <section class="card">
-      <h2 class="hero-title">Image Warping and Mosaicing</h2>
-      <p class="subtitle">By <strong>Kourosh Salahi</strong> · CS180/280A: Computer Vision & Computational Photography</p>
-      <p>The goal of this project is to compute homographies, perform image warping, and blend multiple images into seamless mosaics. This part focuses on implementing warping, resampling, and compositing entirely from scratch. Then, We get to automated
-      feature detection, as well as feature matching, ANMS, and RANSAC.</p>
-    </section>
+      <header class="article-head">
+        <h1>Image warping and mosaicing</h1>
+        <p class="lede">Computing homographies, warping images, and blending them into seamless mosaics, with warping, resampling, and compositing implemented from scratch. Then automating the whole thing with feature detection, ANMS, feature matching, and RANSAC.</p>
+        <div class="meta"><span><b>Course</b> CS 180 / 280A, Computer Vision and Computational Photography</span><span><b>Term</b> Fall 2025</span></div>
+      </header>
 
-    <!-- A.1 -->
-    <section class="card" id="A1">
-      <h2>A.1 — Shooting and Digitizing Pictures</h2>
-      <p>Three sets of overlapping images were taken by rotating the camera about a fixed center of projection. These serve as the input pairs for homography estimation and mosaicing.</p>
-      <div class="grid two">
-        <figure><img src="./media/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Left</figcaption></figure>
-        <figure><img src="./media/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama — Right</figcaption></figure>
-        <figure><img src="./media/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Left</figcaption></figure>
-        <figure><img src="./media/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes — Right</figcaption></figure>
-        <figure><img src="./media/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering — Left</figcaption></figure>
-        <figure><img src="./media/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering — Right</figcaption></figure>
-      </div>
-      <p><em>Each pair was taken with around 50% overlap for reliable point matching and homography recovery.</em></p>
-    </section>
+      <div class="article">
+        <aside class="toc">
+          <h2>On this page</h2>
+          <ol>
+            <li><a href="#A1">A.1 Shooting pictures</a></li>
+            <li><a href="#A2">A.2 Recovering homographies</a></li>
+            <li><a href="#A3">A.3 Warping images</a></li>
+            <li><a href="#A4">A.4 Creating the mosaic</a></li>
+            <li><a href="#B1">B.1 Harris corners</a></li>
+            <li><a href="#B2">B.2 Feature descriptors</a></li>
+            <li><a href="#B3">B.3 Feature matching</a></li>
+            <li><a href="#B4">B.4 RANSAC</a></li>
+            <li><a href="#conclusion">Conclusion</a></li>
+          </ol>
+        </aside>
 
-    <!-- A.2 -->
-    <section class="card" id="A2">
-      <h2>A.2 — Recovering Homographies</h2>
-      <p>To compute the homography <code>H</code> between two images, we solve a linear system of equations constructed from corresponding points <code>(x, y)</code> in image 1 and <code>(u, v)</code> in image 2. Each correspondence contributes two equations:</p>
+        <div class="body">
+          <section id="A1">
+            <h2>A.1. Shooting and digitizing pictures</h2>
+            <p>Three sets of overlapping images were taken by rotating the camera about a fixed center of projection. These serve as the input pairs for homography estimation and mosaicing.</p>
+            <div class="grid cols-2">
+              <figure><img class="zoom" src="./media/pan1_small.jpg" alt="Panorama, left image" loading="lazy"><figcaption>Panorama, left</figcaption></figure>
+              <figure><img class="zoom" src="./media/pan2_small.jpg" alt="Panorama, right image" loading="lazy"><figcaption>Panorama, right</figcaption></figure>
+              <figure><img class="zoom" src="./media/grimes1_small.jpg" alt="Grimes, left image" loading="lazy"><figcaption>Grimes, left</figcaption></figure>
+              <figure><img class="zoom" src="./media/grimes2_small.jpg" alt="Grimes, right image" loading="lazy"><figcaption>Grimes, right</figcaption></figure>
+              <figure><img class="zoom" src="./media/eng1_small.jpg" alt="Engineering building, left image" loading="lazy"><figcaption>Engineering, left</figcaption></figure>
+              <figure><img class="zoom" src="./media/eng2_small.jpg" alt="Engineering building, right image" loading="lazy"><figcaption>Engineering, right</figcaption></figure>
+            </div>
+            <p class="note">Each pair was taken with around 50% overlap for reliable point matching and homography recovery.</p>
+          </section>
 
+          <section id="A2">
+            <h2>A.2. Recovering homographies</h2>
+            <p>To compute the homography <code>H</code> between two images, we solve a linear system built from corresponding points <code>(x, y)</code> in image 1 and <code>(u, v)</code> in image 2. Each correspondence contributes two equations:</p>
 <pre><code>[x  y  1  0  0  0  -ux  -uy] [h1]   [u]
 [0  0  0  x  y  1  -vx  -vy] [h2] = [v]
                               [h3]
@@ -89,308 +89,199 @@
                               [h5]
                               [h6]
                               [h7]
-                              [h8]
-</code></pre>
-
-      <p>Stacking all correspondences yields an overdetermined system <code>Ah = b</code>, which is solved in the least-squares sense. The final 3×3 homography matrix is reconstructed by appending <code>h9 = 1</code>.</p>
-
-      <div class="grid.two">
-        <figure><img src="./media/eng_correspondence.png" onclick="openLightbox(this.src)"><figcaption>Engineering Correspondences</figcaption></figure>
-        <figure><img src="./media/pan_correspondence.png" onclick="openLightbox(this.src)"><figcaption>Panorama Correspondences</figcaption></figure>
-      </div>
-
-      <h3>Compute H Implementation</h3>
-      <pre><code>def compute_H(im1_pts, im2_pts):
+                              [h8]</code></pre>
+            <p>Stacking all correspondences yields an overdetermined system <code>Ah = b</code>, which is solved in the least-squares sense. The final 3×3 homography matrix is reconstructed by appending <code>h9 = 1</code>.</p>
+            <div class="grid cols-2">
+              <figure><img class="zoom" src="./media/eng_correspondence.png" alt="Engineering building correspondences" loading="lazy"><figcaption>Engineering correspondences</figcaption></figure>
+              <figure><img class="zoom" src="./media/pan_correspondence.png" alt="Panorama correspondences" loading="lazy"><figcaption>Panorama correspondences</figcaption></figure>
+            </div>
+            <h3>Implementation</h3>
+<pre><code>def compute_H(im1_pts, im2_pts):
     n = im1_pts.shape[0]
     A = []
     b = []
-
     for i in range(n):
         x, y = im1_pts[i]
         u, v = im2_pts[i]
-
         A.append([x, y, 1, 0, 0, 0, -u*x, -u*y])
         A.append([0, 0, 0, x, y, 1, -v*x, -v*y])
-
         b.append(u)
         b.append(v)
-
     A = np.array(A)
     b = np.array(b)
-
     H = np.linalg.lstsq(A, b)[0]
     H = np.append(H, 1)
     H = H.reshape((3, 3))
-    return H, A, b
-</code></pre>
-
-      <h3>Panorama Homography</h3>
-      <pre><code>[[ 1.59186937e+00  3.61721279e-02 -4.22912313e+02]
+    return H, A, b</code></pre>
+            <h3>Panorama homography</h3>
+<pre><code>[[ 1.59186937e+00  3.61721279e-02 -4.22912313e+02]
  [ 2.28684629e-01  1.49595970e+00 -1.50886837e+02]
  [ 7.10364295e-04  1.93061382e-04  1.00000000e+00]]</code></pre>
-
-      <p>Equations of the stacked system:</p>
-      <pre><code>382.0 * h0 + 408.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -56536.0 * h6 + -60384.0 * h7 +  = 148.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 382.0 * h3 + 408.0 * h4 + 1.0 * h5 + -155092.0 * h6 + -165648.0 * h7 +  = 406.0 
-
-382.0 * h0 + 447.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -57300.0 * h6 + -67050.0 * h7 +  = 150.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 382.0 * h3 + 447.0 * h4 + 1.0 * h5 + -170372.0 * h6 + -199362.0 * h7 +  = 446.0 
-
-346.0 * h0 + 400.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -37368.0 * h6 + -43200.0 * h7 +  = 108.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 346.0 * h3 + 400.0 * h4 + 1.0 * h5 + -137708.0 * h6 + -159200.0 * h7 +  = 398.0 
-
-346.0 * h0 + 433.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -36676.0 * h6 + -45898.0 * h7 +  = 106.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 346.0 * h3 + 433.0 * h4 + 1.0 * h5 + -149472.0 * h6 + -187056.0 * h7 +  = 432.0 
-
-441.0 * h0 + 502.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -93051.0 * h6 + -105922.0 * h7 +  = 211.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 441.0 * h3 + 502.0 * h4 + 1.0 * h5 + -219177.0 * h6 + -249494.0 * h7 +  = 497.0 
-
-398.0 * h0 + 476.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -66466.0 * h6 + -79492.0 * h7 +  = 167.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 398.0 * h3 + 476.0 * h4 + 1.0 * h5 + -189050.0 * h6 + -226100.0 * h7 +  = 475.0 
-
-443.0 * h0 + 633.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -93916.0 * h6 + -134196.0 * h7 +  = 212.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 443.0 * h3 + 633.0 * h4 + 1.0 * h5 + -276432.0 * h6 + -394992.0 * h7 +  = 624.0 
-
-383.0 * h0 + 551.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -57450.0 * h6 + -82650.0 * h7 +  = 150.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 383.0 * h3 + 551.0 * h4 + 1.0 * h5 + -211799.0 * h6 + -304703.0 * h7 +  = 553.0 
-
-306.0 * h0 + 449.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -18972.0 * h6 + -27838.0 * h7 +  = 62.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 306.0 * h3 + 449.0 * h4 + 1.0 * h5 + -138618.0 * h6 + -203397.0 * h7 +  = 453.0 
-
-409.0 * h0 + 439.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -71984.0 * h6 + -77264.0 * h7 +  = 176.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 409.0 * h3 + 439.0 * h4 + 1.0 * h5 + -177915.0 * h6 + -190965.0 * h7 +  = 435.0 </code></pre>
-
-      <h3>Engineering Homography</h3>
-      <pre><code>[[ 1.62486167e+00  2.23877645e-02 -4.10343843e+02]
+            <p>Equations of the stacked system:</p>
+<pre><code>382.0 * h0 + 408.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -56536.0 * h6 + -60384.0 * h7 +  = 148.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 382.0 * h3 + 408.0 * h4 + 1.0 * h5 + -155092.0 * h6 + -165648.0 * h7 +  = 406.0
+382.0 * h0 + 447.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -57300.0 * h6 + -67050.0 * h7 +  = 150.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 382.0 * h3 + 447.0 * h4 + 1.0 * h5 + -170372.0 * h6 + -199362.0 * h7 +  = 446.0
+346.0 * h0 + 400.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -37368.0 * h6 + -43200.0 * h7 +  = 108.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 346.0 * h3 + 400.0 * h4 + 1.0 * h5 + -137708.0 * h6 + -159200.0 * h7 +  = 398.0
+346.0 * h0 + 433.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -36676.0 * h6 + -45898.0 * h7 +  = 106.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 346.0 * h3 + 433.0 * h4 + 1.0 * h5 + -149472.0 * h6 + -187056.0 * h7 +  = 432.0
+441.0 * h0 + 502.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -93051.0 * h6 + -105922.0 * h7 +  = 211.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 441.0 * h3 + 502.0 * h4 + 1.0 * h5 + -219177.0 * h6 + -249494.0 * h7 +  = 497.0
+398.0 * h0 + 476.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -66466.0 * h6 + -79492.0 * h7 +  = 167.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 398.0 * h3 + 476.0 * h4 + 1.0 * h5 + -189050.0 * h6 + -226100.0 * h7 +  = 475.0
+443.0 * h0 + 633.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -93916.0 * h6 + -134196.0 * h7 +  = 212.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 443.0 * h3 + 633.0 * h4 + 1.0 * h5 + -276432.0 * h6 + -394992.0 * h7 +  = 624.0
+383.0 * h0 + 551.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -57450.0 * h6 + -82650.0 * h7 +  = 150.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 383.0 * h3 + 551.0 * h4 + 1.0 * h5 + -211799.0 * h6 + -304703.0 * h7 +  = 553.0
+306.0 * h0 + 449.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -18972.0 * h6 + -27838.0 * h7 +  = 62.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 306.0 * h3 + 449.0 * h4 + 1.0 * h5 + -138618.0 * h6 + -203397.0 * h7 +  = 453.0
+409.0 * h0 + 439.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -71984.0 * h6 + -77264.0 * h7 +  = 176.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 409.0 * h3 + 439.0 * h4 + 1.0 * h5 + -177915.0 * h6 + -190965.0 * h7 +  = 435.0</code></pre>
+            <h3>Engineering homography</h3>
+<pre><code>[[ 1.62486167e+00  2.23877645e-02 -4.10343843e+02]
  [ 3.80771099e-01  1.41534178e+00 -1.60794393e+02]
  [ 1.05300413e-03 -1.48710200e-05  1.00000000e+00]]</code></pre>
+            <p>Equations:</p>
+<pre><code>270.0 * h0 + 317.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -6750.0 * h6 + -7925.0 * h7 +  = 25.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 270.0 * h3 + 317.0 * h4 + 1.0 * h5 + -82620.0 * h6 + -97002.0 * h7 +  = 306.0
+378.0 * h0 + 149.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -56700.0 * h6 + -22350.0 * h7 +  = 150.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 378.0 * h3 + 149.0 * h4 + 1.0 * h5 + -52920.0 * h6 + -20860.0 * h7 +  = 140.0
+547.0 * h0 + 220.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -167382.0 * h6 + -67320.0 * h7 +  = 306.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 547.0 * h3 + 220.0 * h4 + 1.0 * h5 + -123622.0 * h6 + -49720.0 * h7 +  = 226.0
+550.0 * h0 + 332.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -170500.0 * h6 + -102920.0 * h7 +  = 310.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 550.0 * h3 + 332.0 * h4 + 1.0 * h5 + -182050.0 * h6 + -109892.0 * h7 +  = 331.0
+555.0 * h0 + 571.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -177045.0 * h6 + -182149.0 * h7 +  = 319.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 555.0 * h3 + 571.0 * h4 + 1.0 * h5 + -303030.0 * h6 + -311766.0 * h7 +  = 546.0
+392.0 * h0 + 334.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -64680.0 * h6 + -55110.0 * h7 +  = 165.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 392.0 * h3 + 334.0 * h4 + 1.0 * h5 + -128576.0 * h6 + -109552.0 * h7 +  = 328.0
+433.0 * h0 + 534.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -91363.0 * h6 + -112674.0 * h7 +  = 211.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 433.0 * h3 + 534.0 * h4 + 1.0 * h5 + -226026.0 * h6 + -278748.0 * h7 +  = 522.0
+430.0 * h0 + 363.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -89440.0 * h6 + -75504.0 * h7 +  = 208.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 430.0 * h3 + 363.0 * h4 + 1.0 * h5 + -153940.0 * h6 + -129954.0 * h7 +  = 358.0
+504.0 * h0 + 364.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -138600.0 * h6 + -100100.0 * h7 +  = 275.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 504.0 * h3 + 364.0 * h4 + 1.0 * h5 + -180432.0 * h6 + -130312.0 * h7 +  = 358.0
+504.0 * h0 + 533.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -139608.0 * h6 + -147641.0 * h7 +  = 277.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 504.0 * h3 + 533.0 * h4 + 1.0 * h5 + -259560.0 * h6 + -274495.0 * h7 +  = 515.0
+526.0 * h0 + 528.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -155170.0 * h6 + -155760.0 * h7 +  = 295.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 526.0 * h3 + 528.0 * h4 + 1.0 * h5 + -268260.0 * h6 + -269280.0 * h7 +  = 510.0
+377.0 * h0 + 216.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -56173.0 * h6 + -32184.0 * h7 +  = 149.0
+0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 377.0 * h3 + 216.0 * h4 + 1.0 * h5 + -77662.0 * h6 + -44496.0 * h7 +  = 206.0</code></pre>
+            <p class="note">Using more than four correspondences produced stable, low-error homographies suitable for accurate alignment.</p>
+          </section>
 
-      <p>Equations:</p>
-      <pre><code>270.0 * h0 + 317.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -6750.0 * h6 + -7925.0 * h7 +  = 25.0 
+          <section id="A3">
+            <h2>A.3. Warping images</h2>
+            <p>With the recovered homographies, I implemented inverse warping using both nearest-neighbor and bilinear interpolation.</p>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/painting_small.jpg" alt="Source painting" loading="lazy"><figcaption>Source: painting</figcaption></figure>
+              <figure><img class="zoom" src="./media/nn_painting.png" alt="Painting warped with nearest neighbor" loading="lazy"><figcaption>Warped, nearest neighbor</figcaption></figure>
+              <figure><img class="zoom" src="./media/bil_painting.png" alt="Painting warped with bilinear interpolation" loading="lazy"><figcaption>Warped, bilinear</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/interstellar_small.jpg" alt="Source Interstellar poster" loading="lazy"><figcaption>Source: Interstellar</figcaption></figure>
+              <figure><img class="zoom" src="./media/nn_interstellar.png" alt="Poster warped with nearest neighbor" loading="lazy"><figcaption>Warped, nearest neighbor</figcaption></figure>
+              <figure><img class="zoom" src="./media/bil_interstellar.png" alt="Poster warped with bilinear interpolation" loading="lazy"><figcaption>Warped, bilinear</figcaption></figure>
+            </div>
+            <p class="note">Bilinear interpolation yielded smoother results, while nearest neighbor was faster but more pixelated.</p>
+          </section>
 
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 270.0 * h3 + 317.0 * h4 + 1.0 * h5 + -82620.0 * h6 + -97002.0 * h7 +  = 306.0 
+          <section id="A4">
+            <h2>A.4. Creating the mosaic</h2>
+            <p>The warped images were composited into mosaics using alpha-weighted blending with a feathered mask for each image's alpha.</p>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/grimes1_small.jpg" alt="Grimes left" loading="lazy"><figcaption>Grimes left</figcaption></figure>
+              <figure><img class="zoom" src="./media/grimes2_small.jpg" alt="Grimes right" loading="lazy"><figcaption>Grimes right</figcaption></figure>
+              <figure><img class="zoom" src="./media/mosaic_grimes.png" alt="Grimes mosaic" loading="lazy"><figcaption>Grimes mosaic</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/eng1_small.jpg" alt="Engineering left" loading="lazy"><figcaption>Engineering left</figcaption></figure>
+              <figure><img class="zoom" src="./media/eng2_small.jpg" alt="Engineering right" loading="lazy"><figcaption>Engineering right</figcaption></figure>
+              <figure><img class="zoom" src="./media/mosaic_eng.png" alt="Engineering mosaic" loading="lazy"><figcaption>Engineering mosaic</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/pan1_small.jpg" alt="Panorama left" loading="lazy"><figcaption>Panorama left</figcaption></figure>
+              <figure><img class="zoom" src="./media/pan2_small.jpg" alt="Panorama right" loading="lazy"><figcaption>Panorama right</figcaption></figure>
+              <figure><img class="zoom" src="./media/mosaic_pan.png" alt="Panorama mosaic" loading="lazy"><figcaption>Panorama mosaic</figcaption></figure>
+            </div>
+            <h3>Method</h3>
+            <p>The <code>make_mosaic()</code> function follows a multi-stage procedure to warp and blend two input images into a unified panorama:</p>
+            <ol>
+              <li><b>Homography estimation:</b> the 3×3 matrix <code>H</code> is computed from corresponding feature points between the two images. It maps pixels from the first image into the coordinate system of the second.</li>
+              <li><b>Canvas determination:</b> the warped corners of <code>im1</code> and the original corners of <code>im2</code> are combined to determine the overall mosaic bounds. The output canvas is sized to contain both.</li>
+              <li><b>Warping via bilinear interpolation:</b> the first image is warped into the mosaic frame using inverse mapping and bilinear interpolation.</li>
+              <li><b>Feather mask generation:</b> a 2D alpha mask is created for each image with a falloff at the borders. The mask is near 1 in the center and decays to 0 near the edges, so overlapping regions fade naturally instead of forming sharp transitions.</li>
+              <li><b>Compositing and alpha blending:</b> both images are placed into the mosaic canvas.</li>
+              <li><b>Final normalization:</b> the accumulated weights are divided out at the end, leaving a smooth mosaic without visible seams or intensity jumps.</li>
+            </ol>
+            <h3>Edge feathering</h3>
+            <p>The feather mask fades to 0 near the edges, with a default falloff distance of 20% of the way in from the edges.</p>
+          </section>
 
-378.0 * h0 + 149.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -56700.0 * h6 + -22350.0 * h7 +  = 150.0 
+          <section id="B1">
+            <h2>B.1. Harris corner detection</h2>
+            <p>The Harris corner detector identifies points of strong local intensity variation. Using the provided <code>harris.py</code> helper, I detected corners and visualized them on each input image.</p>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/Harris_std_eng.png" alt="Harris corners, standard overlay" loading="lazy"><figcaption>Harris corners overlay, standard</figcaption></figure>
+              <figure><img class="zoom" src="./media/Harris_std_500_eng.png" alt="Top 500 Harris corners" loading="lazy"><figcaption>Harris corners, top 500</figcaption></figure>
+              <figure><img class="zoom" src="./media/ANMS_500_eng.png" alt="Top 500 corners after adaptive non-maximal suppression" loading="lazy"><figcaption>Adaptive non-maximal suppression (ANMS), top 500</figcaption></figure>
+            </div>
+            <p class="note">ANMS gives us strong corners, and also makes sure they are distributed well throughout the image.</p>
+          </section>
 
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 378.0 * h3 + 149.0 * h4 + 1.0 * h5 + -52920.0 * h6 + -20860.0 * h7 +  = 140.0 
+          <section id="B2">
+            <h2>B.2. Feature descriptor extraction</h2>
+            <p>For each detected corner, I sampled a 40×40 window centered on the feature and downsampled it to an 8×8 descriptor. Each patch was bias/gain normalized to zero mean and unit variance, improving robustness to illumination changes.</p>
+            <div class="grid cols-2">
+              <figure><img class="zoom" src="./media/descriptors_eng.png" alt="Engineering building feature descriptors" loading="lazy"><figcaption>Engineering building feature descriptors</figcaption></figure>
+              <figure><img class="zoom" src="./media/descriptors_pan.png" alt="Panorama feature descriptors" loading="lazy"><figcaption>Panorama feature descriptors</figcaption></figure>
+            </div>
+            <p class="note">Descriptors were extracted without rotation invariance for simplicity, following Brown et al., 2005.</p>
+          </section>
 
-547.0 * h0 + 220.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -167382.0 * h6 + -67320.0 * h7 +  = 306.0 
+          <section id="B3">
+            <h2>B.3. Feature matching</h2>
+            <p>Descriptors between two images were matched using Lowe's ratio test. For each feature in image A, the nearest and second-nearest descriptors in image B were found; matches were kept if <code>d1/d2 &lt; 0.7</code>, where d1 and d2 are the distances to the first and second nearest neighbors.</p>
+            <div class="grid cols-2">
+              <figure><img class="zoom" src="./media/matches.png" alt="Panorama matches" loading="lazy"><figcaption>Panorama matches</figcaption></figure>
+              <figure><img class="zoom" src="./media/descriptors_pan_two_images.png" alt="Matched patches across the two images" loading="lazy"><figcaption>Matched patches across each image</figcaption></figure>
+            </div>
+            <p class="note">There are still mismatched features. This is taken care of in the next step, RANSAC. It is interesting how many of the matched feature patches were still matched despite slight rotations, such as patch 7. This is likely because of the blurring, which makes small rotations less noticeable in the calculations.</p>
+          </section>
 
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 547.0 * h3 + 220.0 * h4 + 1.0 * h5 + -123622.0 * h6 + -49720.0 * h7 +  = 226.0 
+          <section id="B4">
+            <h2>B.4. RANSAC for a robust homography</h2>
+            <p>I implemented 4-point RANSAC to estimate homographies while rejecting outlier matches. At each iteration, a random 4-point subset generated a candidate <code>H</code>; inliers were counted by reprojection error under 3 px. The best-inlier model was then refined by least squares on the full inlier set.</p>
+            <h3>Manual versus RANSAC stitching</h3>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/mosaic_pan.png" alt="Manual panorama mosaic" loading="lazy"><figcaption>Manual panorama</figcaption></figure>
+              <figure><img class="zoom" src="./media/mosaic_eng.png" alt="Manual engineering building mosaic" loading="lazy"><figcaption>Manual engineering building</figcaption></figure>
+              <figure><img class="zoom" src="./media/mosaic_grimes.png" alt="Manual Grimes mosaic" loading="lazy"><figcaption>Manual Grimes</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/pan_RANSAC.png" alt="RANSAC panorama mosaic" loading="lazy"><figcaption>RANSAC panorama</figcaption></figure>
+              <figure><img class="zoom" src="./media/eng_RANSAC.png" alt="RANSAC engineering building mosaic" loading="lazy"><figcaption>RANSAC engineering building</figcaption></figure>
+              <figure><img class="zoom" src="./media/grimes_RANSAC.png" alt="RANSAC Grimes mosaic" loading="lazy"><figcaption>RANSAC Grimes</figcaption></figure>
+            </div>
+            <p class="note">RANSAC reduced mismatches and produced nearly identical mosaics to manual point selection, validating the feature pipeline.</p>
+          </section>
 
-550.0 * h0 + 332.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -170500.0 * h6 + -102920.0 * h7 +  = 310.0 
+          <section id="conclusion">
+            <h2>Conclusion</h2>
+            <p>This project introduced planar homographies for geometric alignment and blending. Implementing inverse warping and interpolation from scratch deepened my understanding of projective transformations and compositing. Implementing ANMS, feature matching, and RANSAC gave me a deeper understanding of how automatic image stitching is done. Overall, a cool project to work on.</p>
+            <p>Thanks for viewing my project.</p>
+          </section>
 
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 550.0 * h3 + 332.0 * h4 + 1.0 * h5 + -182050.0 * h6 + -109892.0 * h7 +  = 331.0 
-
-555.0 * h0 + 571.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -177045.0 * h6 + -182149.0 * h7 +  = 319.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 555.0 * h3 + 571.0 * h4 + 1.0 * h5 + -303030.0 * h6 + -311766.0 * h7 +  = 546.0 
-
-392.0 * h0 + 334.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -64680.0 * h6 + -55110.0 * h7 +  = 165.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 392.0 * h3 + 334.0 * h4 + 1.0 * h5 + -128576.0 * h6 + -109552.0 * h7 +  = 328.0 
-
-433.0 * h0 + 534.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -91363.0 * h6 + -112674.0 * h7 +  = 211.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 433.0 * h3 + 534.0 * h4 + 1.0 * h5 + -226026.0 * h6 + -278748.0 * h7 +  = 522.0 
-
-430.0 * h0 + 363.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -89440.0 * h6 + -75504.0 * h7 +  = 208.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 430.0 * h3 + 363.0 * h4 + 1.0 * h5 + -153940.0 * h6 + -129954.0 * h7 +  = 358.0 
-
-504.0 * h0 + 364.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -138600.0 * h6 + -100100.0 * h7 +  = 275.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 504.0 * h3 + 364.0 * h4 + 1.0 * h5 + -180432.0 * h6 + -130312.0 * h7 +  = 358.0 
-
-504.0 * h0 + 533.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -139608.0 * h6 + -147641.0 * h7 +  = 277.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 504.0 * h3 + 533.0 * h4 + 1.0 * h5 + -259560.0 * h6 + -274495.0 * h7 +  = 515.0 
-
-526.0 * h0 + 528.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -155170.0 * h6 + -155760.0 * h7 +  = 295.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 526.0 * h3 + 528.0 * h4 + 1.0 * h5 + -268260.0 * h6 + -269280.0 * h7 +  = 510.0 
-
-377.0 * h0 + 216.0 * h1 + 1.0 * h2 + 0.0 * h3 + 0.0 * h4 + 0.0 * h5 + -56173.0 * h6 + -32184.0 * h7 +  = 149.0 
-
-0.0 * h0 + 0.0 * h1 + 0.0 * h2 + 377.0 * h3 + 216.0 * h4 + 1.0 * h5 + -77662.0 * h6 + -44496.0 * h7 +  = 206.0 </code></pre>
-
-      <p><em>Using more than four correspondences produced stable, low-error homographies suitable for accurate alignment.</em></p>
-    </section>
-
-    <!-- A.3 -->
-    <section class="card" id="A3">
-      <h2>A.3 — Warping Images</h2>
-      <p>With the recovered homographies, I implemented inverse warping using both nearest-neighbor and bilinear interpolation.</p>
-
-      <div class="grid three">
-        <figure><img src="./media/painting_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Painting</figcaption></figure>
-        <figure><img src="./media/nn_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
-        <figure><img src="./media/bil_painting.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
+        </div>
       </div>
 
-      <div class="grid three">
-        <figure><img src="./media/interstellar_small.jpg" onclick="openLightbox(this.src)"><figcaption>Source — Interstellar</figcaption></figure>
-        <figure><img src="./media/nn_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Nearest Neighbor</figcaption></figure>
-        <figure><img src="./media/bil_interstellar.png" onclick="openLightbox(this.src)"><figcaption>Warped — Bilinear</figcaption></figure>
-      </div>
-
-      <p><em>Bilinear interpolation yielded smoother results, while nearest neighbor was faster but more pixelated.</em></p>
-    </section>
-
-    <!-- A.4 -->
-    <section class="card" id="A4">
-      <h2>A.4 — Creating the Mosaic</h2>
-      <p>The warped images were composited into mosaics using alpha weighted blending with a feathered mask for each images alpha.</p>
-
-      <div class="grid three">
-        <figure><img src="./media/grimes1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Left</figcaption></figure>
-        <figure><img src="./media/grimes2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Grimes Right</figcaption></figure>
-        <figure><img src="./media/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Grimes Mosaic</figcaption></figure>
-      </div>
-
-      <div class="grid three">
-        <figure><img src="./media/eng1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Left</figcaption></figure>
-        <figure><img src="./media/eng2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Engineering Right</figcaption></figure>
-        <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Mosaic</figcaption></figure>
-      </div>
-
-      <div class="grid three">
-        <figure><img src="./media/pan1_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Left</figcaption></figure>
-        <figure><img src="./media/pan2_small.jpg" onclick="openLightbox(this.src)"><figcaption>Panorama Right</figcaption></figure>
-        <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Mosaic</figcaption></figure>
-      </div>
-
-      <h3>Method Description</h3>
-      <p>The <code>make_mosaic()</code> function follows a multi-stage procedure to accurately warp and blend two input images into a unified panorama:</p>
-      <ol>
-        <li><strong>Homography Estimation:</strong> The 3×3 matrix <code>H</code> is computed using corresponding feature points between the two images. This transformation maps pixels from the first image into the coordinate system of the second image.</li>
-        <li><strong>Canvas Determination:</strong> The warped corners of <code>im1</code> and the original corners of <code>im2</code> are combined to determine the overall mosaic bounds. The output canvas size is set to encompass both.</li>
-        <li><strong>Warping via Bilinear Interpolation:</strong> The first image is warped into the mosaic coordinate frame using inverse mapping and bilinear interpolation.</li>
-        <li><strong>Feather Mask Generation:</strong> A 2D alpha mask is created for each image using a falloff at the borders. The mask has values near 1 in the center and gradually decays to 0 near the edges, ensuring that overlapping regions fade naturally instead of forming sharp transitions.</li>
-        <li><strong>Compositing and Alpha Blending:</strong> Both images are placed into the mosaic canvas.</li>
-        <li><strong>Final Normalization:</strong> The accumulated weights are divided out at the end, leaving a visually smooth mosaic without visible seams or intensity jumps.</li>
-      </ol>
-
-      <h3>Edge Feathering</h3>
-      <p>The feather mask fades to 0 near the edges, with a default distance of 20% distance away from the edges</p>
-
-      </section>
-
-       <!-- B.1 -->
-    <section class="card" id="B1">
-      <h2>B.1 — Harris Corner Detection</h2>
-      <p>The Harris Corner Detector identifies points of strong local intensity variation. Using the provided <code>harris.py</code> helper, I detected corners and visualized them on each input image.</p>
-
-      <div class="grid three">
-        <figure><img src="./media/Harris_std_eng.png" onclick="openLightbox(this.src)"><figcaption>Harris Corners Overlay Standard</figcaption></figure>
-        <figure><img src="./media/Harris_std_500_eng.png" onclick="openLightbox(this.src)"><figcaption>Harris Corners top 500 </figcaption></figure>
-        <figure><img src="./media/ANMS_500_eng.png" onclick="openLightbox(this.src)"><figcaption>Adaptive Non-Maximal Suppression (ANMS) top 500</figcaption></figure>
-      </div>
-
-      <p><em>ANMS gives us strong corners, but also makes sure that they are distributed well throughout the image</em></p>
-      <h3>Deliverables</h3>
-      <ul>
-        <li>Show detected corners overlaid on image</li>
-        <li>Show corners after ANMS</li>
-      </ul>
-    </section>
-
-    <!-- B.2 -->
-    <section class="card" id="B2">
-      <h2>B.2 — Feature Descriptor Extraction</h2>
-      <p>For each detected corner, I sampled a 40×40 window centered on the feature downsampled to an 8×8 descriptor. Each patch was bias/gain normalized to zero mean and unit variance, improving robustness to illumination changes.</p>
-
-      <div class="grid two">
-        <figure><img src="./media/descriptors_eng.png" onclick="openLightbox(this.src)"><figcaption>Engineering Building Feature Descriptors</figcaption></figure>
-        <figure><img src="./media/descriptors_pan.png" onclick="openLightbox(this.src)"><figcaption>Panorama Feature Descriptors</figcaption></figure>
-      </div>
-
-      <p><em>Descriptors were extracted without rotation invariance for simplicity, following Brown et al., 2005.</em></p>
-      <h3>Deliverables</h3>
-      <ul>
-        <li>Show several normalized 8×8 feature descriptors</li>
-      </ul>
-    </section>
-
-    <!-- B.3 -->
-    <section class="card" id="B3">
-      <h2>B.3 — Feature Matching</h2>
-      <p>Descriptors between two images were matched using the ratio test from Lowe. For each feature in image A, the nearest and second-nearest descriptors in image B were found; matches were retained if <code>d1/d2 &lt; 0.7 </code> for d1 and d2 being the distance to the first and second nearest neighbor respectivly.</p>
-
-      <div class="grid two">
-        <figure><img src="./media/matches.png" onclick="openLightbox(this.src)"><figcaption>Panorama Matches</figcaption></figure>
-        <figure><img src="./media/descriptors_pan_two_images.png" onclick="openLightbox(this.src)"><figcaption>Matched Patches across each image</figcaption></figure>
-      </div>
-
-      <p><em>We see that there are still mismatched features. This will be taken care of in the next step, RANSAC. Interesting to see how many of the matched feature patches were still matched despite slight rotations, such as patch 7. This is likely because of the blurring, which makes small rotations less noticable when doing calculations.</em></p>
-      <h3>Deliverables</h3>
-      <ul>
-        <li>Show matched features between image pairs</li>
-      </ul>
-    </section>
-
-    <!-- B.4 -->
-    <section class="card" id="B4">
-      <h2>B.4 — RANSAC for Robust Homography</h2>
-      <p>I implemented 4-point RANSAC to estimate homographies while rejecting outlier matches. At each iteration, a random 4-point subset generated a candidate <code>H</code>; inliers were counted based on reprojection error &lt; 3 px. The best-inlier model was then refined via least-squares on the set of all inlier points.</p>
-
-      <h3>Manual v.s. RANSAC Stitching</h3>
-      <div class="grid three">
-        <figure><img src="./media/mosaic_pan.png" onclick="openLightbox(this.src)"><figcaption>Manual Panorama</figcaption></figure>
-        <figure><img src="./media/mosaic_eng.png" onclick="openLightbox(this.src)"><figcaption>Manual Engineering Building</figcaption></figure>
-        <figure><img src="./media/mosaic_grimes.png" onclick="openLightbox(this.src)"><figcaption>Manual Grimes</figcaption></figure>
-      </div>
-      <div class="grid three">
-        <figure><img src="./media/pan_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Panorama</figcaption></figure>
-        <figure><img src="./media/eng_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Engineering Building</figcaption></figure>
-        <figure><img src="./media/grimes_RANSAC.png" onclick="openLightbox(this.src)"><figcaption>RANSAC Grimes</figcaption></figure>
-      </div>
-
-      <p><em>RANSAC reduced mismatches and produced nearly identical mosaics to manual point selection, validating the feature pipeline.</em></p>
-
-      <h3>Deliverables</h3>
-      <ul>
-        <li>Implement 4-point RANSAC from scratch</li>
-        <li>Show comparison of manual vs. automatic stitching</li>
-        <li>Include ≥ 3 automatic mosaics</li>
-      </ul>
-    </section>
-
-
-
-
-    <!-- Conclusion -->
-    <section class="card" id="conclusion">
-      <h2>Conclusion</h2>
-      <p>This project introduced the use of planar homographies for geometric alignment and blending. Implementing inverse warping and interpolation from scratch deepened my understanding of projective transformations and compositing techniques.
-      Implementing ANMS, feature matching, and RANSAC gave me a deeper understanding of how automatic image blending is done. Overall, this was a cool project to work on!</p>
-      <p><strong>Thanks for viewing my project!</strong> — Kourosh Salahi</p>
-    </section>
-
+      <footer class="foot">
+        <span>Prepared for CS 180 Project 3 by Kourosh Salahi.</span>
+        <span><a href="../#projects">All projects</a></span>
+      </footer>
+    </div>
   </main>
-
-  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="">
-  </div>
-
-  <script>
-    function openLightbox(src) {
-      document.getElementById('lightbox-img').src = src;
-      document.getElementById('lightbox').style.display = 'flex';
-    }
-    function closeLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
-    }
-  </script>
+</div>
+<script src="../assets/js/site.js"></script>
 </body>
 </html>

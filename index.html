@@ -1,133 +1,337 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kourosh Salahi — Landing Page</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0b1020;
-      --card: #111836;
-      --muted: #a0aec0;
-      --ink: #e6eefc;
-      --accent: #8ab4ff;
-    }
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.6;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      padding: 80px 20px 40px;
-    }
-    header img {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid var(--accent);
-      margin-top: 30px;
-      margin-bottom: 20px;
-    }
-    header h1 {
-      font-size: 3rem;
-      font-weight: 800;
-      margin-bottom: 15px;
-    }
-    header p {
-      font-size: 1.25rem;
-      color: var(--muted);
-    }
-    section {
-      margin: 60px 0;
-      text-align: center;
-    }
-    section h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-    }
-    .btn-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: center;
-    }
-    .btn {
-      background: var(--accent);
-      color: #0b1020;
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: background 0.2s ease;
-    }
-    .btn:hover {
-      background: #a7c4ff;
-    }
-    footer {
-      text-align: center;
-      color: var(--muted);
-      padding: 40px 20px;
-      font-size: 0.9rem;
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kourosh Salahi</title>
+  <meta name="description" content="Kourosh Salahi. EECS and Business at UC Berkeley. Robotics, computer vision, and the software around them.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..700;1,400..700&family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-  <div class="container">
-    <!-- Intro -->
-    <header>
-      <!-- Replace 'me.jpg' with your picture -->
-      <img src="./media/me.jpg" alt="Kourosh Salahi headshot">
-      <h1>Hi, I’m Kourosh Salahi</h1>
-      <p>I'm a UC Berkeley Junior studying EECS and Business as part of the Management, Entrepreneurship, and Technology (M.E.T.) Program. I'm passionate about Computer Vision, AI, Robotics, and building impactful technology.</p>
-    </header>
+<div class="shell">
 
-    <!-- Projects section -->
-    <section>
-      <h2>Projects</h2>
-      <p>Check out some of my work! Projects revolve around Computer Vision and Robotics.</p>
-      <div class="btn-grid">
-        <a href="./5/" class="btn">Project 5: Diffusion + Flow Matching</a>
-        <a href="./4/" class="btn">Project 4: Neural Radiance Fields </a>
-        <a href="./3/" class="btn">Project 3: Image Warping + Mosaicing with Ransac and ANMS</a>
-        <a href="./2/" class="btn">Project 2: Image Blending + Frequencies</a>
-        <a href="./1/" class="btn">Project 1: Image recolorization </a>
-      </div>
+  <!-- ============ Sidebar ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <a class="brand" href="./">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M12 21V13M12 13l6-7M12 13L6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="2.2" fill="currentColor"/><circle cx="18" cy="6" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="6" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        Kourosh Salahi
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav class="nav" id="nav" aria-label="Sections">
+        <ul>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#hobbies">Hobbies</a>
+            <ul class="sub">
+              <li><a href="hobbies/fragrances/">Fragrances</a></li>
+              <li><a href="hobbies/sculpting/">Sculpting</a></li>
+            </ul>
+          </li>
+          <li><a href="#writing">Writing</a></li>
+          <li><a href="#links">Links</a></li>
+        </ul>
+        <div class="nav-foot"><span class="status">System online</span><span>Berkeley, California</span></div>
+      </nav>
+    </div>
+  </aside>
 
-    </section>
+  <!-- ============ Content ============ -->
+  <main class="content">
+    <div class="page">
 
-    <!-- Resume section -->
-<!-- Resume section -->
-<section> 
-  <h2>My Resume</h2> 
-  <p>Download a copy of my latest resume below.</p>  
-  <a href="./media/Salahi_Kourosh_Resume_Site.pdf" target="_blank" class="btn">View Resume (PDF)</a> 
-</section>
-    
-<section>
-  <h2>My Experience</h2>
-  <p>Check out my full background and experience on LinkedIn.</p>
-  <a href="https://www.linkedin.com/in/kourosh-salahi" target="_blank" class="btn">View My LinkedIn</a>
-</section>
+      <!-- Hero -->
+      <section class="hero" id="top">
+        <div class="hero-text">
+          <p class="kicker">Robotics / Perception / Control</p>
+          <div class="hero-id">
+            <div class="operator"><img src="media/me.jpg" alt="Portrait of Kourosh Salahi" width="84" height="84"></div>
+            <h1>Kourosh Salahi</h1>
+          </div>
+          <p class="lede">I build perception and control systems for robots, and the software around them.</p>
+          <p class="sub">EECS and Business at UC Berkeley through the M.E.T. program, class of 2027. Most recently a software engineering intern at DoorDash; before that a contractor at Google and a research assistant in Trevor Darrell's group at Berkeley AI Research. I am Head Lab TA for Berkeley's graduate robotics course.</p>
+          <div class="hero-meta">
+            <a href="media/Salahi_Kourosh_Resume_Site.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+            <a href="https://github.com/Kourosh-Salahi" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://www.linkedin.com/in/kourosh-salahi" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="email" href="#links" data-u="ksalahi" data-h="berkeley" data-t="edu"><span class="email-chars">eykd@iulekeh.blasear</span></a>
+          </div>
+        </div>
 
-<section>
-  <h2>Contact</h2>
-  <p>Ksalahi AT Berkeley DOT edu</p>
-</section>
-    <!-- Footer -->
-    <footer>
-      © 2025 Kourosh Salahi
-    </footer>
-  </div>
+        <!-- Live two-link arm. assets/js/site.js solves the inverse kinematics; without JS it shows this rest pose. -->
+        <figure class="workcell">
+          <div class="wc-bar"><span><b>Workcell 01</b> / 2R planar arm</span><span class="wc-live">Live IK</span></div>
+          <svg class="arm" id="arm" viewBox="0 0 480 340" role="img" aria-label="A two-link robot arm that follows your pointer using inverse kinematics">
+            <path class="reach" d="M-80 290A240 240 0 0 1 400 290"/>
+            <path class="floor" d="M20 290H460"/>
+            <path class="hatch" d="M36 290l-8 8M60 290l-8 8M84 290l-8 8M108 290l-8 8M132 290l-8 8M156 290l-8 8M180 290l-8 8M204 290l-8 8M228 290l-8 8M252 290l-8 8M276 290l-8 8M300 290l-8 8M324 290l-8 8M348 290l-8 8M372 290l-8 8M396 290l-8 8M420 290l-8 8M444 290l-8 8"/>
+            <path class="axis" d="M36 60h30M36 60v-30M66 60l-5-3M66 60l-5 3M36 30l-3 5M36 30l3 5"/>
+            <text x="70" y="63">X</text><text x="33" y="24">Z</text>
+            <text x="444" y="24" text-anchor="end">L1 130 / L2 110</text>
+            <polyline class="trail" id="arm-trail" points=""/>
+            <g class="target" id="arm-target" transform="translate(245 120)"><circle r="9"/><path d="M-15 0h8M7 0h8M0 -15v8M0 7v8"/></g>
+            <rect class="base" x="110" y="276" width="100" height="14" rx="1"/>
+            <rect class="base" x="140" y="246" width="40" height="30" rx="1"/>
+            <line class="link-out" id="arm-l1o" x1="160" y1="246" x2="128" y2="120"/>
+            <line class="link-in" id="arm-l1i" x1="160" y1="246" x2="128" y2="120"/>
+            <line class="link-out" id="arm-l2o" x1="128" y1="120" x2="238" y2="120" style="stroke-width:14"/>
+            <line class="link-in" id="arm-l2i" x1="128" y1="120" x2="238" y2="120" style="stroke-width:10"/>
+            <g id="arm-tool" transform="translate(238 120) rotate(0)">
+              <rect class="tool" x="0" y="-9" width="8" height="18" rx="1"/>
+              <rect class="tool" x="8" y="-9" width="14" height="4" rx="1"/>
+              <rect class="tool" x="8" y="5" width="14" height="4" rx="1"/>
+            </g>
+            <circle class="joint" cx="160" cy="246" r="15"/><circle class="pin" cx="160" cy="246" r="3.5"/>
+            <circle class="joint" id="arm-j2" cx="128" cy="120" r="12"/><circle class="pin" id="arm-p2" cx="128" cy="120" r="3"/>
+            <circle class="joint" id="arm-j3" cx="238" cy="120" r="7"/>
+          </svg>
+          <dl class="wc-telemetry" aria-hidden="true">
+            <div><dt>&theta;1</dt><dd id="arm-t1">104.2&deg;</dd></div>
+            <div><dt>&theta;2</dt><dd id="arm-t2">-104.2&deg;</dd></div>
+            <div><dt>x</dt><dd id="arm-x">78</dd></div>
+            <div><dt>z</dt><dd id="arm-z">126</dd></div>
+          </dl>
+          <figcaption>Move your pointer over the cell. The arm solves inverse kinematics to follow it.</figcaption>
+        </figure>
+      </section>
+
+      <!-- Experience -->
+      <section class="section" id="experience">
+        <div class="section-head">
+          <h2>Experience</h2>
+          <span class="count">2024 to present</span>
+        </div>
+        <ol class="timeline">
+          <li>
+            <div class="when">May to Aug 2026</div>
+            <div>
+              <div class="who">DoorDash</div>
+              <div class="role">Software Engineering Intern</div>
+              <ul class="what">
+                <li>Built a policy impact simulator that replays historical order resolutions through proposed refund policies before rollout, giving a pre-deployment estimate of financial exposure and cohort fairness.</li>
+                <li>Integrated an LLM-based evaluation layer for vetting policies on customer fairness and dispute risk.</li>
+                <li>Finished the main project a month early, then shipped an order-value-based credit cap that saves over $300k per year.</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="when">Sep 2025 to Feb 2026</div>
+            <div>
+              <div class="who">Google</div>
+              <div class="role">Software Engineering Contractor</div>
+              <ul class="what">
+                <li>Developed a CLI tool that captures PostgreSQL traffic and replays it for performance benchmarking: workload capture, concurrency preservation, and variable-speed replay, in Python.</li>
+                <li>Automated summary reports after each replay covering transactions per second and query latency.</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="when">Aug 2025 to present</div>
+            <div>
+              <div class="who">UC Berkeley EECS</div>
+              <div class="role">Undergraduate Course Staff</div>
+              <ul class="what">
+                <li>Head Lab TA for EECS 106A / 206A, Berkeley's introductory robotics course. Lead a team of ten lab staff in developing and running the labs.</li>
+                <li>Course staff for CS 189, Berkeley's flagship machine learning course, serving 800+ students.</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="when">Jul to Sep 2025</div>
+            <div>
+              <div class="who">Berkeley AI Research</div>
+              <div class="role">Research Assistant, Prof. Trevor Darrell's group</div>
+              <ul class="what">
+                <li>Research on diffusion-based generative vision models for 6-DOF robotic perception and control.</li>
+                <li>Replaced the Diffusion Transformer (DiT) loss with Representation Alignment (REPA) and Scalable Interpolant Transformer (SiT) objectives, improving performance by about 30%.</li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <div class="when">May to Aug 2024</div>
+            <div>
+              <div class="who">GoodFin (YC W22)</div>
+              <div class="role">Software Engineering Intern</div>
+              <ul class="what">
+                <li>Built an administrator dashboard on AWS (DynamoDB, Amplify, Lambda), React, and Node for managing user investments, company metrics, and products, backed by serverless REST APIs and S3 file handling. Investment management tasks went from hours to seconds.</li>
+                <li>Shipped an SMS subscription flow with Klaviyo and DynamoDB (engagement up 27%) and Stripe-webhook welcome emails for premium users (retention up 11%).</li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+
+        <div class="edu">
+          <div class="edu-block">
+            <h3>Education</h3>
+            <p><b>UC Berkeley</b>, Management, Entrepreneurship, &amp; Technology (M.E.T.) program. Double major: B.S. Electrical Engineering &amp; Computer Science and B.S. Business Administration. Graduating 2027.</p>
+            <p>GPA 3.87. Dean's List four times. One of about 50 students admitted to M.E.T. per year.</p>
+            <ul class="chips">
+              <li>Reinforcement Learning</li><li>Machine Learning</li><li>Deep Neural Networks</li><li>Computer Vision</li><li>Robotics</li><li>Operating Systems</li><li>Efficient Algorithms</li><li>Probability</li><li>Signal Processing</li>
+            </ul>
+          </div>
+          <div class="edu-block">
+            <h3>Tools I reach for</h3>
+            <p>Python, C++, C, Java, Go, SQL, JavaScript.</p>
+            <ul class="chips">
+              <li>PyTorch</li><li>NumPy</li><li>OpenCV</li><li>ROS 2</li><li>Isaac Sim</li><li>Isaac Lab</li><li>MuJoCo</li><li>CasADi</li><li>SLAM</li><li>React</li><li>AWS</li><li>PostgreSQL</li>
+            </ul>
+            <p style="margin-top:14px">Industry Relations Officer for Eta Kappa Nu (HKN), Berkeley's EECS honor society. Fluent in English and Farsi, proficient in Spanish.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects -->
+      <section class="section" id="projects">
+        <div class="section-head">
+          <h2>Projects</h2>
+          <span class="count">5 write-ups</span>
+        </div>
+        <p class="section-intro">Computer vision and generative modeling from CS 180 at Berkeley, and the robotics work behind my resume. Each card opens a full write-up with figures.</p>
+
+        <div class="cards">
+          <a class="card" href="4/">
+            <div class="thumb"><img src="assets/thumbs/nerf.jpg" alt="NeRF render of a Lego tractor" loading="lazy" width="960" height="720"></div>
+            <div class="body">
+              <h3>Neural Radiance Fields from scratch</h3>
+              <p>Camera calibration with ArUco tags, ray sampling, an 8-layer MLP with a skip connection, and volume rendering. 23.9 dB PSNR on held-out Lego views, then a NeRF of my own captured object.</p>
+              <div class="tags"><span>PyTorch</span><span>Viser</span><span>Calibration</span></div>
+            </div>
+          </a>
+
+          <a class="card" href="5/">
+            <div class="thumb"><img src="assets/thumbs/diffusion.jpg" alt="Diffusion model samples" loading="lazy" width="960" height="720"></div>
+            <div class="body">
+              <h3>Diffusion models and flow matching</h3>
+              <p>DDIM sampling, classifier-free guidance, SDEdit, inpainting, visual anagrams and hybrids with DeepFloyd, then a time- and class-conditioned UNet trained with flow matching on MNIST.</p>
+              <div class="tags"><span>Diffusion</span><span>Flow matching</span><span>UNet</span></div>
+            </div>
+          </a>
+
+          <a class="card" href="3/">
+            <div class="thumb"><img src="assets/thumbs/mosaic.jpg" alt="Stitched panorama of a building interior" loading="lazy" width="960" height="720"></div>
+            <div class="body">
+              <h3>Image warping and automatic mosaicing</h3>
+              <p>Homographies by least squares, inverse warping with bilinear interpolation, feathered blending, then Harris corners, ANMS, feature descriptors, Lowe's ratio test and 4-point RANSAC for automatic stitching.</p>
+              <div class="tags"><span>Homographies</span><span>RANSAC</span><span>Feature matching</span></div>
+            </div>
+          </a>
+
+          <a class="card" href="2/">
+            <div class="thumb"><img src="assets/thumbs/blending.jpg" alt="Hybrid image blend of two faces" loading="lazy" width="960" height="720"></div>
+            <div class="body">
+              <h3>Filters, hybrid images, and multi-resolution blending</h3>
+              <p>Convolution from scratch, derivative-of-Gaussian edges, unsharp masking, hybrid images that change with viewing distance, and Laplacian-stack blending.</p>
+              <div class="tags"><span>Frequencies</span><span>Laplacian stacks</span></div>
+            </div>
+          </a>
+
+          <a class="card" href="1/">
+            <div class="thumb"><img src="assets/thumbs/colorize.jpg" alt="Colorized Prokudin-Gorskii photograph of the Emir of Bukhara" loading="lazy" width="960" height="720"></div>
+            <div class="body">
+              <h3>Colorizing the Prokudin-Gorskii collection</h3>
+              <p>Aligning three glass-plate channels with normalized cross-correlation and a coarse-to-fine image pyramid to recover color photographs from the 1900s.</p>
+              <div class="tags"><span>Alignment</span><span>Image pyramids</span></div>
+            </div>
+          </a>
+        </div>
+
+        <h3 class="subhead">Other Projects</h3>
+        <ul class="list-plain">
+          <li>
+            <div class="aside">UR7e, ROS 2</div>
+            <div class="title">VR-teleoperated robotic arm</div>
+            <p class="desc">Real-time control of a UR7e through a Meta Quest headset, with color- and shape-based object detection in OpenCV and a motion-recording pipeline that replays captured trajectories autonomously based on the objects in the workspace.</p>
+          </li>
+          <li>
+            <div class="aside">Isaac Lab, Allegro hand</div>
+            <div class="title">RL-trained dexterous hand</div>
+            <p class="desc">PPO policies for in-hand manipulation in Isaac Lab with fingertip-distance observations and spin-penalty reward shaping, deployed to a physical Allegro hand over ROS 2 with EMA-smoothed joint control and keypoint-based cube pose estimation.</p>
+          </li>
+          <li>
+            <div class="aside">Isaac Sim, CasADi</div>
+            <div class="title">Autonomous drone racing with nonlinear MPC</div>
+            <p class="desc">Two-phase controller: an offline minimum-snap trajectory planner and a real-time 20-step NLMPC solver running at 100 Hz. 16.66 s lap time and a 96% success rate over 50 trials on a 12-gate course.</p>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Hobbies -->
+      <section class="section" id="hobbies">
+        <div class="section-head">
+          <h2>Hobbies</h2>
+          <span class="count">Away from the keyboard</span>
+        </div>
+        <p class="section-intro">I have spent a lot of my life doing combat sports like Tae Kwon Do, Brazilian Jiu Jitsu, and Judo. Whenever I get enough time, I like to play golf at Tilden Park, where I enjoy the views and lose too many balls. To explore the arts, I play guitar and sculpt. I've also become very interested in fragrances and how different colognes are formulated.</p>
+        <div class="tiles">
+          <a class="tile" href="hobbies/fragrances/">
+            <svg class="glyph" viewBox="0 0 56 56" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M22 6h12v6H22zM24 12v6c-6 2-10 8-10 15v9a4 4 0 0 0 4 4h20a4 4 0 0 0 4-4v-9c0-7-4-13-10-15v-6"/><path d="M34 4h8M38 4v6" stroke-linecap="round"/><path d="M20 36h16" stroke-linecap="round"/></svg>
+            <h3>Fragrances</h3>
+            <p>The bottles on my shelf, what I think of each one, and some notes on how they are put together.</p>
+            <span class="go">Open the shelf</span>
+          </a>
+          <a class="tile" href="hobbies/sculpting/">
+            <svg class="glyph" viewBox="0 0 56 56" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 48h28M18 48l2-10h16l2 10"/><path d="M22 38c-2-6-1-12 2-16 2-3 6-4 8-2s2 6 0 9l-4 4c-2 2-3 4-2 5"/><path d="M30 20c3-2 6-6 6-10" stroke-linecap="round"/></svg>
+            <h3>Sculpting</h3>
+            <p>Things I have made by hand. A gallery of finished pieces and a few in progress.</p>
+            <span class="go">See the pieces</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Writing -->
+      <section class="section" id="writing">
+        <div class="section-head">
+          <h2>Writing</h2>
+          <a class="count" href="writing/">All essays</a>
+        </div>
+        <p class="section-intro">Short essays on things I have been thinking about. New pieces are listed on the <a href="writing/">writing page</a>.</p>
+        <ul class="essays">
+          <!-- Copy a block like this for each essay. Newest first. -->
+          <li>
+            <div class="date">Coming soon</div>
+            <div>
+              <div class="title"><a href="writing/first-essay/">An essay title goes here</a></div>
+              <p class="blurb">A one-sentence summary of what the essay is about, so a reader can decide whether to open it.</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Links -->
+      <section class="section" id="links">
+        <div class="section-head">
+          <h2>Links</h2>
+        </div>
+        <div class="links">
+          <a class="link" href="https://github.com/Kourosh-Salahi" target="_blank" rel="noopener">
+            <span class="label">GitHub</span>
+            <span class="value">github.com/Kourosh-Salahi</span>
+          </a>
+          <a class="link" href="https://www.linkedin.com/in/kourosh-salahi" target="_blank" rel="noopener">
+            <span class="label">LinkedIn</span>
+            <span class="value">linkedin.com/in/kourosh-salahi</span>
+          </a>
+          <a class="link" href="media/Salahi_Kourosh_Resume_Site.pdf" target="_blank" rel="noopener">
+            <span class="label">Resume</span>
+            <span class="value">PDF, one page</span>
+          </a>
+          <a class="link email" href="#links" data-u="ksalahi" data-h="berkeley" data-t="edu">
+            <span class="label">Email</span>
+            <span class="value email-chars">eykd@iulekeh.blasear</span>
+          </a>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span>Kourosh Salahi, 2026</span>
+      </footer>
+    </div>
+  </main>
+</div>
+<script src="assets/js/site.js"></script>
 </body>
 </html>

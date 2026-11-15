@@ -1,81 +1,72 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CS180 Project 2 — Filters, Hybrid Images, and Multi-Resolution Blending</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0b1020;
-      --card: #111836;
-      --muted: #a0aec0;
-      --ink: #e6eefc;
-      --accent: #8ab4ff;
-    }
-    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
-    .container { max-width:1100px; margin:0 auto; padding:20px; }
-
-    header { padding:32px 20px; background:linear-gradient(to bottom,rgba(11,16,32,0.95),rgba(11,16,32,0.7)); border-bottom:1px solid rgba(255,255,255,0.08);}
-    .brand { display:flex; align-items:center; gap:12px; }
-    .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); }
-    .brand h1 { font-size:18px; margin:0; font-weight:800; }
-    nav { margin-left:auto; font-size:14px; display:flex; gap:12px; }
-    nav a { color:var(--accent); text-decoration:none; }
-    nav a:hover { text-decoration:underline; }
-
-    .card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; margin-bottom:30px; }
-    h2 { margin-top:0; }
-
-    .hero-title { font-size:clamp(28px,4vw,44px); font-weight:800; margin:0 0 10px; }
-    .subtitle { color:var(--muted); margin:0 0 10px; }
-    .meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; font-size:14px; }
-    .pill { padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); }
-
-    .grid { display:grid; gap:16px; }
-    .grid.two { grid-template-columns:repeat(2,1fr); }
-    .grid.three { grid-template-columns:repeat(3,1fr); }
-    .grid.four { grid-template-columns:repeat(4,1fr); }
-    .grid.five { grid-template-columns:repeat(5,1fr); }
-    figure { margin:0; cursor:zoom-in; }
-
-    img { width:100%; max-height:250px; object-fit:contain; border-radius:12px; border:1px solid rgba(255,255,255,0.08); }
-    img[src*="expanded.jpg"], img[src*="stack"], img[src*="dreekend_process"], img[src*="fig234"] { max-height:none; width:100%; }
-
-    figcaption { font-size:14px; color:var(--muted); }
-    pre { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px; overflow:auto; font-size:14px; }
-
-    .lightbox { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(7,10,22,0.9); z-index:1000; justify-content:center; align-items:center; padding:40px; }
-    .lightbox img { max-width:90%; max-height:90%; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,0.6); cursor:zoom-out; }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Filters, hybrid images, and multi-resolution blending. Kourosh Salahi</title>
+  <meta name="description" content="CS 180 Project 2: convolution from scratch, derivative-of-Gaussian edges, unsharp masking, hybrid images, and Laplacian-stack blending.">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..700;1,400..700&family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body>
-  <header>
-    <div class="container brand">
-      <span class="dot"></span>
-      <h1>CS180 · Project 2</h1>
-      <nav>
-        <a href="#part1">Part 1</a>
-        <a href="#part2">Part 2</a>
-        <a href="#hybrids">Hybrids</a>
-        <a href="#blending">Blending</a>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <a class="brand" href="../">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M12 21V13M12 13l6-7M12 13L6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="2.2" fill="currentColor"/><circle cx="18" cy="6" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="6" r="1.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        Kourosh Salahi
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav class="nav" id="nav" aria-label="Sections">
+        <ul>
+          <li><a href="../#experience">Experience</a></li>
+          <li><a href="../#projects" class="current">Projects</a></li>
+          <li><a href="../#hobbies">Hobbies</a>
+            <ul class="sub">
+              <li><a href="../hobbies/fragrances/">Fragrances</a></li>
+              <li><a href="../hobbies/sculpting/">Sculpting</a></li>
+            </ul>
+          </li>
+          <li><a href="../writing/">Writing</a></li>
+          <li><a href="../#links">Links</a></li>
+        </ul>
+        <div class="nav-foot"><span class="status">System online</span><span>Berkeley, California</span></div>
       </nav>
     </div>
-  </header>
+  </aside>
 
-  <main class="container">
+  <main class="content">
+    <div class="page">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../">Home</a><span class="sep">/</span><a href="../#projects">Projects</a><span class="sep">/</span><span>CS 180, Project 2</span></nav>
 
-    <!-- Hero -->
-    <section class="card">
-      <h2 class="hero-title">Filters, Hybrid Images, and Multi-Resolution Blending</h2>
-      <p class="subtitle">By <strong>Kourosh Salahi</strong> · CS180: Computer Vision & Computational Photography</p>
-    </section>
+      <header class="article-head">
+        <h1>Filters, hybrid images, and multi-resolution blending</h1>
+        <p class="lede">Convolution written from scratch, edges with finite differences and derivative-of-Gaussian filters, unsharp masking, hybrid images that change with viewing distance, and seamless blends with Gaussian and Laplacian stacks.</p>
+        <div class="meta"><span><b>Course</b> CS 180, Intro to Computer Vision and Computational Photography</span><span><b>Term</b> Fall 2025</span></div>
+      </header>
 
-    <!-- Part 1.1 -->
-    <section class="card" id="part1">
-      <h2>Part 1.1 — Convolution</h2>
-      <p>This section implements convolution from scratch with both four nested loops and a more efficient two-loop version. Results are compared to <code>scipy.signal.convolve2d</code> in terms of runtime and edge handling.</p>
-      <pre><code>def conv4loops(image, kernel):
+      <div class="article">
+        <aside class="toc">
+          <h2>On this page</h2>
+          <ol>
+            <li><a href="#part11">1.1 Convolution</a></li>
+            <li><a href="#part12">1.2 Derivatives and edges</a></li>
+            <li><a href="#part13">1.3 Gaussian and DoG</a></li>
+            <li><a href="#part21">2.1 Unsharp mask</a></li>
+            <li><a href="#hybrids">2.2 Hybrid images</a></li>
+            <li><a href="#blending">2.3 and 2.4 Blending</a></li>
+            <li><a href="#conclusion">Conclusion</a></li>
+          </ol>
+        </aside>
+
+        <div class="body">
+          <section id="part11">
+            <h2>Part 1.1. Convolution</h2>
+            <p>This section implements convolution from scratch with both four nested loops and a more efficient two-loop version. Results are compared to <code>scipy.signal.convolve2d</code> in terms of runtime and edge handling.</p>
+<pre><code>def conv4loops(image, kernel):
     height, width = image.shape
     kh, kw = kernel.shape
     pad_h, pad_w = kh // 2, kw // 2
@@ -88,190 +79,155 @@
                 for n in range(kw):
                     val += kernel[m, n] * padded[i+m, j+n]
             output[i, j] = val
-    return output
-</code></pre>
-      <pre><code>def conv2loops(image, kernel):
+    return output</code></pre>
+<pre><code>def conv2loops(image, kernel):
     height, width = image.shape
     kh, kw = kernel.shape
     pad_h, pad_w = kh // 2, kw // 2
     padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
     output = np.zeros_like(image)
     for i in range(height):
-            for j in range(width):
-                region = padded[i:i+kh, j:j+kw]
-                output[i, j] = np.sum(region * kernel)
+        for j in range(width):
+            region = padded[i:i+kh, j:j+kw]
+            output[i, j] = np.sum(region * kernel)
     return output</code></pre>
-      <div class="grid four">
-        <figure><img src="./media/Me.jpg" onclick="openLightbox(this.src)"><figcaption>Original image (grayscale self-portrait)</figcaption></figure>
-        <figure><img src="./media/res_four.png" onclick="openLightbox(this.src)"><figcaption>9×9 box filter result</figcaption></figure>
-        <figure><img src="./media/fdx_two.png" onclick="openLightbox(this.src)"><figcaption>Finite difference Dx</figcaption></figure>
-        <figure><img src="./media/fdy_two.png" onclick="openLightbox(this.src)"><figcaption>Finite difference Dy</figcaption></figure>
-      </div>
-      <p><em>Runtime: the four loop convolution was much slower, taking 1 minute and 4 seconds to run, compared to the 2 loop convolution only taking 10 seconds. These were both much slower than the built in method, convolve2d, which took 0.3 seconds</em></p>
-        <p><em>Boundaries: boundaries are handled with zero padding in my implementation, and optional, changeable padding in the scipy version.</em></p>
-    </section>
+            <div class="grid cols-4">
+              <figure><img class="zoom" src="./media/Me.jpg" alt="Grayscale self-portrait" loading="lazy"><figcaption>Original image (grayscale self-portrait)</figcaption></figure>
+              <figure><img class="zoom" src="./media/res_four.png" alt="9 by 9 box filter result" loading="lazy"><figcaption>9×9 box filter result</figcaption></figure>
+              <figure><img class="zoom" src="./media/fdx_two.png" alt="Finite difference in x" loading="lazy"><figcaption>Finite difference Dx</figcaption></figure>
+              <figure><img class="zoom" src="./media/fdy_two.png" alt="Finite difference in y" loading="lazy"><figcaption>Finite difference Dy</figcaption></figure>
+            </div>
+            <p class="note">Runtime: the four-loop convolution was much slower, taking 1 minute and 4 seconds, compared to 10 seconds for the two-loop version. Both were far slower than the built-in <code>convolve2d</code>, which took 0.3 seconds.</p>
+            <p class="note">Boundaries are handled with zero padding in my implementation, and with optional, changeable padding in the SciPy version.</p>
+          </section>
 
-    <!-- Part 1.2 -->
-    <section class="card">
-      <h2>Part 1.2 — Derivatives & Edges</h2>
-      <p>Finite difference filters are applied to the Cameraman image to extract partial derivatives. I found that the best threshold was 0.32. When I went to high above this, I would lose out on the thickness of the edges. 
-        When i went below this, I would get more noise. The value 0.32 allowed me to get most of the cameraman's edges while only getting a little bit of the background included</p>
-      <div class="grid five">
-        <figure><img src="./media/cameraman.png" onclick="openLightbox(this.src)"><figcaption>Original Cameraman</figcaption></figure>
-        <figure><img src="./media/cameraman_gx.png" onclick="openLightbox(this.src)"><figcaption>Partial derivative Dx</figcaption></figure>
-        <figure><img src="./media/cameraman_gy.png" onclick="openLightbox(this.src)"><figcaption>Partial derivative Dy</figcaption></figure>
-        <figure><img src="./media/cameraman_gradmag.png" onclick="openLightbox(this.src)"><figcaption>Gradient magnitude</figcaption></figure>
-        <figure><img src="./media/cameraman_edges.png" onclick="openLightbox(this.src)"><figcaption>Binarized edge map</figcaption></figure>
-      </div>
-    </section>
+          <section id="part12">
+            <h2>Part 1.2. Derivatives and edges</h2>
+            <p>Finite difference filters are applied to the cameraman image to extract partial derivatives. I found that the best threshold was 0.32. Going much higher lost the thickness of the edges; going lower brought in more noise. A value of 0.32 captured most of the cameraman's edges while including only a little of the background.</p>
+            <div class="grid cols-5">
+              <figure><img class="zoom" src="./media/cameraman.png" alt="Original cameraman" loading="lazy"><figcaption>Original cameraman</figcaption></figure>
+              <figure><img class="zoom" src="./media/cameraman_gx.png" alt="Partial derivative in x" loading="lazy"><figcaption>Partial derivative Dx</figcaption></figure>
+              <figure><img class="zoom" src="./media/cameraman_gy.png" alt="Partial derivative in y" loading="lazy"><figcaption>Partial derivative Dy</figcaption></figure>
+              <figure><img class="zoom" src="./media/cameraman_gradmag.png" alt="Gradient magnitude" loading="lazy"><figcaption>Gradient magnitude</figcaption></figure>
+              <figure><img class="zoom" src="./media/cameraman_edges.png" alt="Binarized edge map" loading="lazy"><figcaption>Binarized edge map</figcaption></figure>
+            </div>
+          </section>
 
-    <!-- Part 1.3 -->
-    <section class="card">
-      <h2>Part 1.3 — Gaussian & DoG</h2>
-      <p>Gaussian smoothing reduces noise before edge detection. Derivative of Gaussian (DoG) filters combine smoothing and differentiation into one operation, producing cleaner results compared to plain finite difference.</p>
-      <div class="grid four">
-        <figure><img src="./media/DoGx.png" onclick="openLightbox(this.src)"><figcaption>DoG filter (x-direction)</figcaption></figure>
-        <figure><img src="./media/DoGy.png" onclick="openLightbox(this.src)"><figcaption>DoG filter (y-direction)</figcaption></figure>
-        <figure><img src="./media/cam_gradmag_blur.png" onclick="openLightbox(this.src)"><figcaption>Edges via blur first</figcaption></figure>
-        <figure><img src="./media/cam_gradmag_dog.png" onclick="openLightbox(this.src)"><figcaption>Edges via DoG</figcaption></figure>
-      </div>
-      <p><em>Observation: DoG/blurred edges are thicker, smoother, and less noisy compared to plain finite difference. The background edges are more easily picked up. I am overall able to get a cleaner, nicer edge image through the DoG/blurred image as opposed to the finite difference image.</em></p>
-      <p><em>Verification: Both Edge images are the same as found by computing their difference in the code and finding that it is negligible.</em></p>
-    </section>
+          <section id="part13">
+            <h2>Part 1.3. Gaussian and derivative of Gaussian</h2>
+            <p>Gaussian smoothing reduces noise before edge detection. Derivative of Gaussian (DoG) filters combine smoothing and differentiation into one operation, producing cleaner results than a plain finite difference.</p>
+            <div class="grid cols-4">
+              <figure><img class="zoom" src="./media/DoGx.png" alt="DoG filter in x" loading="lazy"><figcaption>DoG filter (x direction)</figcaption></figure>
+              <figure><img class="zoom" src="./media/DoGy.png" alt="DoG filter in y" loading="lazy"><figcaption>DoG filter (y direction)</figcaption></figure>
+              <figure><img class="zoom" src="./media/cam_gradmag_blur.png" alt="Edges after blurring first" loading="lazy"><figcaption>Edges via blur first</figcaption></figure>
+              <figure><img class="zoom" src="./media/cam_gradmag_dog.png" alt="Edges via DoG" loading="lazy"><figcaption>Edges via DoG</figcaption></figure>
+            </div>
+            <p class="note">Observation: DoG and blurred edges are thicker, smoother, and less noisy than the plain finite difference. Background edges are picked up more easily. Overall I get a cleaner edge image through the DoG or blurred approach than through the finite difference alone.</p>
+            <p class="note">Verification: both edge images are the same, as confirmed by computing their difference in code and finding it negligible.</p>
+          </section>
 
-    <!-- Part 2.1 -->
-    <section class="card" id="part2">
-      <h2>Part 2.1 — Unsharp Mask</h2>
-      <p>Unsharp masking works by first creating a blurred version of the original image to capture its low-frequency content, subtracting this blurred version from the original to isolate the high-frequency details such as edges and fine textures, 
-        and then adding these extracted high frequencies back to the original image, often scaled by a chosen factor, to produce a result that appears sharper and more defined to the human eye.</p>
-      <div class="grid four">
-        <figure><img src="./media/taj.jpg" onclick="openLightbox(this.src)"><figcaption>Original Taj Mahal</figcaption></figure>
-        <figure><img src="./media/blurred_taj.jpg" onclick="openLightbox(this.src)"><figcaption>Blurred Taj</figcaption></figure>
-        <figure><img src="./media/high_taj.jpg" onclick="openLightbox(this.src)"><figcaption>High frequencies</figcaption></figure>
-        <figure><img src="./media/sharp_taj.jpg" onclick="openLightbox(this.src)"><figcaption>Sharpened Taj</figcaption></figure>
-      </div>
-      <div class="grid four">
-        <figure><img src="./media/taj.jpg" onclick="openLightbox(this.src)"><figcaption>Original Taj Mahal</figcaption></figure>
-        <figure><img src="./media/blurred_taj_stronger.jpg" onclick="openLightbox(this.src)"><figcaption>Blurred Taj with more sharpening</figcaption></figure>
-        <figure><img src="./media/high_taj_stronger.jpg" onclick="openLightbox(this.src)"><figcaption>High frequencies with more sharpening</figcaption></figure>
-        <figure><img src="./media/sharp_taj_stronger.jpg" onclick="openLightbox(this.src)"><figcaption>Sharpened Taj with more sharpening</figcaption></figure>
-      </div>
-      <div class="grid four">
-        <figure><img src="./media/dog.jpg" onclick="openLightbox(this.src)"><figcaption>Original Dog</figcaption></figure>
-        <figure><img src="./media/blurred_dog.jpg" onclick="openLightbox(this.src)"><figcaption>Blurred Dog</figcaption></figure>
-        <figure><img src="./media/high_dog.jpg" onclick="openLightbox(this.src)"><figcaption>High frequencies</figcaption></figure>
-        <figure><img src="./media/sharp_dog.jpg" onclick="openLightbox(this.src)"><figcaption>Sharpened Dog</figcaption></figure>
-      </div>
-      <div class="grid four">
-        <figure><img src="./media/pre_sharp_cat.jpeg" onclick="openLightbox(this.src)"><figcaption>Original Cat</figcaption></figure>
-        <figure><img src="./media/blurred_cat.jpeg" onclick="openLightbox(this.src)"><figcaption>Blurred Cat</figcaption></figure>
-        <figure><img src="./media/high_blurred_catresharpened.jpeg" onclick="openLightbox(this.src)"><figcaption>High frequencies</figcaption></figure>
-        <figure><img src="./media/sharp_blurred_catresharpened.jpeg" onclick="openLightbox(this.src)"><figcaption>Resharpened Cat</figcaption></figure>
-      </div>
-      <p><em>Observation: Sharpening improves details but can amplify noise if over-applied. Also makes the images more vibrant</em></p>
-      <p><em>Key Point to notice: more sharpening on the taj mahal not only makes the image sharper, but also more vibrant/saturated</em></p>
-    </section>
+          <section id="part21">
+            <h2>Part 2.1. Unsharp mask</h2>
+            <p>Unsharp masking first creates a blurred version of the original image to capture its low-frequency content, subtracts this blurred version from the original to isolate high-frequency details such as edges and fine textures, and then adds these high frequencies back to the original, scaled by a chosen factor, to produce a result that appears sharper and more defined.</p>
+            <div class="grid cols-4">
+              <figure><img class="zoom" src="./media/taj.jpg" alt="Original Taj Mahal" loading="lazy"><figcaption>Original Taj Mahal</figcaption></figure>
+              <figure><img class="zoom" src="./media/blurred_taj.jpg" alt="Blurred Taj Mahal" loading="lazy"><figcaption>Blurred Taj</figcaption></figure>
+              <figure><img class="zoom" src="./media/high_taj.jpg" alt="High frequencies of the Taj Mahal" loading="lazy"><figcaption>High frequencies</figcaption></figure>
+              <figure><img class="zoom" src="./media/sharp_taj.jpg" alt="Sharpened Taj Mahal" loading="lazy"><figcaption>Sharpened Taj</figcaption></figure>
+            </div>
+            <div class="grid cols-4">
+              <figure><img class="zoom" src="./media/taj.jpg" alt="Original Taj Mahal" loading="lazy"><figcaption>Original Taj Mahal</figcaption></figure>
+              <figure><img class="zoom" src="./media/blurred_taj_stronger.jpg" alt="Blurred Taj Mahal, stronger" loading="lazy"><figcaption>Blurred Taj with more sharpening</figcaption></figure>
+              <figure><img class="zoom" src="./media/high_taj_stronger.jpg" alt="High frequencies, stronger" loading="lazy"><figcaption>High frequencies with more sharpening</figcaption></figure>
+              <figure><img class="zoom" src="./media/sharp_taj_stronger.jpg" alt="Sharpened Taj Mahal, stronger" loading="lazy"><figcaption>Sharpened Taj with more sharpening</figcaption></figure>
+            </div>
+            <div class="grid cols-4">
+              <figure><img class="zoom" src="./media/dog.jpg" alt="Original dog" loading="lazy"><figcaption>Original dog</figcaption></figure>
+              <figure><img class="zoom" src="./media/blurred_dog.jpg" alt="Blurred dog" loading="lazy"><figcaption>Blurred dog</figcaption></figure>
+              <figure><img class="zoom" src="./media/high_dog.jpg" alt="High frequencies of the dog" loading="lazy"><figcaption>High frequencies</figcaption></figure>
+              <figure><img class="zoom" src="./media/sharp_dog.jpg" alt="Sharpened dog" loading="lazy"><figcaption>Sharpened dog</figcaption></figure>
+            </div>
+            <div class="grid cols-4">
+              <figure><img class="zoom" src="./media/pre_sharp_cat.jpeg" alt="Original cat" loading="lazy"><figcaption>Original cat</figcaption></figure>
+              <figure><img class="zoom" src="./media/blurred_cat.jpeg" alt="Blurred cat" loading="lazy"><figcaption>Blurred cat</figcaption></figure>
+              <figure><img class="zoom" src="./media/high_blurred_catresharpened.jpeg" alt="High frequencies of the cat" loading="lazy"><figcaption>High frequencies</figcaption></figure>
+              <figure><img class="zoom" src="./media/sharp_blurred_catresharpened.jpeg" alt="Resharpened cat" loading="lazy"><figcaption>Resharpened cat</figcaption></figure>
+            </div>
+            <p class="note">Observation: sharpening improves detail but can amplify noise if over-applied. It also makes the images more vibrant.</p>
+            <p class="note">Key point: more sharpening on the Taj Mahal makes the image not only sharper but also more vibrant and saturated.</p>
+          </section>
 
-    <!-- Part 2.2 -->
-    <section class="card" id="hybrids">
-      <h2>Part 2.2 — Hybrid Images</h2>
-      <p>Hybrid images mix low frequencies from one source and high frequencies from another. The perception changes depending on viewing distance. To see the effect best: click on the hybrid image of your choice, then look at it from very close, and then look at it from very far. You should see two different images.</p>
-      <div class="grid three">
-        <figure><img src="./media/DerekPicture.jpg" onclick="openLightbox(this.src)"><figcaption>Derek </figcaption></figure>
-        <figure><img src="./media/nutmeg.jpg" onclick="openLightbox(this.src)"><figcaption>Nutmeg</figcaption></figure>
-        <figure><img src="./media/hybrid_Derek.jpg" onclick="openLightbox(this.src)"><figcaption>Derek + Nutmeg. Dutmeg, if you will.</figcaption></figure>
-      </div>
-      <div class="grid three">
-        <figure><img src="./media/Bron.jpg" onclick="openLightbox(this.src)"><figcaption>LeBron</figcaption></figure>
-        <figure><img src="./media/Denero.jpg" onclick="openLightbox(this.src)"><figcaption>Denero</figcaption></figure>
-        <figure><img src="./media/hybrid_DeneroBron.jpg" onclick="openLightbox(this.src)"><figcaption>LeBron + Denero. Respective G.O.A.T.s</figcaption></figure>
-      </div>
-      <div class="grid three">
-        <figure><img src="./media/gihun_happy.webp" onclick="openLightbox(this.src)"><figcaption>Gi-hun Happy</figcaption></figure>
-        <figure><img src="./media/gihun_mad.webp" onclick="openLightbox(this.src)"><figcaption>Gi-hun Mad</figcaption></figure>
-        <figure><img src="./media/hybrid_Gihun.jpg" onclick="openLightbox(this.src)"><figcaption>Gi-hun Expressions</figcaption></figure>
-      </div>
-      <div class="grid three">
-        <figure><img src="./media/Monkey.jpg" onclick="openLightbox(this.src)"><figcaption>Monkey Image 1</figcaption></figure>
-        <figure><img src="./media/monkey2.jpg" onclick="openLightbox(this.src)"><figcaption>Monkey Image 2</figcaption></figure>
-        <figure><img src="./media/hybrid_Monkey.jpg" onclick="openLightbox(this.src)"><figcaption>Monkey Blend</figcaption></figure>
-      </div>
-      <div>
-        <figure><img src="./media/expanded.jpg" onclick="openLightbox(this.src)"><figcaption>Fourier Analysis of Hybrid Monkey</figcaption></figure>
-      </div>
-      <p><em>Observation: At close distance, high-frequency details dominate. At far distance, low-frequency structures dominate.</em></p>
-    </section>
+          <section id="hybrids">
+            <h2>Part 2.2. Hybrid images</h2>
+            <p>Hybrid images mix low frequencies from one source and high frequencies from another. The perception changes depending on viewing distance. To see the effect best, click on a hybrid image, look at it from very close, then look at it from very far. You should see two different images.</p>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/DerekPicture.jpg" alt="Derek" loading="lazy"><figcaption>Derek</figcaption></figure>
+              <figure><img class="zoom" src="./media/nutmeg.jpg" alt="Nutmeg the cat" loading="lazy"><figcaption>Nutmeg</figcaption></figure>
+              <figure><img class="zoom" src="./media/hybrid_Derek.jpg" alt="Hybrid of Derek and Nutmeg" loading="lazy"><figcaption>Derek + Nutmeg. Dutmeg, if you will.</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/Bron.jpg" alt="LeBron James" loading="lazy"><figcaption>LeBron</figcaption></figure>
+              <figure><img class="zoom" src="./media/Denero.jpg" alt="John DeNero" loading="lazy"><figcaption>DeNero</figcaption></figure>
+              <figure><img class="zoom" src="./media/hybrid_DeneroBron.jpg" alt="Hybrid of LeBron and DeNero" loading="lazy"><figcaption>LeBron + DeNero. Respective G.O.A.T.s.</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/gihun_happy.webp" alt="Gi-hun, happy" loading="lazy"><figcaption>Gi-hun, happy</figcaption></figure>
+              <figure><img class="zoom" src="./media/gihun_mad.webp" alt="Gi-hun, mad" loading="lazy"><figcaption>Gi-hun, mad</figcaption></figure>
+              <figure><img class="zoom" src="./media/hybrid_Gihun.jpg" alt="Hybrid of the two Gi-hun expressions" loading="lazy"><figcaption>Gi-hun expressions</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/Monkey.jpg" alt="Monkey image 1" loading="lazy"><figcaption>Monkey image 1</figcaption></figure>
+              <figure><img class="zoom" src="./media/monkey2.jpg" alt="Monkey image 2" loading="lazy"><figcaption>Monkey image 2</figcaption></figure>
+              <figure><img class="zoom" src="./media/hybrid_Monkey.jpg" alt="Monkey hybrid" loading="lazy"><figcaption>Monkey blend</figcaption></figure>
+            </div>
+            <figure class="single medium"><img class="zoom" src="./media/expanded.jpg" alt="Fourier analysis of the monkey hybrid" loading="lazy"><figcaption>Fourier analysis of the hybrid monkey</figcaption></figure>
+            <p class="note">Observation: at close distance, high-frequency details dominate. At far distance, low-frequency structures dominate.</p>
+          </section>
 
-    <!-- Part 2.3 -->
-    <section class="card" id="blending">
-      <h2>Part 2.3 & 2.4 — Multi-resolution Blending</h2>
-      <p>Gaussian and Laplacian stacks allow smooth blending, avoiding harsh seams. Here I recreate the classic “Oraple” and experiment with custom blends.</p>
+          <section id="blending">
+            <h2>Parts 2.3 and 2.4. Multi-resolution blending</h2>
+            <p>Gaussian and Laplacian stacks allow smooth blending and avoid harsh seams. Here I recreate the classic oraple and experiment with custom blends.</p>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/apple.jpeg" alt="Apple source" loading="lazy"><figcaption>Apple source</figcaption></figure>
+              <figure><img class="zoom" src="./media/orange.jpeg" alt="Orange source" loading="lazy"><figcaption>Orange source</figcaption></figure>
+              <figure><img class="zoom" src="./media/oraple.png" alt="Oraple blend" loading="lazy"><figcaption>Oraple</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/apple_stack.png" alt="Apple Laplacian stack" loading="lazy"><figcaption>Apple stack</figcaption></figure>
+              <figure><img class="zoom" src="./media/orange_stack.png" alt="Orange Laplacian stack" loading="lazy"><figcaption>Orange stack</figcaption></figure>
+              <figure><img class="zoom" src="./media/fig234.png" alt="Reference figure 3.42" loading="lazy"><figcaption>Reference Fig. 3.42</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/golf_img.jpg" alt="Golf ball" loading="lazy"><figcaption>Golf image</figcaption></figure>
+              <figure><img class="zoom" src="./media/face.jpg" alt="Face" loading="lazy"><figcaption>Face image</figcaption></figure>
+              <figure><img class="zoom" src="./media/golface.png" alt="Golf ball and face blend" loading="lazy"><figcaption>Golf + face blend. Golface.</figcaption></figure>
+            </div>
+            <div class="grid cols-3">
+              <figure><img class="zoom" src="./media/weeknd.jpg" alt="The Weeknd" loading="lazy"><figcaption>Weeknd source</figcaption></figure>
+              <figure><img class="zoom" src="./media/drake2.jpg" alt="Drake" loading="lazy"><figcaption>Drake source</figcaption></figure>
+              <figure><img class="zoom" src="./media/dreekend.png" alt="Blend of Drake and the Weeknd" loading="lazy"><figcaption>The Dreekend</figcaption></figure>
+            </div>
+            <figure class="single medium"><img class="zoom" src="./media/dreekend_process.png" alt="Laplacian stack visualization for the Dreekend blend" loading="lazy"><figcaption>Laplacian stack visualization for the Dreekend</figcaption></figure>
+            <p class="note">Observation: the golface image uses a circular mask. Notice that it is more than transparency on the face pasted over the golf ball: the ball blends into the face, and parts of the golf ball's divots fade away as the face becomes more prominent. The face is rather light, which was my attempt to match the shades. I would assume that implementing color matching would make the blend much prettier.</p>
+            <p class="note">Observation: The Weeknd and Drake both make music that is enjoyable together. Their faces are not enjoyable together. The way their mouths, hairlines, noses, and forehead wrinkles line up makes the image rather eerie. Notice that the sharp line above Drake is not a seam but a remnant of the background he stands in front of.</p>
+          </section>
 
-      <div class="grid three">
-        <figure><img src="./media/apple.jpeg" onclick="openLightbox(this.src)"><figcaption>Apple source</figcaption></figure>
-        <figure><img src="./media/orange.jpeg" onclick="openLightbox(this.src)"><figcaption>Orange source</figcaption></figure>
-        <figure><img src="./media/oraple.png" onclick="openLightbox(this.src)"><figcaption>Oraple</figcaption></figure>
-      </div>
+          <section id="conclusion">
+            <h2>Conclusion</h2>
+            <p>This project explored convolution, edge detection, Gaussian and DoG filtering, unsharp masking, hybrid images, and multi-resolution blending. Along the way I learned how different frequency components contribute to visual perception and how computational photography techniques can be combined to produce compelling and sometimes surprising results.</p>
+            <p>Thanks for checking out my project. I appreciate you taking the time to explore my work and I hope you found the results as fun and fascinating as I did while building them.</p>
+          </section>
 
-      <div class="grid three">
-        <figure><img src="./media/apple_stack.png" onclick="openLightbox(this.src)"><figcaption>Apple stack</figcaption></figure>
-        <figure><img src="./media/orange_stack.png" onclick="openLightbox(this.src)"><figcaption>Orange stack</figcaption></figure>
-        <figure><img src="./media/fig234.png" onclick="openLightbox(this.src)"><figcaption>Reference Fig. 3.42</figcaption></figure>
-      </div>
-
-      <div class="grid three">
-        <figure><img src="./media/golf_img.jpg" onclick="openLightbox(this.src)"><figcaption>Golf image</figcaption></figure>
-        <figure><img src="./media/face.jpg" onclick="openLightbox(this.src)"><figcaption>Face image</figcaption></figure>
-        <figure><img src="./media/golface.png" onclick="openLightbox(this.src)"><figcaption>Golf + Face blend. Golface</figcaption></figure>
-      </div>
-
-      <div class="grid three">
-        <figure><img src="./media/weeknd.jpg" onclick="openLightbox(this.src)"><figcaption>Weeknd source</figcaption></figure>
-        <figure><img src="./media/drake2.jpg" onclick="openLightbox(this.src)"><figcaption>Drake source</figcaption></figure>
-        <figure><img src="./media/dreekend.png" onclick="openLightbox(this.src)"><figcaption>The Dreekend</figcaption></figure>
-      </div>
-
-      <div>
-        <figure><img src="./media/dreekend_process.png" onclick="openLightbox(this.src)"><figcaption>Laplacian stack visualization for “Dreekend”</figcaption></figure>
+        </div>
       </div>
 
-      <p><em>Observation: The golface image has a circular mask. Notice that it is more than just transparency on the face and pasting that over the golf ball, the ball blends into the face, and you can see parts of the golf ball divots fade away as the face becomes more prominent. The face is rather light, which was my attempt to match the shades. 
-      I would assume that implementing color matching would make the blend much prettier.</em></p>
-      <p><em>Observation: The Weeknd and Drake both make music that is enjoyable together. Their faces are not enjoyable together. The way that their mouths, hairlines, noses, and forehead wrinkles line up make the image rather eery. Notice that the sharp line above drake is not a seam, but a remant of the background he stands in front of.</em></p>
-    </section>
-
-
-        <!-- Conclusion -->
-    <section class="card" id="conclusion">
-      <h2>Conclusion</h2>
-      <p>
-        This project explored convolution, edge detection, Gaussian and DoG filtering, 
-        unsharp masking, hybrid images, and multi-resolution blending. Along the way, 
-        I learned how different frequency components contribute to visual perception 
-        and how computational photography techniques can be combined to produce 
-        compelling and sometimes surprising results. 
-      </p>
-      <p>
-        <strong>🍎 + 🍊 Thanks for checking out my project!</strong>  
-        I appreciate you taking the time to explore my work and I hope you found the 
-        results as fun and fascinating as I did while building them! -Kourosh Salahi
-      </p>
-    </section>
-
+      <footer class="foot">
+        <span>Prepared for CS 180 Project 2 by Kourosh Salahi.</span>
+        <span><a href="../#projects">All projects</a></span>
+      </footer>
+    </div>
   </main>
-
-  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="">
-  </div>
-
-  <script>
-    function openLightbox(src) {
-      document.getElementById('lightbox-img').src = src;
-      document.getElementById('lightbox').style.display = 'flex';
-    }
-    function closeLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
-    }
-  </script>
+</div>
+<script src="../assets/js/site.js"></script>
 </body>
 </html>
