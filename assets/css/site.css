@@ -648,3 +648,7 @@ th { font-family: var(--font-mono); font-size: var(--fs-0); text-transform: uppe
 
 /* Project cards reuse the class name "body"; undo the article heading spacing there */
 .card .body h3 { margin: 0; padding: 0; border: 0; }
+
+/* Product shots on a white background: show the whole bottle instead of cropping */
+.bottle .photo.product { background: #fff; aspect-ratio: 1; }
+.bottle .photo.product img { object-fit: contain; padding: 8%; }

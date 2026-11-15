@@ -44,87 +44,123 @@
 
       <header class="article-head">
         <h1>Fragrances</h1>
-        <p class="lede">What is on my shelf, what I think of each bottle, and a little on how they are put together. I like reading the note pyramids on Fragrantica, working out why a composition does what it does, and occasionally mixing something of my own.</p>
-        <div class="meta"><span><b>Bottles</b> 3 listed so far</span><span><b>Rating</b> Five-segment bar, my own scale</span></div>
+        <p class="lede">What is on my shelf and when I wear each bottle. I am a big fan of <a href="https://www.fragrantica.com/" target="_blank" rel="noopener">Fragrantica</a>: I like reading the note pyramids there and working out why a composition smells the way it does. Some of these are daytime scents, some only come out at night, and most of them belong to a particular season.</p>
+        <div class="meta"><span><b>Bottles</b> 7</span><span><b>Cold weather</b> Gentleman R&eacute;serve Priv&eacute;e, Spicebomb Extreme</span><span><b>Warm weather</b> MYSLF, Aventus Cologne, Le Beau Le Parfum</span><span><b>Any time</b> Y</span></div>
       </header>
 
       <!--
-        HOW TO ADD A FRAGRANCE
-        1. Drop a photo in hobbies/fragrances/media/ (a 4:5 portrait crop looks best, ~1200px tall).
-        2. Copy one <article class="bottle"> block below and fill it in.
-        3. For the rating, mark 0 to 5 of the <i> bars with class="on".
-        4. Delete the placeholder SVG and uncomment the <img> line once you have a photo.
-        5. Update the "Bottles" count in the header when you remember to.
+        HOW TO ADD OR CHANGE A FRAGRANCE
+        New bottle: copy one <article class="bottle"> block, fill it in, and put its photo in hobbies/fragrances/media/.
+        To use your own photo of a bottle, replace the file of the same name in media/. For a photo that is not on a
+        white background, change class="photo product" to class="photo" so it fills the frame.
+        The bottle images are product shots taken from Parfumo's listings and belong to the brands.
+        The note lists are a draft from retailer and brand listings. Check them against Fragrantica.
       -->
 
       <div class="shelf">
 
         <article class="bottle">
-          <div class="photo">
-            <!-- <img src="media/bottle-1.jpg" alt="Bottle of FRAGRANCE NAME" loading="lazy" class="zoom"> -->
-            <svg viewBox="0 0 56 72" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M22 6h12v8H22zM24 14v6c-7 3-12 10-12 18v22a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4V38c0-8-5-15-12-18v-6"/><path d="M20 46h16" stroke-linecap="round"/></svg>
+          <div class="photo product">
+            <img src="media/diptyque-34.jpg" alt="Bottle of Diptyque 34 Boulevard Saint Germain" loading="lazy" class="zoom" width="720" height="720">
           </div>
           <div class="info">
-            <div class="top">
-              <div>
-                <div class="house">House</div>
-                <h3>Fragrance name</h3>
-              </div>
-              <div class="rating" aria-label="4 out of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
-            </div>
-            <div class="notes"><b>Top</b> bergamot, pink pepper. <b>Heart</b> iris, violet leaf. <b>Base</b> vetiver, ambroxan.</div>
-            <p class="take">Two or three sentences on how it wears: what it smells like on skin versus paper, how long it lasts, when you reach for it, and whether it earned its place on the shelf.</p>
-            <div class="facts"><span><b>Season</b> spring, fall</span><span><b>Longevity</b> 6 to 8 hours</span><span><b>Bought</b> 2025</span></div>
+            <div class="house">Diptyque</div>
+            <h3>34 Boulevard Saint Germain</h3>
+            <div class="facts"><span>Eau de Parfum</span></div>
+            <div class="notes"><b>Top</b> blackcurrant leaf, pink pepper, citrus. <b>Heart</b> rose, cinnamon, clove. <b>Base</b> amber and patchouli accord, sandalwood, vanilla.</div>
+            <p class="take">Meant to smell like the inside of Diptyque's original shop: green and a little spicy on top, then rose and warm woods. It is the most unusual bottle I own and the one that is hardest to pin to a single note. I reach for it in the daytime when the weather is mild.</p>
+            <div class="facts"><span><b>Wear</b> Day</span><span><b>Season</b> Spring, fall</span></div>
           </div>
         </article>
 
         <article class="bottle">
-          <div class="photo">
-            <svg viewBox="0 0 56 72" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M22 6h12v8H22zM24 14v6c-7 3-12 10-12 18v22a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4V38c0-8-5-15-12-18v-6"/><path d="M20 46h16" stroke-linecap="round"/></svg>
+          <div class="photo product">
+            <img src="media/gentleman-reserve-privee.jpg" alt="Bottle of Givenchy Gentleman R&eacute;serve Priv&eacute;e" loading="lazy" class="zoom" width="720" height="720">
           </div>
           <div class="info">
-            <div class="top">
-              <div>
-                <div class="house">House</div>
-                <h3>Fragrance name</h3>
-              </div>
-              <div class="rating" aria-label="5 out of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
-            </div>
-            <div class="notes"><b>Top</b> cardamom, lemon. <b>Heart</b> lavender, geranium. <b>Base</b> tonka, sandalwood.</div>
-            <p class="take">Your take goes here. A good test: would a friend know whether to buy it after reading this?</p>
-            <div class="facts"><span><b>Season</b> winter</span><span><b>Longevity</b> all day</span><span><b>Bought</b> 2024</span></div>
+            <div class="house">Givenchy</div>
+            <h3>Gentleman R&eacute;serve Priv&eacute;e</h3>
+            <div class="facts"><span>Eau de Parfum</span></div>
+            <div class="notes"><b>Top</b> bergamot. <b>Heart</b> whisky accord, chestnut, iris. <b>Base</b> benzoin, cedar, vetiver, amber.</div>
+            <p class="take">A boozy, nutty scent built around a whisky accord, with iris keeping it smooth instead of syrupy. Warm and a little dressed up, so it works best on cold evenings.</p>
+            <div class="facts"><span><b>Wear</b> Night</span><span><b>Season</b> Fall, winter</span></div>
           </div>
         </article>
 
         <article class="bottle">
-          <div class="photo">
-            <svg viewBox="0 0 56 72" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M22 6h12v8H22zM24 14v6c-7 3-12 10-12 18v22a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4V38c0-8-5-15-12-18v-6"/><path d="M20 46h16" stroke-linecap="round"/></svg>
+          <div class="photo product">
+            <img src="media/ysl-y.jpg" alt="Bottle of Yves Saint Laurent Y" loading="lazy" class="zoom" width="720" height="720">
           </div>
           <div class="info">
-            <div class="top">
-              <div>
-                <div class="house">House</div>
-                <h3>Fragrance name</h3>
-              </div>
-              <div class="rating" aria-label="3 out of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
-            </div>
-            <div class="notes"><b>Top</b> grapefruit. <b>Heart</b> sea notes, rosemary. <b>Base</b> musk, patchouli.</div>
-            <p class="take">Your take goes here.</p>
-            <div class="facts"><span><b>Season</b> summer</span><span><b>Longevity</b> 4 hours</span><span><b>Bought</b> 2023</span></div>
+            <div class="house">Yves Saint Laurent</div>
+            <h3>Y</h3>
+            <div class="facts"><span>Eau de Parfum</span></div>
+            <div class="notes"><b>Top</b> apple, ginger, bergamot. <b>Heart</b> sage, geranium, juniper. <b>Base</b> tonka bean, amberwood, cedar, olibanum.</div>
+            <p class="take">A fresh, clean opening that settles into something sweeter and woodier. It is the safest pick on the shelf: it fits the office, a night out, and any season.</p>
+            <div class="facts"><span><b>Wear</b> Day or night</span><span><b>Season</b> All year</span></div>
+          </div>
+        </article>
+
+        <article class="bottle">
+          <div class="photo product">
+            <img src="media/ysl-myslf.jpg" alt="Bottle of Yves Saint Laurent MYSLF" loading="lazy" class="zoom" width="720" height="720">
+          </div>
+          <div class="info">
+            <div class="house">Yves Saint Laurent</div>
+            <h3>MYSLF</h3>
+            <div class="facts"><span>Eau de Parfum</span></div>
+            <div class="notes"><b>Top</b> Calabrian bergamot, bergamot leaf. <b>Heart</b> Tunisian orange blossom. <b>Base</b> Ambrofix, patchouli, woods.</div>
+            <p class="take">Orange blossom over a clean, slightly musky wood base. Bright and soapy in a good way, and it stays close to the same smell from start to finish. Best in warm weather during the day.</p>
+            <div class="facts"><span><b>Wear</b> Day</span><span><b>Season</b> Spring, summer</span></div>
+          </div>
+        </article>
+
+        <article class="bottle">
+          <div class="photo product">
+            <img src="media/aventus-cologne.jpg" alt="Bottle of Creed Aventus Cologne" loading="lazy" class="zoom" width="720" height="720">
+          </div>
+          <div class="info">
+            <div class="house">Creed</div>
+            <h3>Aventus Cologne</h3>
+            <div class="facts"><span>Eau de Parfum, despite the name</span></div>
+            <div class="notes"><b>Top</b> mandarin, ginger, pink pepper. <b>Heart</b> patchouli, vetiver, sandalwood. <b>Base</b> musk, birch, tonka bean, styrax.</div>
+            <p class="take">A lighter, more citrus-driven relative of the original Aventus. The ginger and mandarin make it sharp and fresh up top, with a quiet smoky wood underneath. This is my hot-weather daytime choice.</p>
+            <div class="facts"><span><b>Wear</b> Day</span><span><b>Season</b> Summer</span></div>
+          </div>
+        </article>
+
+        <article class="bottle">
+          <div class="photo product">
+            <img src="media/spicebomb-extreme.jpg" alt="Bottle of Viktor&amp;Rolf Spicebomb Extreme" loading="lazy" class="zoom" width="720" height="720">
+          </div>
+          <div class="info">
+            <div class="house">Viktor&amp;Rolf</div>
+            <h3>Spicebomb Extreme</h3>
+            <div class="facts"><span>Eau de Parfum</span></div>
+            <div class="notes"><b>Top</b> grapefruit, black pepper, pimento. <b>Heart</b> cinnamon, cumin, saffron. <b>Base</b> tobacco, vanilla, amber.</div>
+            <p class="take">Tobacco and vanilla with a lot of warm spice. It is the heaviest and longest-lasting bottle I have, and it only really makes sense when it is cold out. Strictly a winter night scent.</p>
+            <div class="facts"><span><b>Wear</b> Night</span><span><b>Season</b> Winter</span></div>
+          </div>
+        </article>
+
+        <article class="bottle">
+          <div class="photo product">
+            <img src="media/jpg-le-beau.jpg" alt="Bottle of Jean Paul Gaultier Le Beau Le Parfum" loading="lazy" class="zoom" width="720" height="720">
+          </div>
+          <div class="info">
+            <div class="house">Jean Paul Gaultier</div>
+            <h3>Le Beau Le Parfum</h3>
+            <div class="facts"><span>Eau de Parfum Intense</span></div>
+            <div class="notes"><b>Top</b> pineapple, iris, cypress, ginger. <b>Heart</b> coconut, woody notes. <b>Base</b> tonka bean, sandalwood, amber, ambergris.</div>
+            <p class="take">Coconut and tonka bean again, but deeper and creamier than the original Le Beau, with pineapple on top and sandalwood and amber underneath. Sweet and tropical without being light, which makes it a good fit for warm summer nights.</p>
+            <div class="facts"><span><b>Wear</b> Night</span><span><b>Season</b> Summer</span></div>
           </div>
         </article>
 
       </div>
 
-      <section class="section" id="mixing" style="padding-top:56px">
-        <div class="section-head">
-          <h2>Mixing notes</h2>
-        </div>
-        <p class="section-intro">A place for things I have learned about scent chemistry and the blends I have tried. Replace this paragraph with your own notes, or delete the section until there is something to say.</p>
-      </section>
-
       <footer class="foot">
-        <span>Opinions are my own and change with the weather.</span>
+        <span>Opinions are my own and change with the weather. Bottle images belong to their brands.</span>
         <span><a href="../../">Home</a></span>
       </footer>
     </div>
